@@ -1,5 +1,5 @@
 # .gitignore
 
-Token/.env
+Token/dev_bot.env
 test.py
 twitch_api_call.py
