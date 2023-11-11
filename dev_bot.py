@@ -1604,7 +1604,6 @@ async def twitch_loop():
          print(response)
 
      await asyncio.sleep(10)
-     print("Test")
     
 
 
