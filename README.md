@@ -23,10 +23,9 @@ List some key features or functionalities of your project.
 
 ## Installation
 
-Provide instructions on how to install and set up your project. Include any dependencies or prerequisites.
+In terminal, type the commands below :
 
 ```bash
-# Example installation steps
 git clone https://github.com/TGA25dev/Dev-Arabot.git
 cd Dev-Arabot
 pip install -r requirements.txt
