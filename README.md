@@ -23,9 +23,8 @@ List some key features or functionalities of your project.
 
 ## License
 
-This project is under a CC BY-NC-ND 4.0 license
+**This project is licensed under the CC BY-NC-ND 4.0 License - see the [LICENSE](LICENSE) file for details.**
 
-[See lincense](LICENSE)
 
 ## Installation
 
