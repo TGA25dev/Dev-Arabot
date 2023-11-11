@@ -7,8 +7,6 @@ Un bot Discord limite mais plutôt drôle.
 - [Introduction](#introduction)
 - [Features](#features)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Introduction
@@ -31,4 +29,6 @@ Provide instructions on how to install and set up your project. Include any depe
 # Example installation steps
 git clone https://github.com/TGA25dev/Dev-Arabot.git
 cd Dev-Arabot
-pip install requirements.txt # or any other package manager
+pip install -r requirements.txt
+
+
