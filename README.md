@@ -23,9 +23,9 @@ List some key features or functionalities of your project.
 
 ## License
 
-This project is under a CC BY-NC-ND 4.0 license :
+This project is under a CC BY-NC-ND 4.0 license
 
-**Arabot © 2023 by TGA25 is licensed under CC BY-NC-ND 4.0. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/**
+[See lincense](LICENSE)
 
 ## Installation
 
