@@ -1,0 +1,6 @@
+discord
+datetime
+pytz
+asyncio
+requests
+python-dotenv
