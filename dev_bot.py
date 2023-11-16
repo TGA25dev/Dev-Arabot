@@ -44,12 +44,19 @@ class aclient(discord.Client):
 
 client = aclient()
 
-dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/{bot_mode_lc}_bot.env")
-token = os.getenv(f"{bot_mode_hc}_BOT_TOKEN")
+dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/twitch_authorization.env")
+twitch_authorization = os.getenv(f"Twitch_Authorization")
+
+print(f"{printer_timestamp()} Twitch authorization token has been loaded !")
+
+dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/twitch_client_id.env")
+twitch_client_id = os.getenv(f"Twitch_Client_Id")
+
+print(f"{printer_timestamp()} Twitch client id token has been loaded !")
 
 headers = {
-    'Client-Id': 'jukdm7e3ynl1dvioxqwwojy0oewma7',
-    'Authorization': 'Bearer 2g5jpctomxro6ycqcqn0xxdjai0ez4',
+    'Client-Id': f'{twitch_client_id}',
+    'Authorization': f'Bearer {twitch_authorization}',
     
 }
 
@@ -1603,8 +1610,7 @@ async def twitch_loop():
         else:    
 
          print(f"{printer_timestamp()} Request returned status code {response.status_code}")
-         print(response)
-         print(response)
+         print(response.text)
 
      await asyncio.sleep(10)
     
