@@ -44,6 +44,9 @@ class aclient(discord.Client):
 
 client = aclient()
 
+dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/{bot_mode_lc}_bot.env")
+token = os.getenv(f"{bot_mode_hc}_BOT_TOKEN")
+
 headers = {
     'Client-Id': 'jukdm7e3ynl1dvioxqwwojy0oewma7',
     'Authorization': 'Bearer 2g5jpctomxro6ycqcqn0xxdjai0ez4',
