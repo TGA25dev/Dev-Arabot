@@ -1587,7 +1587,7 @@ async def twitch_loop():
                  color=discord.Color.from_rgb(136, 3, 252)        
                  )
                  twitch_live_embed.add_field(name="", value=f"***{user_name}*** est en live sur *__{game_name}__* <:logo_twitch_arabot:1151919627983659148>", inline=False)
-                 twitch_live_embed.add_field(name=f"", value=f"**{title}**", inline=True)
+                 twitch_live_embed.add_field(name=f"", value=f"{title}", inline=True)
                  
                  twitch_live_embed.add_field(name="", value= f":rocket: **Venez voir en cliquant** [ici]({live_url}) :rocket:", inline=False)
 
@@ -1597,7 +1597,7 @@ async def twitch_loop():
                  twitch_live_embed.set_footer(text=f"{version_note}")
 
                  await twitch_message_channel.send(content="@everyone",embed=twitch_live_embed)
-                 print(f"{printer_timestamp()} Twitch Live Alert has been sent !")
+                 print(f"{printer_timestamp()} Twitch Live Alert has been sent ! (in channel : {twitch_message_channel})")
 
 
                 
