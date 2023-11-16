@@ -1,6 +1,6 @@
 # Arabot
 
-Un bot Discord limite mais plutôt drôle.
+.
 
 ## Table des matières.
 
