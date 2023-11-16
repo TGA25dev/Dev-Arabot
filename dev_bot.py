@@ -172,11 +172,11 @@ async def on_ready():
 restart_time = datetime.now()
 tree = app_commands.CommandTree(client)
 france_tz = pytz.timezone("Europe/Paris")
-version_note = f"{bot_mode_lc} Arabot v2.0p|Ink Corp|✨TGA25✨"
+version_note = f"{bot_mode_hc} Arabot v2.0p|Ink Corp|✨TGA25✨"
 maintenance_mode = False
 default_bot_nick = f"{bot_mode_lc} Arabot"
 version_number = "v2.0p"
-streamer_name = ("Goomink")
+streamer_name = ("Ponce")
 
 
 explosion_command_avalaible = True
@@ -1574,10 +1574,10 @@ async def twitch_loop():
 
                 live_url = f"https://twitch.tv/{user_login}"
 
-                channel_id = 1120722998673027082 # Replace with your channel ID
-                channel = client.get_channel(news_channel_id)
+                 # Replace with your channel ID
+                twitch_message_channel = client.get_channel(news_channel_id)
 
-                if channel:
+                if twitch_message_channel:
                  
 
 
@@ -1596,7 +1596,7 @@ async def twitch_loop():
 
                  twitch_live_embed.set_footer(text=f"{version_note}")
 
-                 await channel.send(content="@everyone",embed=twitch_live_embed)
+                 await twitch_message_channel.send(content="@everyone",embed=twitch_live_embed)
                  print(f"{printer_timestamp()} Twitch Live Alert has been sent !")
 
 
