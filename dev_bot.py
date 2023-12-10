@@ -109,8 +109,8 @@ async def on_ready():
      await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"/help | {version_number}"))
      print(f"{printer_timestamp()} Bot Status has been corectly set up !")
 
-     asyncio.create_task(twitch_loop())
-     print(f"{printer_timestamp()} Twitch script has been corectly started ! ")
+     # asyncio.create_task(twitch_loop())
+     # print(f"{printer_timestamp()} Twitch script has been corectly loaded ! ")
 
     
 
@@ -1617,54 +1617,51 @@ async def twitch_loop():
 
 # Load cooldowns from the JSON file
 try:
- try:
-    with open("JSON Files/vol_command_is_available.json", 'r') as file:
-        data = json.load(file)
- except FileNotFoundError:
-    data = {"cooldowns": {}}
+    try:
+        with open("JSON Files/vol_command_is_available.json", 'r') as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        data = {"cooldowns": {}}
 
- @tree.command(name="test", description="test")
- async def vol_command(interaction: discord.Interaction, user: discord.Member):
-    # Check if the command is on cooldown for this server
-    server_id = interaction.guild.id
-    cooldown_info = data["cooldowns"].get(server_id, {"last_time": 0, "cooldown": {"minutes": 0, "seconds": 30}})
+    @tree.command(name="test", description="test")
+    async def vol_command(interaction: discord.Interaction, user: discord.Member):
+        # Check if the command is on cooldown for this server
+        server_id = interaction.guild.id
+        cooldown_info = data["cooldowns"].get(server_id, {"last_time": 0, "cooldown": {"minutes": 0, "seconds": 30}, "is_available": True})
 
-    # Check if the cooldown has ended
-    current_time = time.time()
-    cooldown_seconds = cooldown_info["cooldown"]["minutes"] * 60 + cooldown_info["cooldown"]["seconds"]
-    
-    if current_time - cooldown_info["last_time"] >= cooldown_seconds:
-        cooldown_info["is_available"] = True
+        # Check if the cooldown has ended
+        current_time = time.time()
+        cooldown_seconds = cooldown_info["cooldown"]["minutes"] * 60 + cooldown_info["cooldown"]["seconds"]
 
-    if cooldown_info["is_available"]:
-        # Set the cooldown
-        cooldown_info["is_available"] = False
-        cooldown_info["last_time"] = current_time
-        data["cooldowns"][server_id] = cooldown_info
+        if cooldown_info["is_available"] is True:
+            # Set the cooldown
+            cooldown_info["is_available"] = False
+            cooldown_info["last_time"] = current_time
+            data["cooldowns"][server_id] = cooldown_info
 
-        # Your command logic here
-        # ...
+            # Your command logic here
+            # ...
 
-        # Update vol_command_is_available list before writing it back to the file
-        data["vol_command_is_available"].append({
-            "server_id": interaction.guild.id,
-            "is_available": True  # Update this to True since the command is available
-        })
+            # Update cooldowns list before writing it back to the file
+            data["cooldowns"].append({
+                "server_id": interaction.guild.id,
+                "is_available": True  # Update this to True since the command is available
+            })
 
-        with open("JSON Files/vol_command_is_available.json", 'w') as file:
-            json.dump(data, file)
+            with open("JSON Files/vol_command_is_available.json", 'w') as file:
+                json.dump(data, file)
 
-        await interaction.response.send_message("Command done!")
-    else:
-        # Print remaining time if the command is on cooldown
-        remaining_time = cooldown_seconds - (current_time - cooldown_info["last_time"])
-        remaining_minutes = remaining_time // 60
-        remaining_seconds = remaining_time % 60
-        await interaction.response.send_message(f"The command is on cooldown. Remaining time: {int(remaining_minutes)} minutes and {remaining_seconds:.2f} seconds.")
+            await interaction.response.send_message("Command done!")
+        else:
+            # Print remaining time if the command is on cooldown
+            remaining_time = cooldown_seconds - (current_time - cooldown_info["last_time"])
+            remaining_minutes = remaining_time // 60
+            remaining_seconds = remaining_time % 60
+            await interaction.response.send_message(f"The command is on cooldown. Remaining time: {int(remaining_minutes)} minutes and {remaining_seconds:.2f} seconds.")
 
 except Exception as e:
-   print(e)   
-       
+    print(e)
+
        
         
 #---------------------------------------       
