@@ -1154,7 +1154,7 @@ class AdminSelectMenu(discord.ui.View):
         title="Infos",
         color=discord.Color.from_rgb(60, 240, 132)
         )
-        info_embed1.add_field(name="**Ping 🏓**", value=f"*{client.latency}* ms de latence", inline=False)
+        info_embed1.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 3)}* ms de latence", inline=False)
         info_embed1.add_field(name="**Heure 🕐**", value=f"Il est {current_time}", inline=False)
         info_embed1.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>", inline=False) # Bot restart date and time field
         info_embed1.add_field(name="**Langage de programmation 🌐**", value="__Python__ <:logo_python_arabot:1108367929457791116>", inline=False) # Bot restart date and time field
@@ -1353,7 +1353,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                         print(f"{printer_timestamp()} The nickname has been successfully changed to {user.name} #{user.id} (Normal User)")
 
                     print(f"{printer_timestamp()} The profile of {user.name} #{user.id} has been stolen! (profile resetting in 30s)")
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(30)
 
                     # Reset the profile after 30s
                     try:
@@ -1387,7 +1387,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                     remaining_minutes = remaining_time // 60
                     remaining_seconds = remaining_time % 60
 
-                    await interaction.response.send_message(f"Veuillez patienter {remaining_minutes} minutes et {remaining_seconds} secondes avant de réutiliser cette commande.")
+                    await interaction.response.send_message(f"Veuillez patienter *{remaining_minutes} minutes* et *{remaining_seconds} secondes* avant de pouvoir réutiliser cette commande.", ephemeral=True)
 
                 # Save the updated server cooldown data to the JSON file
                 with open("JSON Files/vol_command_cooldown.json", 'w') as f:
@@ -1497,7 +1497,7 @@ async def embed_command(interaction: discord.Interaction):
      title="Infos",
      color=discord.Color.from_rgb(60, 240, 132)
      )
-     info_embed2.add_field(name="**Ping 🏓**", value=f"*{client.latency}* ms de latence", inline=False)
+     info_embed2.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 3)}* ms de latence", inline=False)
      info_embed2.add_field(name="**Heure 🕐**", value=f"Il est *{current_time}* ", inline=False)
      info_embed2.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>" ,inline=False) # Bot restart date and time field
      info_embed2.add_field(name="**Langage de programmation 🌐**", value="*__Python__*" ,inline=False) # Bot restart date and time field
