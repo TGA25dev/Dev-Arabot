@@ -20,6 +20,7 @@ TEXT_PATH = f"Text_Files"
 
 bot_mode_lc ="dev"
 bot_mode_hc = "DEV"
+bot_mode_def = "Dev"
 
 def printer_timestamp():
    return datetime.now().strftime("\033[1;90m %Y-%m-%d %H:%M:%S \033[0m")
@@ -101,7 +102,7 @@ async def on_ready():
      profile_image = open(profile_image_path, "rb")
      pfp = profile_image.read()
         
-     await client.user.edit(avatar=pfp)
+     #await client.user.edit(avatar=pfp)
 
      print(f"{printer_timestamp()} Profile image sucessfully restablished to default !")
 
@@ -175,7 +176,7 @@ tree = app_commands.CommandTree(client)
 france_tz = pytz.timezone("Europe/Paris")
 version_note = f"{bot_mode_hc} Arabot v2.0p|Ink Corp|✨TGA25✨"
 maintenance_mode = False
-default_bot_nick = f"{bot_mode_lc} Arabot"
+default_bot_nick = f"{bot_mode_def} Arabot"
 version_number = "v2.0p"
 streamer_name = ("Ponce")
 
@@ -1278,133 +1279,140 @@ async def explosion_command(interaction: discord.Interaction):
         await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
 
+# ... (imports and constants)
+
 @tree.command(name="vol", description="Vole le nom d'un utilisateur")
 async def vol_command(interaction: discord.Interaction, user: discord.Member):
+    if vol_command_avalaible == False:
+        await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
+    elif vol_command_avalaible == True:
+        current_time = datetime.now(france_tz).strftime("%H:%M")
+        current_date = datetime.now().strftime("%d-%m-%Y")
+        user_id = interaction.user.id
+        command_name = interaction.data['name']
+        command_id = interaction.data['id']
+        guild_name = interaction.guild.name
+        TGA25_ID = "845327664143532053"
+        USER_DM = await client.fetch_user(TGA25_ID)
 
-    if vol_command_avalaible == False :
-
-     await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
-
-    elif vol_command_avalaible == True :
-     
-     current_time = datetime.now(france_tz).strftime("%H:%M")
-
-     current_date = datetime.now().strftime("%d-%m-%Y") 
-
-     user_id = interaction.user.id
-
-     command_name = interaction.data['name']
-
-     command_id = interaction.data['id']
-
-     guild_name = interaction.guild.name
-
-     TGA25_ID = "845327664143532053"
-     USER_DM = await client.fetch_user(TGA25_ID)
-
-     try:
-        if maintenance_mode:
-            await interaction.response.send_message(embed=maintenance_embed)
-            
-        else:
-           
-
-           guild_id = str(interaction.guild_id)
-    
-
-           if guild_id not in server_cooldowns:
-            server_cooldowns[guild_id] = 0
-
-            current_time = time.time()
-            cooldown_time = 60  # Change this to the desired cooldown time in seconds
-
-            if current_time - server_cooldowns[guild_id] > cooldown_time:
-        # Server is not on cooldown, proceed with the command
-             await interaction.response.send_message("Example command executed!")
-             server_cooldowns[guild_id] = current_time  # Update the cooldown time for the server
+        try:
+            if maintenance_mode:
+                await interaction.response.send_message(embed=maintenance_embed)
             else:
-        # Server is on cooldown, inform users
-             remaining_time = int(cooldown_time - (current_time - server_cooldowns[guild_id]))
-             await interaction.response.send_message(f"The server is on cooldown. Please wait {remaining_time} seconds.")
-        
+                try:
+                    with open("JSON Files/vol_command_cooldown.json", 'r') as f:
+                        server_cooldowns = json.load(f)
+                except FileNotFoundError:
+                    server_cooldowns = {}
 
-    # Save the updated server cooldown data to the JSON file
-             with open('server_cooldowns.json', 'w') as f:
-              json.dump(server_cooldowns, f)    
+                guild_id = str(interaction.guild_id)
 
-            
+                if guild_id not in server_cooldowns:
+                    server_cooldowns[guild_id] = 0
 
-        # Get the bot's user object
-        bot_user = interaction.guild.me
+                current_time = time.time()
+                cooldown_time = 300  # Change this to the desired cooldown time in seconds
 
-        choosen_user_id = user.id
-        choosen_user = await client.fetch_user(choosen_user_id)
-        choosen_user_avatar_url = choosen_user.avatar.url
+                if current_time - server_cooldowns[guild_id] > cooldown_time:
+                    bot_user = interaction.guild.me
+                    choosen_user_id = user.id
+                    choosen_user = await client.fetch_user(choosen_user_id)
+                    choosen_user_avatar_url = choosen_user.avatar.url
+                    response = requests.get(choosen_user_avatar_url)
 
-        response = requests.get(choosen_user_avatar_url)
+                    if response.status_code == 200:
+                        # Save the image to disk
+                        with open(f"Images/{choosen_user}.png", "wb") as f:
+                            f.write(response.content)
+                            print(f"{printer_timestamp()} Image downloaded successfully!")
+                    else:
+                        print(f"{printer_timestamp()} Failed to download image.")
 
-        if response.status_code == 200:
-            # Save the image to disk
-            with open(f"Images/{choosen_user}.png", "wb") as f:
-                f.write(response.content)
-                print(f"{printer_timestamp()} Image downloaded successfully!")
-        else:
-            print(f"{printer_timestamp()} Failed to download image.")
+                    # Update the bot's username to match the username of the mentioned user
+                    profile_image_path = f"Images/{choosen_user}.png"
+                    profile_image = open(profile_image_path, 'rb')
+                    pfp = profile_image.read()
 
-        # Update the bot's username to match the username of the mentioned user
-        profile_image_path = f"Images/{choosen_user}.png"
-        profile_image = open(profile_image_path, 'rb')
-        pfp = profile_image.read()
+                    await interaction.response.send_message(f"J'ai volé le profil de <@{user.id}> :tada::tada: ! ", ephemeral=True)
 
-        await client.user.edit(avatar=pfp)
+                    try:
+                        await client.user.edit(avatar=pfp)
+                        print(f"The avatar has been successfully changed to: {user.avatar}")
+                    except Exception as rate_limit_error:
+                        if "You are changing your avatar too fast" in str(rate_limit_error):
+                            print(f"{printer_timestamp()} ! Rate limit avatar !")
+                            await interaction.edit_original_response(
+                                content=":red_circle: Une erreur est survenue durant la modification de la photo de profil... :red_circle: ")
+                            pass
 
+                    if user.bot:
+                        await bot_user.edit(nick=user.name)
+                        print(f"{printer_timestamp()} The nickname has been successfully changed to {user.name} #{user.id} (Bot)")
+                    else:
+                        await bot_user.edit(nick=user.global_name)
+                        print(f"{printer_timestamp()} The nickname has been successfully changed to {user.name} #{user.id} (Normal User)")
 
+                    print(f"{printer_timestamp()} The profile of {user.name} #{user.id} has been stolen! (profile resetting in 30s)")
+                    await asyncio.sleep(5)
 
-        
+                    # Reset the profile after 30s
+                    try:
+                        profile_image_path = f"{IMAGES_PATH}/default_image_{bot_mode_lc}_bot.png"
+                        profile_image = open(profile_image_path, "rb")
+                        pfp = profile_image.read()
 
-        await interaction.guild.get_member(client.user.id).edit(nick=user.name)
+                        await client.user.edit(avatar=pfp)
+                        print(f"{printer_timestamp()} Profile image successfully reestablished to default!")
+                    except Exception as rate_limit_error:
+                        if "You are changing your avatar too fast" in str(rate_limit_error):
+                            print(f"{printer_timestamp()} ! Rate limit avatar !")
+                            pass
 
-        await interaction.response.send_message(f"J'ai temporairement volé le profil de {user.mention} !", ephemeral=True)
-        print(f"{printer_timestamp()} The profil of {user.name} has been stolen ! (profile reseting in 30s)")
+                            await bot_user.edit(nick=default_bot_nick)
+                            print(f"{printer_timestamp()} Nickname successfully reestablished to default!")
 
-        await asyncio.sleep(30)
+                            await interaction.edit_original_response(
+                                content="Mon profil a partiellement été réinitialisé :ballot_box_with_check: !")
+                            server_cooldowns[guild_id] = current_time
+                        else:
+                            await bot_user.edit(nick=default_bot_nick)
+                            print(f"{printer_timestamp()} Nickname successfully reestablished to default!")
 
-        #Reset the profil after 30s
+                            await interaction.edit_original_response(
+                                content="Mon profil a correctement été réinitialisé :white_check_mark: !")
+                            server_cooldowns[guild_id] = current_time
+                else:
+                    remaining_time = int(cooldown_time - (current_time - server_cooldowns[guild_id]))
 
-        profile_image_path = f"{IMAGES_PATH}/default_image_{bot_mode_lc}_bot.png"
+                    remaining_minutes = remaining_time // 60
+                    remaining_seconds = remaining_time % 60
 
-        profile_image = open(profile_image_path, "rb")
-        pfp = profile_image.read()
-        
-        await client.user.edit(avatar=pfp)
+                    await interaction.response.send_message(f"Veuillez patienter {remaining_minutes} minutes et {remaining_seconds} secondes avant de réutiliser cette commande.")
 
-        print(f"{printer_timestamp()} Profile image sucessfully restablished to default !")
+                # Save the updated server cooldown data to the JSON file
+                with open("JSON Files/vol_command_cooldown.json", 'w') as f:
+                    json.dump(server_cooldowns, f)
 
-        await bot_user.edit(nick=default_bot_nick)
+        except Exception as e:
+            print(e)
+            error_dminfo_embed = discord.Embed(
+                title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
+                description=f"**Erreur causée par** <@{user.id}>",
+                color=discord.Color.from_rgb(245, 170, 66)
+            )
 
-        print(f"{printer_timestamp()} Nickname sucessfully restablished to default !")
+            error_dminfo_embed.add_field(name="Details :",
+                                         value=f"Erreur survenue le `{current_date}` à `{current_time}` dans le serveur `{guild_name}`",
+                                         inline=True)
+            error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
+            error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
+            error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
+            error_dminfo_embed.set_footer(text=f"{version_note}")
 
-        await interaction.response.send_message("Le profil à été réinitialisé ! :white_check_mark: ", ephemeral=True)
+            await USER_DM.send(embed=error_dminfo_embed)
+            await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
-
-
-     except Exception as e:
-        error_dminfo_embed = discord.Embed( 
-        title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
-        description=f"**Erreur causée par** <@{user_id}>",
-        color=discord.Color.from_rgb(245, 170, 66)        
-        )
-        
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue le `{current_date}` à `{current_time}` dans le serveur `{guild_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
-        error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
-        error_dminfo_embed.set_footer(text=f"{version_note}")
-
-        
-        await USER_DM.send(embed=error_dminfo_embed)
-        await interaction.response.send_message(embed=error_embed, ephemeral=True)
-        print(e)
+          
 
         
 @tree.command(name="help", description="Affiche les commandes disponibles")
