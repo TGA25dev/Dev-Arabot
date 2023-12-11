@@ -119,7 +119,7 @@ async def on_ready():
 
      bot_started_embed = discord.Embed(
         title=":green_circle: Succès ! :green_circle:",
-        description="**Le Bot a correctement démarré !** *__(N'oubliez pas de relancer les commandes nécessaires...)__* "
+        description="**Le Bot a correctement démarré !**\n*__(N'oubliez pas de relancer les commandes nécessaires...)__* "
 
      )
 
@@ -195,20 +195,24 @@ bot_channel = 1120723328307581003
 autorole_role = 1102260664401150024
 
 #EVENTS
-@client.command(name="test", description="test")
+@tree.command(name="clear-dm", description="Supprime tous DM avec le bot")
 async def test(interaction: discord.Interaction):
     # Check if the command is sent in a DM
     if isinstance(interaction.channel, discord.DMChannel):
+        await interaction.response.send_message(content="Tout les messages sont en cours de suppression.....", ephemeral=True)
         # Fetch the bot's sent messages in the DM
-        bot_messages = await interaction.channel.history(limit=None).flatten()
+        bot_messages = []
+        async for message in interaction.channel.history(limit=None):
+            bot_messages.append(message)
 
         # Delete each bot message
         for message in bot_messages:
             await message.delete()
 
-        await interaction.response.send_message("All bot messages in this DM have been erased.")
+        
+        await interaction.edit_original_response(content="L'ensemble des messages à été supprimé !")
     else:
-        await interaction.response.send_message("This command can only be used in a DM.")
+        await interaction.response.send_message("Cette commande n'est utilisable que dans les DM")
 
 
 
@@ -512,17 +516,6 @@ class ButtonView_settings(discord.ui.View):
        else:
     
          await interaction.response.send_message("Seul @TGA25 est autorisé a utiliser cette commande :no_entry_sign: ", ephemeral=True)     
-
-
-
-    @discord.ui.button(style=discord.ButtonStyle.primary, label="Réinitialiser les dm", custom_id="button_reset_private_messages", emoji="🗑️")
-    async def button6_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-       for channel in client.private_channels:
-            if isinstance(channel, discord.DMChannel):
-                async for msg in channel.history(limit=None):
-                    if msg.author == client.user:
-                        await msg.delete()
-                        await interaction.response.send_message("Tout les dm ont été supprimés !", ephemeral=True)
 
 
 
