@@ -194,6 +194,13 @@ bot_channel = 1120723328307581003
 
 autorole_role = 1102260664401150024
 
+#EVENTS
+
+
+
+
+
+
 #EMBEDS
 
  #Help Embed
