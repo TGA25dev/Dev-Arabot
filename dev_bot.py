@@ -1337,7 +1337,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
 
                     try:
                         await client.user.edit(avatar=pfp)
-                        print(f"The avatar has been successfully changed to: {user.avatar}")
+                        print(f"{printer_timestamp()} The avatar has been successfully changed to: {user.avatar}")
                     except Exception as rate_limit_error:
                         if "You are changing your avatar too fast" in str(rate_limit_error):
                             print(f"{printer_timestamp()} ! Rate limit avatar !")
