@@ -195,11 +195,11 @@ bot_channel = 1120723328307581003
 autorole_role = 1102260664401150024
 
 #EVENTS
-@tree.command(name="dm", description="Supprime tous DM avec le bot")
+@tree.command(name="test", description="Supprime tous DM avec le bot")
 async def test(interaction: discord.Interaction):
     # Check if the command is sent in a DM
     if isinstance(interaction.channel, discord.DMChannel):
-        await interaction.response.send_message(content=":hourglass_flowing_sand:  Tous les messages sont en cours de suppression.....", ephemeral=True)
+        await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages sont en cours de suppression.....\n\n(La vitesse de suppression est limitée à 1 message seconde pour ne pas surcharger le bot :information_source:)", ephemeral=True)
 
         # Fetch the bot's sent messages in the DM
         bot_messages = []
@@ -212,7 +212,7 @@ async def test(interaction: discord.Interaction):
             await message.delete()
             await asyncio.sleep(1)
 
-        await interaction.edit_original_response(content="L'ensemble des messages a été supprimé :white_check_mark:  !")
+        await interaction.edit_original_response(content="L'ensemble des messages a été supprimé :white_check_mark: !")
     else:
         await interaction.response.send_message("Cette commande n'est utilisable que dans les DM")
 
