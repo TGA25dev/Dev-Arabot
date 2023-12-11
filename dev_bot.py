@@ -195,9 +195,22 @@ bot_channel = 1120723328307581003
 autorole_role = 1102260664401150024
 
 #EVENTS
-@tree.command(name="test", description="test")
+@client.command(name="test", description="test")
 async def test(interaction: discord.Interaction):
-   print("test")
+    # Check if the command is sent in a DM
+    if isinstance(interaction.channel, discord.DMChannel):
+        # Fetch the bot's sent messages in the DM
+        bot_messages = await interaction.channel.history(limit=None).flatten()
+
+        # Delete each bot message
+        for message in bot_messages:
+            await message.delete()
+
+        await interaction.response.send_message("All bot messages in this DM have been erased.")
+    else:
+        await interaction.response.send_message("This command can only be used in a DM.")
+
+
 
 
 try:
