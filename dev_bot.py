@@ -1305,7 +1305,34 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
      try:
         if maintenance_mode:
             await interaction.response.send_message(embed=maintenance_embed)
-            return
+            
+        else:
+           
+
+           guild_id = str(interaction.guild_id)
+    
+
+           if guild_id not in server_cooldowns:
+            server_cooldowns[guild_id] = 0
+
+            current_time = time.time()
+            cooldown_time = 60  # Change this to the desired cooldown time in seconds
+
+            if current_time - server_cooldowns[guild_id] > cooldown_time:
+        # Server is not on cooldown, proceed with the command
+             await interaction.response.send_message("Example command executed!")
+             server_cooldowns[guild_id] = current_time  # Update the cooldown time for the server
+            else:
+        # Server is on cooldown, inform users
+             remaining_time = int(cooldown_time - (current_time - server_cooldowns[guild_id]))
+             await interaction.response.send_message(f"The server is on cooldown. Please wait {remaining_time} seconds.")
+        
+
+    # Save the updated server cooldown data to the JSON file
+             with open('server_cooldowns.json', 'w') as f:
+              json.dump(server_cooldowns, f)    
+
+            
 
         # Get the bot's user object
         bot_user = interaction.guild.me
@@ -1330,9 +1357,14 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
         pfp = profile_image.read()
 
         await client.user.edit(avatar=pfp)
-        await bot_user.edit(nick=user.name)
 
-        await interaction.response.send_message(f"J'ai temporairement volé le profil de {user.mention} !", ephemeral=False)
+
+
+        
+
+        await interaction.guild.get_member(client.user.id).edit(nick=user.name)
+
+        await interaction.response.send_message(f"J'ai temporairement volé le profil de {user.mention} !", ephemeral=True)
         print(f"{printer_timestamp()} The profil of {user.name} has been stolen ! (profile reseting in 30s)")
 
         await asyncio.sleep(30)
@@ -1372,6 +1404,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
         
         await USER_DM.send(embed=error_dminfo_embed)
         await interaction.response.send_message(embed=error_embed, ephemeral=True)
+        print(e)
 
         
 @tree.command(name="help", description="Affiche les commandes disponibles")
@@ -1617,51 +1650,37 @@ async def twitch_loop():
 
 # Load cooldowns from the JSON file
 try:
-    try:
-        with open("JSON Files/vol_command_is_available.json", 'r') as file:
-            data = json.load(file)
-    except FileNotFoundError:
-        data = {"cooldowns": {}}
+    with open('server_cooldowns.json', 'r') as f:
+        server_cooldowns = json.load(f)
+except FileNotFoundError:
+    server_cooldowns = {}
 
-    @tree.command(name="test", description="test")
-    async def vol_command(interaction: discord.Interaction, user: discord.Member):
-        # Check if the command is on cooldown for this server
-        server_id = interaction.guild.id
-        cooldown_info = data["cooldowns"].get(server_id, {"last_time": 0, "cooldown": {"minutes": 0, "seconds": 30}, "is_available": True})
+# Command with server-wide cooldown
+@tree.command(name='example', description='Example command with server-wide cooldown')
+async def example_command(interaction: discord.Interaction):
+    # Check if the server is on cooldown
+    guild_id = str(interaction.guild_id)
+    
 
-        # Check if the cooldown has ended
-        current_time = time.time()
-        cooldown_seconds = cooldown_info["cooldown"]["minutes"] * 60 + cooldown_info["cooldown"]["seconds"]
+    if guild_id not in server_cooldowns:
+        server_cooldowns[guild_id] = 0
 
-        if cooldown_info["is_available"] is True:
-            # Set the cooldown
-            cooldown_info["is_available"] = False
-            cooldown_info["last_time"] = current_time
-            data["cooldowns"][server_id] = cooldown_info
+    current_time = time.time()
+    cooldown_time = 60  # Change this to the desired cooldown time in seconds
 
-            # Your command logic here
-            # ...
+    if current_time - server_cooldowns[guild_id] > cooldown_time:
+        # Server is not on cooldown, proceed with the command
+        await interaction.response.send_message("Example command executed!")
+        server_cooldowns[guild_id] = current_time  # Update the cooldown time for the server
+    else:
+        # Server is on cooldown, inform users
+        remaining_time = int(cooldown_time - (current_time - server_cooldowns[guild_id]))
+        await interaction.response.send_message(f"The server is on cooldown. Please wait {remaining_time} seconds.")
+        
 
-            # Update cooldowns list before writing it back to the file
-            data["cooldowns"].append({
-                "server_id": interaction.guild.id,
-                "is_available": True  # Update this to True since the command is available
-            })
-
-            with open("JSON Files/vol_command_is_available.json", 'w') as file:
-                json.dump(data, file)
-
-            await interaction.response.send_message("Command done!")
-        else:
-            # Print remaining time if the command is on cooldown
-            remaining_time = cooldown_seconds - (current_time - cooldown_info["last_time"])
-            remaining_minutes = remaining_time // 60
-            remaining_seconds = remaining_time % 60
-            await interaction.response.send_message(f"The command is on cooldown. Remaining time: {int(remaining_minutes)} minutes and {remaining_seconds:.2f} seconds.")
-
-except Exception as e:
-    print(e)
-
+    # Save the updated server cooldown data to the JSON file
+    with open('server_cooldowns.json', 'w') as f:
+        json.dump(server_cooldowns, f)
        
         
 #---------------------------------------       
