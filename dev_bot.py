@@ -195,10 +195,47 @@ bot_channel = 1120723328307581003
 autorole_role = 1102260664401150024
 
 #EVENTS
+@tree.command(name="test", description="test")
+async def test(interaction: discord.Interaction):
+   print("test")
 
 
+try:
+    with open("JSON Files/welcome_data_file.json", 'r') as f:
+        welcome_data = json.load(f)
+except FileNotFoundError:
+    welcome_data = {} 
 
+def get_fallback_channel(guild):
+    return discord.utils.get(guild.text_channels)
 
+@client.event
+async def on_guild_join(guild):
+    guild_id = str(guild.id)
+
+    # Check if the guild has already received the welcome message
+    if guild_id not in welcome_data or not welcome_data[guild_id]:
+        default_channel = guild.system_channel
+        fallback_channel = get_fallback_channel(guild)  # Replace this with your logic to get a fallback channel
+        
+        # Define the welcome message variable outside of the if statement
+        welcome_message = "Thank you for adding me to your server! I'm here to help."
+
+        if default_channel:
+            print(f'{guild.name}: {default_channel.name} ({default_channel.id})')
+            await default_channel.send(welcome_message)
+        elif fallback_channel:
+            print(f'{guild.name}: No default channel set. Sending to fallback channel: {fallback_channel.name} ({fallback_channel.id})')
+            await fallback_channel.send(welcome_message)
+        else:
+            print(f'{guild.name}: No default channel or fallback channel set. Unable to send welcome message.')
+
+        # Mark the guild as having received the welcome message
+        welcome_data[guild_id] = True
+
+        # Save the updated data to the JSON file
+        with open("JSON Files/welcome_data_file.json", "w") as f:
+            json.dump(welcome_data, f, indent=2)
 
 
 #EMBEDS
