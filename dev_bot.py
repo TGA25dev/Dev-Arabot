@@ -174,7 +174,7 @@ async def on_ready():
 restart_time = datetime.now()
 tree = app_commands.CommandTree(client)
 france_tz = pytz.timezone("Europe/Paris")
-version_note = f"{bot_mode_hc} Arabot v2.0p|Ink Corp|✨TGA25✨"
+version_note = f"{bot_mode_def} Arabot v2.0p|Ink Corp|✨TGA25✨"
 maintenance_mode = False
 default_bot_nick = f"{bot_mode_def} Arabot"
 version_number = "v2.0p"
@@ -194,27 +194,10 @@ bot_channel = 1120723328307581003
 
 autorole_role = 1102260664401150024
 
+setup_command_id = 1184232293691293726
+
 #EVENTS
-@tree.command(name="test", description="Supprime tous DM avec le bot")
-async def test(interaction: discord.Interaction):
-    # Check if the command is sent in a DM
-    if isinstance(interaction.channel, discord.DMChannel):
-        await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages sont en cours de suppression.....\n\n(La vitesse de suppression est limitée à 1 message seconde pour ne pas surcharger le bot :information_source:)", ephemeral=True)
 
-        # Fetch the bot's sent messages in the DM
-        bot_messages = []
-        async for message in interaction.channel.history(limit=None):
-            if message.author == interaction.client.user:
-                bot_messages.append(message)
-
-        # Delete each bot message
-        for message in bot_messages:
-            await message.delete()
-            await asyncio.sleep(1)
-
-        await interaction.edit_original_response(content="L'ensemble des messages a été supprimé :white_check_mark: !")
-    else:
-        await interaction.response.send_message("Cette commande n'est utilisable que dans les DM")
 
 
 
@@ -233,20 +216,29 @@ def get_fallback_channel(guild):
 async def on_guild_join(guild):
     guild_id = str(guild.id)
 
+    welcome_embed = discord.Embed(
+        title="Bonjour ! :wave:",
+        description="",
+        color=discord.Color.from_rgb(176, 68, 52)
+    )
+    welcome_embed.add_field(name="",value="Merci de m'avoir ajouté !\nJe suis un bot français mais avec quelques origines...", inline=False)
+    welcome_embed.add_field(name="", value=f"\n\nAvant de pouvoir m'utiliser merci de faire </setup:{setup_command_id}> pour lire les conditions d'utilisations et me configurer.", inline=False)
+    welcome_embed.set_footer(text=version_note)
+
     # Check if the guild has already received the welcome message
     if guild_id not in welcome_data or not welcome_data[guild_id]:
         default_channel = guild.system_channel
         fallback_channel = get_fallback_channel(guild)  # Replace this with your logic to get a fallback channel
         
         # Define the welcome message variable outside of the if statement
-        welcome_message = "Thank you for adding me to your server! I'm here to help."
+        
 
         if default_channel:
             print(f'{guild.name}: {default_channel.name} ({default_channel.id})')
-            await default_channel.send(welcome_message)
+            await default_channel.send(embed=welcome_embed)
         elif fallback_channel:
             print(f'{guild.name}: No default channel set. Sending to fallback channel: {fallback_channel.name} ({fallback_channel.id})')
-            await fallback_channel.send(welcome_message)
+            await fallback_channel.send(embed=welcome_embed)
         else:
             print(f'{guild.name}: No default channel or fallback channel set. Unable to send welcome message.')
 
@@ -256,6 +248,7 @@ async def on_guild_join(guild):
         # Save the updated data to the JSON file
         with open("JSON Files/welcome_data_file.json", "w") as f:
             json.dump(welcome_data, f, indent=2)
+    
 
 
 #EMBEDS
@@ -1234,7 +1227,30 @@ class AdminSelectMenu(discord.ui.View):
 
 #COMMANDS
 
+@tree.command(name="setup", description="Configuration du bot")
+async def setup(interaction: discord.Interaction):
+   await interaction.response.send_message("Setup", ephemeral=True)
 
+@tree.command(name="delete-dm", description="Supprime tous DM avec le bot")
+async def delete_dm(interaction: discord.Interaction):
+    # Check if the command is sent in a DM
+    if isinstance(interaction.channel, discord.DMChannel):
+        await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages sont en cours de suppression.....\n\n(La vitesse de suppression est limitée à 1 message par seconde pour ne pas surcharger le bot :information_source:)", ephemeral=True)
+
+        # Fetch the bot's sent messages in the DM
+        bot_messages = []
+        async for message in interaction.channel.history(limit=None):
+            if message.author == interaction.client.user:
+                bot_messages.append(message)
+
+        # Delete each bot message
+        for message in bot_messages:
+            await message.delete()
+            await asyncio.sleep(1)
+
+        await interaction.edit_original_response(content="L'ensemble des messages a été supprimé :white_check_mark: !")
+    else:
+        await interaction.response.send_message("Cette commande n'est utilisable que dans les DM")
 
 @tree.command(name="admin", description="Affiche le panel d'administration du bot")
 async def admin_panel(interaction: discord.Interaction):
@@ -1386,7 +1402,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                     profile_image = open(profile_image_path, 'rb')
                     pfp = profile_image.read()
 
-                    await interaction.response.send_message(f"J'ai volé le profil de <@{user.id}> :tada::tada: ! ", ephemeral=True)
+                    await interaction.response.send_message(f"J'ai temporairement volé le profil de <@{user.id}> :tada::tada: ! ", ephemeral=True)
 
                     try:
                         await client.user.edit(avatar=pfp)
@@ -1416,6 +1432,15 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
 
                         await client.user.edit(avatar=pfp)
                         print(f"{printer_timestamp()} Profile image successfully reestablished to default!")
+
+                        await bot_user.edit(nick=default_bot_nick)
+                        print(f"{printer_timestamp()} Nickname successfully reestablished to default!")
+
+                        await interaction.edit_original_response(content="Mon profil a correctement été réinitialisé :white_check_mark: !")
+                        server_cooldowns[guild_id] = current_time
+
+
+
                     except Exception as rate_limit_error:
                         if "You are changing your avatar too fast" in str(rate_limit_error):
                             print(f"{printer_timestamp()} ! Rate limit avatar !")
