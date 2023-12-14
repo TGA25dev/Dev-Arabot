@@ -1258,11 +1258,11 @@ class AdminSelectMenu(discord.ui.View):
 async def setup(interaction: discord.Interaction):
    await interaction.response.send_message("Setup", ephemeral=True)
 
-@tree.command(name="effacer-dm", description="Supprime tous DM avec le bot")
+@tree.command(name="effacer-dm", description="Supprime tout DM du bot")
 async def delete_dm(interaction: discord.Interaction):
     # Check if the command is sent in a DM
     if isinstance(interaction.channel, discord.DMChannel):
-        await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages sont en cours de suppression.....\n\n(La vitesse de suppression est limitée à 1 message par seconde pour ne pas surcharger le bot :information_source:)", ephemeral=True)
+        await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages du bot sont en cours de suppression.....\n\n(La vitesse de suppression est limitée à 1 message par seconde pour ne pas surcharger le bot :information_source:)", ephemeral=True)
 
         # Fetch the bot's sent messages in the DM
         bot_messages = []
@@ -1275,7 +1275,7 @@ async def delete_dm(interaction: discord.Interaction):
             await message.delete()
             await asyncio.sleep(1)
 
-        await interaction.edit_original_response(content="L'ensemble des messages a été supprimé :white_check_mark: !")
+        await interaction.edit_original_response(content="L'ensemble des messages du bot ont étés supprimés :white_check_mark: !")
     else:
         await interaction.response.send_message("Cette commande n'est utilisable que dans les DM", ephemeral=True)
 
