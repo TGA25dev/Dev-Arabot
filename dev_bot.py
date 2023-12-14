@@ -182,7 +182,7 @@ france_tz = pytz.timezone("Europe/Paris")
 version_note = f"{bot_mode_def} Arabot v2.0p|Ink Corp|✨TGA25✨"
 maintenance_mode = False
 default_bot_nick = f"{bot_mode_def} Arabot"
-version_number = "v2.0p"
+version_number = "v2.0"
 streamer_name = ("Ponce")
 
 
@@ -272,7 +272,7 @@ help_embed.add_field(name="</explosion:1119281805477036194>", value="Fait explos
 
 help_embed.add_field(name="</vol:1119281805477036195>", value="Vole le profil d'un membre du serveur", inline=False) 
 
-help_embed.add_field(name="</effacer-dm:1184232293691293727>", value="Supprime tout les messages privés avec le bot", inline=False)
+help_embed.add_field(name="</effacer-dm:1184924715480006707>", value="Supprime tout les messages privés avec le bot", inline=False)
 
 help_embed.add_field(name="</info:1119281805477036197>", value="Affiche les informations du bot", inline=False)
 
@@ -1785,30 +1785,5 @@ async def example_command(interaction: discord.Interaction):
     with open('server_cooldowns.json', 'w') as f:
         json.dump(server_cooldowns, f)
        
-        
-#---------------------------------------       
-#Commands Cooldowns
-#--------------------------------------- 
-
-@vol_command.error
-async def on_test_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
-    if isinstance(error, app_commands.CommandOnCooldown):
-        remaining_time = round(error.retry_after, 2)
-        message = f"Veuillez patienter {round(error.retry_after/60, 2)} minutes avant de pouvoir réutiliser cette commande.... :hourglass:"
-        await interaction.response.send_message(message, ephemeral=True)
-
-
-@explosion_command.error
-async def on_test_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
-    if isinstance(error, app_commands.CommandOnCooldown):
-        remaining_time = timedelta(seconds=round(error.retry_after))
-        days, seconds = remaining_time.days, remaining_time.seconds
-        hours = seconds // 3600
-        minutes = (seconds % 3600) // 60
-        seconds = seconds % 60
-        message = f"Veuillez patienter {days}j, {hours}h, {minutes}m, {seconds}s avant de pouvoir refaire exploser le serveur.... :hourglass:"
-        await interaction.response.send_message(message, ephemeral=True)
-
-
 
 client.run(token)
