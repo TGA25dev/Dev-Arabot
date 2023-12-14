@@ -179,7 +179,7 @@ async def on_ready():
 restart_time = datetime.now()
 tree = app_commands.CommandTree(client)
 france_tz = pytz.timezone("Europe/Paris")
-version_note = f"{bot_mode_def} Arabot v2.0p|Ink Corp|✨TGA25✨"
+version_note = f"{bot_mode_def} Arabot v2.0|Ink Corp|✨TGA25✨"
 maintenance_mode = False
 default_bot_nick = f"{bot_mode_def} Arabot"
 version_number = "v2.0"
@@ -189,6 +189,12 @@ def generate_current_time_timestamp():
    discord_current_time = datetime.now(france_tz)
    current_time_timestamp = int(discord_current_time.timestamp())
    return current_time_timestamp
+
+
+
+ 
+
+
 
 explosion_command_avalaible = True
 vol_command_avalaible = True
@@ -1216,15 +1222,15 @@ class AdminSelectMenu(discord.ui.View):
     async def select_callback(self, interaction):
         
           
-        current_time = datetime.now(france_tz).strftime("%H:%M")
+        
         info_embed1 = discord.Embed(
         title="Infos",
         color=discord.Color.from_rgb(60, 240, 132)
         )
-        info_embed1.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 3)}* ms de latence", inline=False)
-        info_embed1.add_field(name="**Heure 🕐**", value=f"Il est {current_time}", inline=False)
+        info_embed1.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 2)}* ms de latence", inline=False)
+        info_embed1.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>.", inline=False)
         info_embed1.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>", inline=False) # Bot restart date and time field
-        info_embed1.add_field(name="**Langage de programmation 🌐**", value="__Python__ <:logo_python_arabot:1108367929457791116>", inline=False) # Bot restart date and time field
+        info_embed1.add_field(name="**Langage de programmation 🌐**", value="*Python* <:logo_python_arabot:1108367929457791116>", inline=False) # Bot restart date and time field
         info_embed1.set_footer(text=version_note)
 
         selected_option = interaction.data['values'][0]
@@ -1303,7 +1309,7 @@ async def admin_panel(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `<t:{generate_current_time_timestamp()}:R>` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
@@ -1350,7 +1356,7 @@ async def explosion_command(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `<t:{generate_current_time_timestamp()}:R>` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
@@ -1491,7 +1497,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
             )
 
             error_dminfo_embed.add_field(name="Details :",
-                                         value=f"Erreur survenue il y a `<t:{generate_current_time_timestamp()}:R>` dans le serveur `{guild_name}`",
+                                         value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
                                          inline=True)
             error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
             error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
@@ -1534,7 +1540,7 @@ async def embed_command(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `<t:{generate_current_time_timestamp()}:R>` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
@@ -1579,10 +1585,10 @@ async def embed_command(interaction: discord.Interaction):
      title="Infos",
      color=discord.Color.from_rgb(60, 240, 132)
      )
-     info_embed2.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 3)}* ms de latence", inline=False)
-     info_embed2.add_field(name="**Heure 🕐**", value=f"Il est *{current_time}* ", inline=False)
-     info_embed2.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>" ,inline=False) # Bot restart date and time field
-     info_embed2.add_field(name="**Langage de programmation 🌐**", value="*__Python__*" ,inline=False) # Bot restart date and time field
+     info_embed2.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 2)}* ms de latence", inline=False)
+     info_embed2.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>.", inline=False)
+     info_embed2.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>", inline=False) # Bot restart date and time field
+     info_embed2.add_field(name="**Langage de programmation 🌐**", value="*Python* <:logo_python_arabot:1108367929457791116>", inline=False) # Bot restart date and time field
      info_embed2.set_footer(text=version_note)
 
      await interaction.response.send_message(embed=info_embed2, ephemeral=False)
@@ -1594,7 +1600,7 @@ async def embed_command(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `<t:{generate_current_time_timestamp()}:R>` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
@@ -1632,7 +1638,7 @@ async def dev_info_command(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `<t:{generate_current_time_timestamp()}:R>` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
