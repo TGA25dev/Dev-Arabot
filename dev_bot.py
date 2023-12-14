@@ -259,15 +259,21 @@ help_embed = discord.Embed(
         description="Voici toutes mes commandes :",
         color=discord.Color.from_rgb(252, 165, 119)
 )
-help_embed.add_field(name="</explosion:1119281805477036194>", value="Fait exploser le serveur. (__Temporairement indisponible)", inline=False)
+help_embed.add_field(name="</explosion:1119281805477036194>", value="Fait exploser le serveur (__Temporairement indisponible__)", inline=False)
 
-help_embed.add_field(name="</vol:1119281805477036195>", value="Vole le profil d'un membre du serveur. (__Temporairement indisponible)", inline=False)     
+help_embed.add_field(name="</vol:1119281805477036195>", value="Vole le profil d'un membre du serveur", inline=False)     
 
-help_embed.add_field(name="</info:1119281805477036197>", value="Affiche les informations du bot.", inline=False)
+help_embed.add_field(name="</info:1119281805477036197>", value="Affiche les informations du bot", inline=False)
 
-help_embed.add_field(name="</help:1119281805477036196>", value="Affiche ceci.", inline=False)
+help_embed.add_field(name="</delete-dm:1184232293691293727>", value="Supprime tout les messages privés avec le bot", inline=False)
 
-help_embed.add_field(name="</admin:1119281805477036192>", value="Affiche le panel d'administration du bot **Commande réservée aux admins du bot**", inline=False)
+help_embed.add_field(name="</help:1098204837612617731>", value="Affiche ceci", inline=False)
+
+help_embed.add_field(name="</setup:1184232293691293726>", value="Affiche l'interface de configuration du bot", inline=False)
+
+help_embed.add_field(name="</admin:1098204837612617733>", value="Affiche le panel d'administration du bot **Commande réservée aux admins du bot**", inline=False)
+
+
 help_embed.set_footer(text=version_note)
 
  #Warning Timeout Embed
@@ -1250,7 +1256,7 @@ async def delete_dm(interaction: discord.Interaction):
 
         await interaction.edit_original_response(content="L'ensemble des messages a été supprimé :white_check_mark: !")
     else:
-        await interaction.response.send_message("Cette commande n'est utilisable que dans les DM")
+        await interaction.response.send_message("Cette commande n'est utilisable que dans les DM", ephemeral=True)
 
 @tree.command(name="admin", description="Affiche le panel d'administration du bot")
 async def admin_panel(interaction: discord.Interaction):
