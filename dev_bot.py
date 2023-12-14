@@ -31,7 +31,7 @@ token = os.getenv(f"{bot_mode_hc}_BOT_TOKEN")
 global start_time
 start_time = datetime.now()
 
-print(f"\033[1m {printer_timestamp()} Token has been loaded ! \033[0m")
+print(f"\033[1m{printer_timestamp()} Token has been loaded ! \033[0m")
 
 TGA25_ID = 845327664143532053
 
@@ -81,6 +81,8 @@ is_ready = False
 
 @client.event
 async def on_ready():
+    await client.wait_until_ready()
+    print(f"{printer_timestamp()} Bot ready !")
 
     try:
      bot_starting_embed = discord.Embed(
@@ -101,6 +103,9 @@ async def on_ready():
 
      profile_image = open(profile_image_path, "rb")
      pfp = profile_image.read()
+
+     
+
         
      #await client.user.edit(avatar=pfp)
 
@@ -221,8 +226,15 @@ async def on_guild_join(guild):
         description="",
         color=discord.Color.from_rgb(176, 68, 52)
     )
-    welcome_embed.add_field(name="",value="Merci de m'avoir ajouté !\nJe suis un bot français mais avec quelques origines...", inline=False)
-    welcome_embed.add_field(name="", value=f"\n\nAvant de pouvoir m'utiliser merci de faire </setup:{setup_command_id}> pour lire les conditions d'utilisations et me configurer.", inline=False)
+    welcome_embed.add_field(name="",value="Merci de m'avoir ajouté !", inline=False)
+
+    welcome_embed.add_field(name="", value="", inline=False)
+
+    welcome_embed.add_field(name="", value="Je suis un bot français mais avec quelques origines...\nJe possède plusieurs commandes, toutes visibles avec la commande </help:1098204837612617731>.", inline=False)
+
+    welcome_embed.add_field(name="", value="", inline=False)
+
+    welcome_embed.add_field(name="", value=f"**Avant de pouvoir m'utiliser merci de faire </setup:{setup_command_id}> pour lire les conditions d'utilisations et me configurer :smile:**", inline=False)
     welcome_embed.set_footer(text=version_note)
 
     # Check if the guild has already received the welcome message
@@ -234,13 +246,15 @@ async def on_guild_join(guild):
         
 
         if default_channel:
-            print(f'{guild.name}: {default_channel.name} ({default_channel.id})')
+            print(f"{printer_timestamp()} The bot has been added to the server {guild.name}. Welcome message sending to :{default_channel.name} ({default_channel.id})")
+
             await default_channel.send(embed=welcome_embed)
+
         elif fallback_channel:
-            print(f'{guild.name}: No default channel set. Sending to fallback channel: {fallback_channel.name} ({fallback_channel.id})')
+            print(f"{printer_timestamp()} The bot has been added to the server {guild.name}. Welcome message sending to fallback channel: {fallback_channel.name} ({fallback_channel.id})")
             await fallback_channel.send(embed=welcome_embed)
         else:
-            print(f'{guild.name}: No default channel or fallback channel set. Unable to send welcome message.')
+            print(f"{printer_timestamp()} The bot has been added to the server {guild.name}: No default channel or fallback channel has been set. Unable to send welcome message...")
 
         # Mark the guild as having received the welcome message
         welcome_data[guild_id] = True
@@ -259,20 +273,21 @@ help_embed = discord.Embed(
         description="Voici toutes mes commandes :",
         color=discord.Color.from_rgb(252, 165, 119)
 )
-help_embed.add_field(name="</explosion:1119281805477036194>", value="Fait exploser le serveur (__Temporairement indisponible__)", inline=False)
+help_embed.add_field(name="</explosion:1119281805477036194>", value="Fait exploser le serveur (__*Temporairement indisponible*__)", inline=False)
 
-help_embed.add_field(name="</vol:1119281805477036195>", value="Vole le profil d'un membre du serveur", inline=False)     
-
-help_embed.add_field(name="</info:1119281805477036197>", value="Affiche les informations du bot", inline=False)
+help_embed.add_field(name="</vol:1119281805477036195>", value="Vole le profil d'un membre du serveur", inline=False) 
 
 help_embed.add_field(name="</delete-dm:1184232293691293727>", value="Supprime tout les messages privés avec le bot", inline=False)
 
-help_embed.add_field(name="</help:1098204837612617731>", value="Affiche ceci", inline=False)
+help_embed.add_field(name="</info:1119281805477036197>", value="Affiche les informations du bot", inline=False)
+
+help_embed.add_field(name="</devinfo:1108432433830965340>", value="Affiche des informations sur le développeur du bot", inline=False)
 
 help_embed.add_field(name="</setup:1184232293691293726>", value="Affiche l'interface de configuration du bot", inline=False)
 
-help_embed.add_field(name="</admin:1098204837612617733>", value="Affiche le panel d'administration du bot **Commande réservée aux admins du bot**", inline=False)
+help_embed.add_field(name="</help:1098204837612617731>", value="Affiche ceci", inline=False)
 
+help_embed.add_field(name="</admin:1098204837612617733>", value="Affiche le panel d'administration du bot ***Commande réservée aux admins du bot***", inline=False)
 
 help_embed.set_footer(text=version_note)
 
@@ -490,7 +505,7 @@ class ButtonView_settings(discord.ui.View):
     async def button4_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
      await interaction.response.send_message("Mode maintenance **désactivé** 👷 !", ephemeral=True)
 
-     await client.change_presence(activity=discord.Activity(status=discord.Status.do_not_disturb ,name="de retour... 🎉", type=discord.ActivityType.watching))  
+     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="de retour...🎉"))  
           
      await asyncio.sleep(10)
      global maintenance_mode
@@ -498,10 +513,11 @@ class ButtonView_settings(discord.ui.View):
 
      channel = client.get_channel(bot_channel)
      if channel is not None:
-        await channel.send("@everyone", embed=end_maintenance_embed)
+        await channel.send("", embed=end_maintenance_embed)
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"/help | {version_number}"))
      else:
         print(f"{printer_timestamp()} Channel not found!")
-     await client.change_presence(activity=discord.Activity(status=discord.Status.online))
+     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"/help | {version_number}"))
 
     @discord.ui.button(style=discord.ButtonStyle.primary, label="Setup Auto_Role", custom_id="button_give_role")
     async def button5_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
