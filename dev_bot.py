@@ -185,6 +185,10 @@ default_bot_nick = f"{bot_mode_def} Arabot"
 version_number = "v2.0"
 streamer_name = ("Ponce")
 
+def generate_current_time_timestamp():
+   discord_current_time = datetime.now(france_tz)
+   current_time_timestamp = int(discord_current_time.timestamp())
+   return current_time_timestamp
 
 explosion_command_avalaible = True
 vol_command_avalaible = True
@@ -1271,10 +1275,6 @@ async def delete_dm(interaction: discord.Interaction):
 
 @tree.command(name="admin", description="Affiche le panel d'administration du bot")
 async def admin_panel(interaction: discord.Interaction):
-    current_time = datetime.now(france_tz).strftime("%H:%M")
-
-    current_date = datetime.now().strftime("%d-%m-%Y")  
-
     command_name = interaction.data['name']
 
     user_id = interaction.user.id
@@ -1303,7 +1303,7 @@ async def admin_panel(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue le `{current_date}` à `{current_time}` à `{current_time}` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `{generate_current_time_timestamp()}` dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
@@ -1325,10 +1325,6 @@ async def explosion_command(interaction: discord.Interaction):
     elif explosion_command_avalaible == True :
 
      user_id = interaction.user.id
-    
-     current_date = datetime.now().strftime("%d-%m-%Y") 
-    
-     current_time = datetime.now(france_tz).strftime("%H:%M")
 
      command_name = interaction.data['name']
 
@@ -1354,7 +1350,7 @@ async def explosion_command(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue le `{current_date}` à `{current_time}` à `{current_time}` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `{generate_current_time_timestamp()}` dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
@@ -1372,8 +1368,6 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
     if vol_command_avalaible == False:
         await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
     elif vol_command_avalaible == True:
-        current_time = datetime.now(france_tz).strftime("%H:%M")
-        current_date = datetime.now().strftime("%d-%m-%Y")
         user_id = interaction.user.id
         command_name = interaction.data['name']
         command_id = interaction.data['id']
@@ -1497,7 +1491,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
             )
 
             error_dminfo_embed.add_field(name="Details :",
-                                         value=f"Erreur survenue le `{current_date}` à `{current_time}` dans le serveur `{guild_name}`",
+                                         value=f"Erreur survenue il y a `{generate_current_time_timestamp()}` dans le serveur `{guild_name}`",
                                          inline=True)
             error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
             error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
@@ -1514,10 +1508,6 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
 async def embed_command(interaction: discord.Interaction):
     user_id = interaction.user.id
 
-    current_date = datetime.now().strftime("%d-%m-%Y") 
-
-    current_time = datetime.now(france_tz).strftime("%H:%M")
-
     command_name = interaction.data['name']
 
     command_id = interaction.data['id']
@@ -1532,10 +1522,10 @@ async def embed_command(interaction: discord.Interaction):
 
 
     if maintenance_mode:
-        await interaction.response.send_message(embed=maintenance_embed)
+        await interaction.response.send_message(embed=maintenance_embed) ##############
         return
     try:
-     await interaction.response.send_message(embed=help_embed, ephemeral=False)
+     await interaction.response.sed_message(embed=help_embed, ephemeral=False)
 
     except Exception as e:
         error_dminfo_embed = discord.Embed( 
@@ -1544,7 +1534,7 @@ async def embed_command(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue le `{current_date}` à `{current_time}` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `{generate_current_time_timestamp()}` dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
@@ -1562,9 +1552,6 @@ async def embed_command(interaction: discord.Interaction):
 
 @tree.command(name="info", description="Affiche des informations à propos du bot")
 async def embed_command(interaction: discord.Interaction):
-    current_time = datetime.now(france_tz).strftime("%H:%M")
-
-    current_date = datetime.now().strftime("%d-%m-%Y") 
 
     user_id = interaction.user.id
 
@@ -1607,7 +1594,7 @@ async def embed_command(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue le `{current_date}` à `{current_time}` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `{generate_current_time_timestamp()}` dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
@@ -1619,9 +1606,6 @@ async def embed_command(interaction: discord.Interaction):
 
 @tree.command(name="devinfo", description="Affiche des informations à propos du développeur")
 async def dev_info_command(interaction: discord.Interaction):
- current_time = datetime.now(france_tz).strftime("%H:%M")
-
- current_date = datetime.now().strftime("%d-%m-%Y") 
 
  command_name = interaction.data['name']
 
@@ -1648,7 +1632,7 @@ async def dev_info_command(interaction: discord.Interaction):
         color=discord.Color.from_rgb(245, 170, 66)        
         )
         
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue le `{current_date}` à `{current_time}` dans le serveur `{guild_name}`", inline=True)
+        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a `{generate_current_time_timestamp()}` dans le serveur `{guild_name}`", inline=True)
         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
         error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
@@ -1773,7 +1757,7 @@ async def example_command(interaction: discord.Interaction):
 
     if current_time - server_cooldowns[guild_id] > cooldown_time:
         # Server is not on cooldown, proceed with the command
-        await interaction.response.send_message("Example command executed!")
+        await interaction.response.send_message(f"<t:{generate_current_time_timestamp()}:R>")
         server_cooldowns[guild_id] = current_time  # Update the cooldown time for the server
     else:
         # Server is on cooldown, inform users
