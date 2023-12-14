@@ -203,11 +203,6 @@ setup_command_id = 1184232293691293726
 
 #EVENTS
 
-
-
-
-
-
 try:
     with open("JSON Files/welcome_data_file.json", 'r') as f:
         welcome_data = json.load(f)
@@ -277,7 +272,7 @@ help_embed.add_field(name="</explosion:1119281805477036194>", value="Fait explos
 
 help_embed.add_field(name="</vol:1119281805477036195>", value="Vole le profil d'un membre du serveur", inline=False) 
 
-help_embed.add_field(name="</delete-dm:1184232293691293727>", value="Supprime tout les messages privés avec le bot", inline=False)
+help_embed.add_field(name="</effacer-dm:1184232293691293727>", value="Supprime tout les messages privés avec le bot", inline=False)
 
 help_embed.add_field(name="</info:1119281805477036197>", value="Affiche les informations du bot", inline=False)
 
@@ -1253,7 +1248,7 @@ class AdminSelectMenu(discord.ui.View):
 async def setup(interaction: discord.Interaction):
    await interaction.response.send_message("Setup", ephemeral=True)
 
-@tree.command(name="delete-dm", description="Supprime tous DM avec le bot")
+@tree.command(name="effacer-dm", description="Supprime tous DM avec le bot")
 async def delete_dm(interaction: discord.Interaction):
     # Check if the command is sent in a DM
     if isinstance(interaction.channel, discord.DMChannel):
