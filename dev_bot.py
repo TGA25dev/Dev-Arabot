@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
 import asyncio
 import random
@@ -211,6 +211,21 @@ autorole_role = 1102260664401150024
 
 setup_command_id = 1184232293691293726
 
+help_command_id = 1098204837612617731
+
+explosion_command_id = 1119281805477036194
+
+vol_command_id = 1119281805477036195
+
+effacer_dm_command_id = 1184924715480006707
+
+info_command_id = 1119281805477036197
+
+dev_info_command_id = 1108432433830965340
+
+admin_command_id = 1098204837612617733
+
+
 #EVENTS
 
 try:
@@ -235,7 +250,7 @@ async def on_guild_join(guild):
 
     welcome_embed.add_field(name="", value="", inline=False)
 
-    welcome_embed.add_field(name="", value="Je suis un bot français mais avec quelques origines...\nJe possède plusieurs commandes, toutes visibles avec la commande </help:1098204837612617731>.", inline=False)
+    welcome_embed.add_field(name="", value=f"Je suis un bot français mais avec quelques origines...\nJe possède plusieurs commandes, toutes visibles avec la commande </help:{help_command_id}>.", inline=False)
 
     welcome_embed.add_field(name="", value="", inline=False)
 
@@ -278,21 +293,21 @@ help_embed = discord.Embed(
         description="Voici toutes mes commandes :",
         color=discord.Color.from_rgb(252, 165, 119)
 )
-help_embed.add_field(name="</explosion:1119281805477036194>", value="Fait exploser le serveur (__*Temporairement indisponible*__)", inline=False)
+help_embed.add_field(name=f"</explosion:{explosion_command_id}>", value="Fait 'exploser' le serveur (__*Temporairement indisponible*__)", inline=False)
 
-help_embed.add_field(name="</vol:1119281805477036195>", value="Vole le profil d'un membre du serveur", inline=False) 
+help_embed.add_field(name=f"</vol:{vol_command_id}>", value="'Vole' le profil d'un membre du serveur", inline=False) 
 
-help_embed.add_field(name="</effacer-dm:1184924715480006707>", value="Supprime tout les messages privés avec le bot", inline=False)
+help_embed.add_field(name=f"</effacer-dm:{effacer_dm_command_id}>", value="Supprime tout les messages privés avec le bot", inline=False)
 
-help_embed.add_field(name="</info:1119281805477036197>", value="Affiche les informations du bot", inline=False)
+help_embed.add_field(name=f"</info:{info_command_id}>", value="Affiche les informations du bot", inline=False)
 
-help_embed.add_field(name="</devinfo:1108432433830965340>", value="Affiche des informations sur le développeur du bot", inline=False)
+help_embed.add_field(name=f"</devinfo:{dev_info_command_id}>", value="Affiche des informations sur le développeur du bot", inline=False)
 
-help_embed.add_field(name="</setup:1184232293691293726>", value="Affiche l'interface de configuration du bot", inline=False)
+help_embed.add_field(name=f"</setup:{setup_command_id}>", value="Affiche l'interface de configuration du bot", inline=False)
 
-help_embed.add_field(name="</help:1098204837612617731>", value="Affiche ceci", inline=False)
+help_embed.add_field(name=f"</help:{help_command_id}>", value="Affiche ceci", inline=False)
 
-help_embed.add_field(name="</admin:1098204837612617733>", value="Affiche le panel d'administration du bot ***Commande réservée aux admins du bot***", inline=False)
+help_embed.add_field(name=f"</admin:{admin_command_id}>", value="Affiche le panel d'administration du bot ***Commande réservée aux admins du bot***", inline=False)
 
 help_embed.set_footer(text=version_note)
 
@@ -1419,7 +1434,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                     profile_image = open(profile_image_path, 'rb')
                     pfp = profile_image.read()
 
-                    await interaction.response.send_message(f"J'ai temporairement volé le profil de <@{user.id}> :tada::tada: ! ", ephemeral=True)
+                    await interaction.response.send_message(f"J'ai temporairement 'volé' le profil de <@{user.id}> :tada::tada: ! ", ephemeral=True)
 
                     try:
                         await client.user.edit(avatar=pfp)
@@ -1482,7 +1497,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                     remaining_minutes = remaining_time // 60
                     remaining_seconds = remaining_time % 60
 
-                    await interaction.response.send_message(f"Veuillez patienter *{remaining_minutes} minutes* et *{remaining_seconds} secondes* avant de pouvoir réutiliser cette commande.", ephemeral=True)
+                    await interaction.response.send_message(f"Veuillez patienter ***{remaining_minutes} minutes*** et ***{remaining_seconds} secondes*** avant de pouvoir réutiliser cette commande.", ephemeral=True)
 
                 # Save the updated server cooldown data to the JSON file
                 with open("JSON Files/vol_command_cooldown.json", 'w') as f:
@@ -1528,10 +1543,10 @@ async def embed_command(interaction: discord.Interaction):
 
 
     if maintenance_mode:
-        await interaction.response.send_message(embed=maintenance_embed) ##############
+        await interaction.response.send_message(embed=maintenance_embed)
         return
     try:
-     await interaction.response.sed_message(embed=help_embed, ephemeral=False)
+     await interaction.response.send_message(embed=help_embed, ephemeral=False)
 
     except Exception as e:
         error_dminfo_embed = discord.Embed( 
@@ -1578,7 +1593,7 @@ async def embed_command(interaction: discord.Interaction):
         return
     try:
 
-     current_time = datetime.now(france_tz).strftime("%H:%M")
+     
 
     # Create the embed
      info_embed2 = discord.Embed(
