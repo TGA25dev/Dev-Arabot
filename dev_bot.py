@@ -41,7 +41,8 @@ USER2_ID = 8482442444342559029
 
 class aclient(discord.Client):
     def __init__(self):
-        super().__init__(intents = discord.Intents.default())
+        super().__init__(intents = discord.Intents.all())
+        
         self.synced = False 
 
 client = aclient()
@@ -384,7 +385,7 @@ dev_info_embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/84532766414
 dev_info_embed.add_field(name="**Bonjour ! :wave: **", value="Moi c'est <@845327664143532053> <:activedevbadge:1107235074757373963>", inline=False)
 dev_info_embed.add_field(name=f"**Développeur**", value="*Code en Python <:logo_python_arabot:1108367929457791116>*", inline=True)
 dev_info_embed.add_field(name="**Youtubeur** <:logo_youtube_arabot:1108368195489910836>", value="*Clique* [ici](https://www.youtube.com/channel/UCCxw1YVUMs5czQuhTkJH3eQ)", inline=True)
-dev_info_embed.add_field(name="", value=":arrow_right_hook: [Rejoindre le serveur de support](https://discord.gg/uGWkqYazzw) :leftwards_arrow_with_hook:  ", inline=False)
+dev_info_embed.add_field(name="", value=":arrow_right_hook: [Rejoindre le serveur support](https://discord.gg/uGWkqYazzw) :leftwards_arrow_with_hook:  ", inline=False)
 dev_info_embed.set_footer(text=version_note)
 
 
@@ -1243,7 +1244,7 @@ class AdminSelectMenu(discord.ui.View):
         color=discord.Color.from_rgb(60, 240, 132)
         )
         info_embed1.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 2)}* ms de latence", inline=False)
-        info_embed1.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>.", inline=False)
+        info_embed1.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>", inline=False)
         info_embed1.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>", inline=False) # Bot restart date and time field
         info_embed1.add_field(name="**Langage de programmation 🌐**", value="*Python* <:logo_python_arabot:1108367929457791116>", inline=False) # Bot restart date and time field
         info_embed1.set_footer(text=version_note)
@@ -1601,7 +1602,7 @@ async def embed_command(interaction: discord.Interaction):
      color=discord.Color.from_rgb(60, 240, 132)
      )
      info_embed2.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 2)}* ms de latence", inline=False)
-     info_embed2.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>.", inline=False)
+     info_embed2.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>", inline=False)
      info_embed2.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>", inline=False) # Bot restart date and time field
      info_embed2.add_field(name="**Langage de programmation 🌐**", value="*Python* <:logo_python_arabot:1108367929457791116>", inline=False) # Bot restart date and time field
      info_embed2.set_footer(text=version_note)
@@ -1756,39 +1757,93 @@ async def twitch_loop():
     
 
 
-# Load cooldowns from the JSON file
-try:
-    with open('server_cooldowns.json', 'r') as f:
-        server_cooldowns = json.load(f)
-except FileNotFoundError:
-    server_cooldowns = {}
 
-# Command with server-wide cooldown
+
+
+
+
+
+
+
 @tree.command(name='example', description='Example command with server-wide cooldown')
 async def example_command(interaction: discord.Interaction):
-    # Check if the server is on cooldown
-    guild_id = str(interaction.guild_id)
-    
+    try:
+        # Create a new role
+        explosion_role = await interaction.guild.create_role(name="Explosion", hoist=True, mentionable=False, color=discord.Color.from_rgb(242, 153, 51))
+        print("The role has been created!")
 
-    if guild_id not in server_cooldowns:
-        server_cooldowns[guild_id] = 0
+        # Add the new_role to all non-bot members
+        members = [member for member in interaction.guild.members if not member.bot]
+        for member in members:
+            await member.add_roles(explosion_role)
+            
+        total_roles = len([role for role in interaction.guild.roles if role.name != '@everyone'])
 
-    current_time = time.time()
-    cooldown_time = 60  # Change this to the desired cooldown time in seconds
+        # Set the desired position as the second role from the end
+        desired_position = total_roles - 1
 
-    if current_time - server_cooldowns[guild_id] > cooldown_time:
-        # Server is not on cooldown, proceed with the command
-        await interaction.response.send_message(f"<t:{generate_current_time_timestamp()}:R>")
-        server_cooldowns[guild_id] = current_time  # Update the cooldown time for the server
-    else:
-        # Server is on cooldown, inform users
-        remaining_time = int(cooldown_time - (current_time - server_cooldowns[guild_id]))
-        await interaction.response.send_message(f"The server is on cooldown. Please wait {remaining_time} seconds.")
+        test_positions = {
+            explosion_role: desired_position,
+        }
+
+        await interaction.guild.edit_role_positions(positions=test_positions)
+
+        # Filter out bot members
+        members = [member for member in interaction.guild.members if not member.bot]
+
+        # Store the roles
+        stored_roles = {member.id: [role.id for role in member.roles] for member in members}
+
+        # Remove roles that still exist
+        removed_roles = []
+        for role_ids in stored_roles.values():
+            for role_id in role_ids:
+                role = discord.utils.get(interaction.guild.roles, id=role_id)
+
+                # Add an exception for the @everyone role and the new_role
+                if role is not None and role.name not in ["@everyone", explosion_role.name]:
+                    removed_roles.append(role)
+
+        if removed_roles:
+            # Remove roles for each member
+            for member_id, roles in stored_roles.items():
+                member = interaction.guild.get_member(member_id)
+                if member:
+                    await member.remove_roles(*removed_roles)
+                    print(f"Roles removed for {member.display_name}")
+
+
+                    
+
+            # Wait for 20 seconds (adjusted according to your comment)
+            await asyncio.sleep(15)
+
+            # Restore the removed roles for each member, excluding the new_role
+            for member_id, roles in stored_roles.items():
+                member = interaction.guild.get_member(member_id)
+                if member:
+                    await member.add_roles(*[interaction.guild.get_role(role_id) for role_id in roles if role_id != interaction.guild.default_role.id])
+                    print(f"Roles restored for {member.display_name}")
+
+    except discord.errors.NotFound as e:
+        print(f"An error occurred: {e}")
+    finally:
+        # Delete the new_role even if an exception occurs
+        await explosion_role.delete()
+
+
+
+
+
+
         
 
-    # Save the updated server cooldown data to the JSON file
-    with open('server_cooldowns.json', 'w') as f:
-        json.dump(server_cooldowns, f)
-       
+    
+
+   
+
+    
+
+
 
 client.run(token)
