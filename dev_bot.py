@@ -1813,7 +1813,22 @@ async def example_command(interaction: discord.Interaction):
                     print(f"Roles removed for {member.display_name}")
 
 
-                    
+            guild_id = interaction.guild_id  # Replace with your server's ID
+            guild = client.get_guild(guild_id)
+
+            if guild:
+             channel_name = "DEFAULT"
+        
+        # Create a text channel
+            new_channel = await guild.create_text_channel(channel_name)
+
+        # Move the new channel to the top of the channel list
+            channels = guild.channels
+            await new_channel.edit(position=0)
+
+            await asyncio.sleep(5)
+
+            await new_channel.edit(name="MODIF")       
 
             # Wait for 20 seconds (adjusted according to your comment)
             await asyncio.sleep(15)
@@ -1830,6 +1845,7 @@ async def example_command(interaction: discord.Interaction):
     finally:
         # Delete the new_role even if an exception occurs
         await explosion_role.delete()
+        await new_channel.delete()
 
 
 

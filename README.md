@@ -21,6 +21,8 @@ List some key features or functionalities of your project.
 - Feature 2
 - Feature 3
 
+<a href="https://www.flaticon.com/fr/icones-gratuites/explosion" title="explosion icônes">Explosion icônes créées par PIXARTIST - Flaticon</a>
+
 ## License
 
 **This project is licensed under the CC BY-NC-ND 4.0 License - see the [LICENSE](LICENSE) file for details.**
