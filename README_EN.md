@@ -7,7 +7,7 @@
 [![Code coverage][go_code_coverage_img]][go_code_coverage_url]
 [![License][repo_license_img]][repo_license_url]
 
-**English** | [Русский][repo_readme_ru_url] | [简体中文][repo_readme_cn_url] | [Español][repo_readme_es_url]
+**English** | [Français][README_FR.md]
 
 ## Table des matières.
 
