@@ -2,12 +2,10 @@
 
 # Arabot
 
-[![Go version][go_version_img]][go_dev_url]
-[![Go report][go_report_img]][go_report_url]
-[![Code coverage][go_code_coverage_img]][go_code_coverage_url]
-[![License][repo_license_img]][repo_license_url]
 
-**English** | [Français][README_FR.md]
+[![License][https://i.postimg.cc/pXJtyFHY/balance.png]][LICENSE]
+
+**English** | [LICENSE](README_FR.md)
 
 ## Table des matières.
 
