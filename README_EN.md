@@ -3,7 +3,8 @@
 # Arabot
 
 
-[![License][https://i.postimg.cc/pXJtyFHY/balance.png]][LICENSE]
+[![License](https://i.postimg.cc/pXJtyFHY/balance.png)](LICENSE)
+
 
 **English** | [LICENSE](README_FR.md)
 
