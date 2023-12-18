@@ -383,7 +383,7 @@ dev_info_embed = discord.Embed(
 )
 dev_info_embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/845327664143532053/65a0b52e2a7b881a64c5769d8f12f359.png?size=512")
 dev_info_embed.add_field(name="**Bonjour ! :wave: **", value="Moi c'est <@845327664143532053> <:activedevbadge:1107235074757373963>", inline=False)
-dev_info_embed.add_field(name=f"**Développeur**", value="*Code en Python <:logo_python_arabot:1108367929457791116>*", inline=True)
+dev_info_embed.add_field(name=f"**Développeur**", value="*Développeur Python <:logo_python_arabot:1108367929457791116>*", inline=True)
 dev_info_embed.add_field(name="**Youtubeur** <:logo_youtube_arabot:1108368195489910836>", value="*Clique* [ici](https://www.youtube.com/channel/UCCxw1YVUMs5czQuhTkJH3eQ)", inline=True)
 dev_info_embed.add_field(name="", value=":arrow_right_hook: [Rejoindre le serveur support](https://discord.gg/uGWkqYazzw) :leftwards_arrow_with_hook:  ", inline=False)
 dev_info_embed.set_footer(text=version_note)
