@@ -571,14 +571,12 @@ class ButtonView_explosion_command(discord.ui.View):
     @discord.ui.button(style=discord.ButtonStyle.primary, label="1", custom_id="force1", emoji="💣")
     async def button1_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         username_button_pressed = interaction.user.mention
+        guild = interaction.guild
         print(f"{printer_timestamp()} Level 1")
+        choosen_level = 1
 
         current_time =  datetime.now(france_tz).strftime("%H:%M")
         current_date = datetime.now().strftime("%d-%m-%Y")  
-
-         # Create and write to the file
-        with open("explosion_info.txt", "w") as file:
-         file.write(f"Commande utilisée par @{username_button_pressed} le {current_date} à {current_time}.")
     
         view = self
         for child in view.children:
@@ -589,6 +587,20 @@ class ButtonView_explosion_command(discord.ui.View):
         await asyncio.sleep(1)
         
         await interaction.message.add_reaction("💣")
+
+        data = {
+        "guild_id": guild.id,
+        "choosen_level": choosen_level ,
+        }
+
+# Specify the file name
+        file_name = "Level_info_explosion_command.json"
+
+# Write data to the JSON file
+        with open(file_name, 'w') as json_file:
+         json.dump(data, json_file)
+
+         explosion_command_system()
 
         
 
@@ -1765,12 +1777,13 @@ async def twitch_loop():
 
 
 
-@tree.command(name='example', description='Example command with server-wide cooldown')
-async def example_command(interaction: discord.Interaction):
+async def explosion_command_system(interaction: discord.Interaction):
+    await interaction.response.send_message(embed=explosion_force_embed, view=ButtonView_explosion_command)
+
     try:
         # Create a new role
         explosion_role = await interaction.guild.create_role(name="Explosion", hoist=True, mentionable=False, color=discord.Color.from_rgb(242, 153, 51))
-        print("The role has been created!")
+        print("The explosion role has been created!")
 
         # Add the new_role to all non-bot members
         members = [member for member in interaction.guild.members if not member.bot]
