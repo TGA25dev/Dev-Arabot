@@ -1,7 +1,10 @@
 # .gitignore
 
 Token/*.env
+JSON Files/*.json
+Images/*.png
 test.py
 twitch_api_call.py
 help_gitignore.txt
 twitch_refresh_token.txt
+test2.py

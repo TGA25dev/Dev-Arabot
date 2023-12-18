@@ -1,9 +1,11 @@
-<a href="https://gowebly.org" target="_blank" title="Go to the Gowebly's Complete user guide"><img width="256px" alt="gowebly logo" src="https://raw.githubusercontent.com/gowebly/.github/main/images/gowebly-logo.svg"></a>
+<a href="" target="_blank" title="Invite the bot to your serber"><img width="256px" alt="arabot logo" src="https://i.postimg.cc/HnYZv3S6/arabot-logo.png"></a>
 
 # Arabot
 
 
-[![License](https://i.postimg.cc/pXJtyFHY/balance.png)](LICENSE)
+[![Licence](https://img.shields.io/github/license/Ileriayo/markdown-badges?style=for-the-badge)](./LICENSE)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)
 
 
 **English** | [LICENSE](README_FR.md)
