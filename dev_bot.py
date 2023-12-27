@@ -441,9 +441,57 @@ unavaileble_command_embed = discord.Embed(
 )
 unavaileble_command_embed.set_footer(text=version_note)
 
+
+tos_not_accepted_embed = discord.Embed(
+   title="Vous n'avez pas accepté les conditions d'utilisation !",
+   description="**Pour utiliser le bot, veuillez accepter les conditions en exécutant la commande `/setup`.\nSi vous préférez ne pas les accepter, vous avez la possibilité de supprimer le bot en cliquant sur le bouton ci-dessous.** :x:",
+   color=discord.Color.from_rgb(66, 135, 245),
+   
+)
+tos_not_accepted_embed.set_footer(text=version_note)
+
 #BUTTON VIEWS
 
+ #Button View Delete Bot
+
+
+
  #Button View Status
+
+class ButtonView_delete_bot(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.bot = client
+
+    @discord.ui.button(style=discord.ButtonStyle.danger, label="Supprimer le bot", custom_id="delete_bot_button")
+    async def button_delete_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message(content="**Êtes-vous sûr ?** (Le bot pourra être ajouté à nouveau avec un lien d'invitation)\nRépondez `oui` pour supprimer le bot de ce serveur. :grey_question:", ephemeral=True, delete_after=35)
+
+        try:
+            confirm_response = await self.bot.wait_for(
+                "message",
+                check=lambda m: m.author == interaction.user and m.channel == interaction.channel,
+                timeout=30  # You can adjust the timeout duration
+            )
+
+            if confirm_response.content.lower() == "oui":
+                # Delete the bot from the server
+               await confirm_response.delete()
+               print(f"{printer_timestamp()} Bot deleted from server: {interaction.guild.name} ({interaction.guild.id})")
+               await interaction.edit_original_response(content="**Le bot a bien été supprimé de ce serveur !** :white_check_mark:")
+
+               await interaction.guild.leave()
+                
+            else:
+                await interaction.edit_original_response(content="**Opération annulée...** :x:")
+                await confirm_response.delete()
+        
+        except asyncio.TimeoutError:
+            await interaction.edit_original_response(content="***Temps écoulé.*** Veuillez réessayer. :alarm_clock:")
+            
+
+
+
 
 class ButtonView_status(discord.ui.View):
     def __init__(self, message):
@@ -752,6 +800,51 @@ class ButtonView_give_roles(discord.ui.View):
      await interaction.response.send_message(embed=removed_autorole_embed, ephemeral=True)
 
 
+class ButtonView_setup_tos(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    custom_accept_emoji = discord.PartialEmoji(name="rule_logo", id=1189622492357214249, animated=False)
+
+    custom_refuse_emoji = discord.PartialEmoji(name="refuse_logo", id=1189625708838916207, animated=False)
+
+    @discord.ui.button(style=discord.ButtonStyle.green, label="J'ai lu et j'accepte", custom_id="button_accept_tos", emoji=custom_accept_emoji)
+    async def button_accept_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} TOS have been accepted !")
+
+        try:
+         with open("JSON Files/TOS_info_data.json", 'r') as f:
+            tos_data_file = json.load(f)
+        except FileNotFoundError:
+         tos_data_file = {}
+
+
+        tos_data_file[interaction.guild.id] = {"accepted_tos": True} 
+
+
+        with open("JSON Files/TOS_info_data.json", 'w') as f:
+         json.dump(tos_data_file, f)
+
+
+    @discord.ui.button(style=discord.ButtonStyle.blurple, label="Je refuse", custom_id="button_deny_tos", emoji=custom_refuse_emoji)
+    async def button_refuse_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} TOS have been denied...")
+
+        try:
+         with open("JSON Files/TOS_info_data.json", 'r') as f:
+            tos_data_file = json.load(f)
+        except FileNotFoundError:
+         tos_data_file = {}
+
+
+        tos_data_file[interaction.guild.id] = {"accepted_tos": False} 
+
+
+        with open("JSON Files/TOS_info_data.json", 'w') as f:
+         json.dump(tos_data_file, f)
+
+
 
 #SELECT VIEWS  
 
@@ -820,8 +913,21 @@ async def setup(interaction: discord.Interaction):
 
 @tree.command(name="effacer-dm", description="Supprime tout DM du bot")
 async def delete_dm(interaction: discord.Interaction):
+
+    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+     loaded_data = json.load(json_file)
+
+    # Extract relevant data from loaded JSON using the specific guild ID
+    guild_id = str(interaction.guild.id)
+    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+
+    if not is_tos_accepted:
+       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+
+    else:   
+
     # Check if the command is sent in a DM
-    if isinstance(interaction.channel, discord.DMChannel):
+     if isinstance(interaction.channel, discord.DMChannel):
         await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages du bot sont en cours de suppression.....\n\n(La vitesse de suppression est limitée à 1 message par seconde pour ne pas surcharger le bot :information_source:)", ephemeral=True)
 
         # Fetch the bot's sent messages in the DM
@@ -836,7 +942,7 @@ async def delete_dm(interaction: discord.Interaction):
             await asyncio.sleep(1)
 
         await interaction.edit_original_response(content="L'ensemble des messages du bot ont étés supprimés :white_check_mark: !")
-    else:
+     else:
         await interaction.response.send_message("Cette commande n'est utilisable que dans les DM !", ephemeral=True)
 
 @tree.command(name="admin", description="Affiche le panel d'administration du bot")
@@ -883,23 +989,34 @@ async def admin_panel(interaction: discord.Interaction):
 
 @tree.command(name="explosion", description="Boum !")
 async def explosion_command(interaction: discord.Interaction):
+      
+    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+     loaded_data = json.load(json_file)
 
-    try:
+      # Extract relevant data from loaded JSON using the specific guild ID
+    guild_id = str(interaction.guild.id)
+    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+
+    if not is_tos_accepted:
+       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+    else:   
+
+     try:
         with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'r') as f:
             explosion_command_cooldown = json.load(f)
-    except FileNotFoundError:
+     except FileNotFoundError:
         explosion_command_cooldown = {}
 
     # Check for cooldown
-    guild_id = str(interaction.guild_id)
+     guild_id = str(interaction.guild_id)
 
-    if guild_id not in explosion_command_cooldown:
+     if guild_id not in explosion_command_cooldown:
         explosion_command_cooldown[guild_id] = 0
 
-    current_time = time.time()
-    cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
+     current_time = time.time()
+     cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
 
-    if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
+     if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
         # Server is on cooldown, inform users
         remaining_time_seconds = int(cooldown_time - (current_time - explosion_command_cooldown[guild_id]))
 
@@ -912,11 +1029,11 @@ async def explosion_command(interaction: discord.Interaction):
         await interaction.response.send_message(f"Veuillez attendre {remaining_time_formatted} avant de refaire exploser ce serveur... :hourglass_flowing_sand:", ephemeral=True)
         return
 
-    explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
+     explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
 
-    if explosion_command_avalaible == False:
+     if explosion_command_avalaible == False:
         await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
-    elif explosion_command_avalaible == True:
+     elif explosion_command_avalaible == True:
         user_id = interaction.user.id
         command_name = interaction.data['name']
         command_id = interaction.data['id']
@@ -949,8 +1066,8 @@ async def explosion_command(interaction: discord.Interaction):
             await USER_DM.send(embed=error_dminfo_embed)
             await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
-    # Save the updated server cooldown data to the JSON file
-    with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
+     # Save the updated server cooldown data to the JSON file
+     with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
         json.dump(explosion_command_cooldown, f)
 
 
@@ -960,9 +1077,21 @@ async def explosion_command(interaction: discord.Interaction):
 
 @tree.command(name="vol", description="Vole le nom d'un utilisateur")
 async def vol_command(interaction: discord.Interaction, user: discord.Member):
-    if vol_command_avalaible == False:
+    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+     loaded_data = json.load(json_file)
+
+    # Extract relevant data from loaded JSON using the specific guild ID
+    guild_id = str(interaction.guild.id)
+    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+
+    if not is_tos_accepted:
+       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+
+    else: 
+       
+     if vol_command_avalaible == False:
         await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
-    elif vol_command_avalaible == True:
+     elif vol_command_avalaible == True:
         user_id = interaction.user.id
         command_name = interaction.data['name']
         command_id = interaction.data['id']
@@ -1101,28 +1230,40 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
         
 @tree.command(name="help", description="Affiche les commandes disponibles")
 async def embed_command(interaction: discord.Interaction):
-    user_id = interaction.user.id
+    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+     loaded_data = json.load(json_file)
 
-    command_name = interaction.data['name']
+    # Extract relevant data from loaded JSON using the specific guild ID
+    guild_id = str(interaction.guild.id)
+    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
 
-    command_id = interaction.data['id']
+    if not is_tos_accepted:
+       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
 
-    guild_name = interaction.guild.name
+    else: 
+       
+     user_id = interaction.user.id
 
-    TGA25_ID = "845327664143532053"  
-    USER_DM = await client.fetch_user(TGA25_ID)
+     command_name = interaction.data['name']
+
+     command_id = interaction.data['id']
+
+     guild_name = interaction.guild.name
+
+     TGA25_ID = "845327664143532053"  
+     USER_DM = await client.fetch_user(TGA25_ID)
 
 
 
 
 
-    if maintenance_mode:
+     if maintenance_mode:
         await interaction.response.send_message(embed=maintenance_embed)
         return
-    try:
-     await interaction.response.send_message(embed=help_embed, ephemeral=False)
+     try:
+      await interaction.response.send_message(embed=help_embed, ephemeral=False)
 
-    except Exception as e:
+     except Exception as e:
         error_dminfo_embed = discord.Embed( 
         title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
         description=f"**Erreur causée par** <@{user_id}>",
@@ -1147,42 +1288,53 @@ async def embed_command(interaction: discord.Interaction):
 
 @tree.command(name="info", description="Affiche des informations à propos du bot")
 async def embed_command(interaction: discord.Interaction):
+    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+     loaded_data = json.load(json_file)
 
-    user_id = interaction.user.id
+    # Extract relevant data from loaded JSON using the specific guild ID
+    guild_id = str(interaction.guild.id)
+    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
 
-    command_name = interaction.data['name']
+    if not is_tos_accepted:
+       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
 
-    command_id = interaction.data['id']
+    else:    
 
-    guild_name = interaction.guild.name
+     user_id = interaction.user.id
 
-    TGA25_ID = "845327664143532053"  
-    USER_DM = await client.fetch_user(TGA25_ID)
+     command_name = interaction.data['name']
+
+     command_id = interaction.data['id']
+
+     guild_name = interaction.guild.name
+
+     TGA25_ID = "845327664143532053"  
+     USER_DM = await client.fetch_user(TGA25_ID)
 
 
 
 
-    if maintenance_mode:
+     if maintenance_mode:
         await interaction.response.send_message(embed=maintenance_embed)
         return
-    try:
+     try:
 
      
 
     # Create the embed
-     info_embed2 = discord.Embed(
-     title="Infos",
-     color=discord.Color.from_rgb(60, 240, 132)
-     )
-     info_embed2.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 2)}* ms de latence", inline=False)
-     info_embed2.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>", inline=False)
-     info_embed2.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>", inline=False) # Bot restart date and time field
-     info_embed2.add_field(name="**Langage de programmation 🌐**", value="*Python* <:logo_python_arabot:1108367929457791116>", inline=False) # Bot restart date and time field
-     info_embed2.set_footer(text=version_note)
+      info_embed2 = discord.Embed(
+      title="Infos",
+      color=discord.Color.from_rgb(60, 240, 132)
+      )
+      info_embed2.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 2)}* ms de latence", inline=False)
+      info_embed2.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>", inline=False)
+      info_embed2.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>", inline=False) # Bot restart date and time field
+      info_embed2.add_field(name="**Langage de programmation 🌐**", value="*Python* <:logo_python_arabot:1108367929457791116>", inline=False) # Bot restart date and time field
+      info_embed2.set_footer(text=version_note)
 
-     await interaction.response.send_message(embed=info_embed2, ephemeral=False)
+      await interaction.response.send_message(embed=info_embed2, ephemeral=False)
 
-    except Exception as e:
+     except Exception as e:
         error_dminfo_embed = discord.Embed( 
         title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
         description=f"**Erreur causée par** <@{user_id}>",
@@ -1201,26 +1353,37 @@ async def embed_command(interaction: discord.Interaction):
 
 @tree.command(name="devinfo", description="Affiche des informations à propos du développeur")
 async def dev_info_command(interaction: discord.Interaction):
+    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+     loaded_data = json.load(json_file)
 
- command_name = interaction.data['name']
+    # Extract relevant data from loaded JSON using the specific guild ID
+    guild_id = str(interaction.guild.id)
+    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
 
- user_id = interaction.user.id
+    if not is_tos_accepted:
+       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
 
- command_id = interaction.data['id']
+    else: 
+       #
+     command_name = interaction.data['name']
 
- guild_name = interaction.guild.name
+     user_id = interaction.user.id
 
- TGA25_ID = "845327664143532053"  
- USER_DM = await client.fetch_user(TGA25_ID)
+     command_id = interaction.data['id']
+
+     guild_name = interaction.guild.name
+
+     TGA25_ID = "845327664143532053"  
+     USER_DM = await client.fetch_user(TGA25_ID)
    
    
 
- try:
-    emoji_id = 1107235074757373963 # Replace with the ID of your custom emoji
-    myemoji = client.get_emoji(emoji_id)
-    await interaction.response.send_message(content= myemoji, embed=dev_info_embed)
+     try:
+       emoji_id = 1107235074757373963 # Replace with the ID of your custom emoji
+       myemoji = client.get_emoji(emoji_id)
+       await interaction.response.send_message(content= myemoji, embed=dev_info_embed)
 
- except Exception as e:
+     except Exception as e:
         error_dminfo_embed = discord.Embed( 
         title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
         description=f"**Erreur causée par** <@{user_id}>",
@@ -1330,7 +1493,9 @@ async def twitch_loop():
     
 
 
-
+@tree.command(name="test", description="test_command")
+async def test_command(interaction: discord.Interaction):
+    await interaction.response.send_message(view=ButtonView_setup_tos())
 
 
 async def explosion_command_system(interaction: discord.Interaction):
