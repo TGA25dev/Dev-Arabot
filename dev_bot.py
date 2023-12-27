@@ -444,7 +444,7 @@ unavaileble_command_embed.set_footer(text=version_note)
 
 tos_not_accepted_embed = discord.Embed(
    title="Vous n'avez pas accepté les conditions d'utilisation !",
-   description="**Pour utiliser le bot, veuillez accepter les conditions en exécutant la commande `/setup`.\nSi vous préférez ne pas les accepter, vous avez la possibilité de supprimer le bot en cliquant sur le bouton ci-dessous.** :x:",
+   description="*Pour utiliser le bot, veuillez accepter les conditions en exécutant la commande `/setup`*\nSi vous préférez ne pas les accepter, vous avez la possibilité de supprimer le bot en cliquant sur le bouton ci-dessous :x:",
    color=discord.Color.from_rgb(66, 135, 245),
    
 )
