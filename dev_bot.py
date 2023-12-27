@@ -186,6 +186,15 @@ default_bot_nick = f"{bot_mode_def} Arabot"
 version_number = "v2.0"
 streamer_name = ("Ponce")
 
+lock_icon_url = "https://i.postimg.cc/MTG44vm8/lock-icon.png"
+clock12_icon_url = "https://i.postimg.cc/nrCysCX1/clock12-icon.png"
+clock3_icon_url = "https://i.postimg.cc/SRFPKDpm/clock3-icon.png"
+clock1230_icon_url = "https://i.postimg.cc/2yQKLhzh/clock1230-icon.png"
+clock9_icon_url = "https://i.postimg.cc/7ZYWb5jJ/clock9-icon.png"
+unlock_icon_url = "https://i.postimg.cc/X7gPVf10/unlock-icon.png"
+trash_icon_url = "https://i.postimg.cc/1z6SZ7Fm/trash-icon.png"
+tada_icon_url = "https://i.postimg.cc/zvrbZPGK/tada-icon.png"
+
 def generate_current_time_timestamp():
    discord_current_time = datetime.now(france_tz)
    current_time_timestamp = int(discord_current_time.timestamp())
@@ -570,14 +579,9 @@ class ButtonView_explosion_command(discord.ui.View):
 
     @discord.ui.button(style=discord.ButtonStyle.primary, label="1", custom_id="force1", emoji="💣")
     async def button1_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        username_button_pressed = interaction.user.mention
         guild = interaction.guild
-        print(f"{printer_timestamp()} Level 1")
         choosen_level = 1
 
-        current_time =  datetime.now(france_tz).strftime("%H:%M")
-        current_date = datetime.now().strftime("%d-%m-%Y")  
-    
         view = self
         for child in view.children:
          child.disabled = True
@@ -590,194 +594,20 @@ class ButtonView_explosion_command(discord.ui.View):
 
         data = {
         "guild_id": guild.id,
+        "guild_name": guild.name,
         "choosen_level": choosen_level ,
+        "username_button_pressed": interaction.user.mention
         }
 
 # Specify the file name
-        file_name = "Level_info_explosion_command.json"
+        file_name = "JSON Files/Explosion_Command_Data/level_info_explosion_command.json"
 
 # Write data to the JSON file
         with open(file_name, 'w') as json_file:
          json.dump(data, json_file)
 
-         explosion_command_system()
-
-        
-
-       
-
-        await asyncio.sleep(3)
-        guild = interaction.guild
-        category = await guild.create_category("🏡Refuge🏡") #Crée la categorie
-
-       
-        channel = await guild.create_text_channel("❗venez❗", category=category) #Crée le salon
-        await category.edit(position=0) #Met la categorie en haut de la liste
-
-
-        for role in channel.guild.roles:
-         await channel.set_permissions(role, send_messages=False)
-
-        await asyncio.sleep(5)
-        await channel.edit(name="🔰Refuge🔰") #Renome le salon
-
-        await asyncio.sleep(3)
-
-        refuge_channel_id = channel.id  #Recupere l'id du salon
-        print(f"{printer_timestamp()} <#{refuge_channel_id}>")
-
-        await asyncio.sleep(2)
-
-
-        with open("user_explosion.txt", "w") as f: #Crée un .txt avec l'id de la personne qui a pressé le bouton
-         f.write(f"{username_button_pressed}")
-
-        await interaction.channel.send(f"@here ! Rejoignez le salon <#{refuge_channel_id}> !")
-
-        await asyncio.sleep(2)
-
-        #-------------------------------------------------------------------------------
-        #Explosion Command Embed 
-        with open("user_explosion.txt", 'r') as file:
-         explosion_username = file.read()
-
-        await asyncio.sleep(1)
-
-        explosion_command_embed = discord.Embed( #Crée l'embed
-        title="**🟢 Refuge 🟢**",
-        description="Ce salon vous permet de patienter jusqu'à la fin des explosions.",
-        color=discord.Color.from_rgb(158, 240, 91)        
-        )
-        explosion_command_embed.set_footer(text=f"{version_note}")
-        explosion_command_embed.add_field(name="Le serveur va être inaccessible pendant *1* minute.", value=f"*On peut remercier{explosion_username} 👏👏*", inline=False)
-        
-
-        #-------------------------------------------------------------------------------
-        channel_id = refuge_channel_id # Replace with the ID of the channel you want to send a message to
-
-        await asyncio.sleep(2)
-
-        refuge_channel = client.get_channel(channel_id)
-        embed_message = await channel.send(embed=explosion_command_embed) #Envoi l'embed
-
-        os.remove("user_explosion.txt") #Supprime le fichier .txt
-
-        await asyncio.sleep(2)
-   
-        refuge_channel = client.get_channel(refuge_channel_id)
-      
-        await asyncio.sleep(2)
-
-        for role in channel.guild.roles:
-         await channel.set_permissions(role, send_messages=False) #Empeche les utilisateurs d'envoyer des messages
-
-         await asyncio.sleep(1)
-
-       #-------------------------------------------------------------------------------
-
-        print(f"{printer_timestamp()} Explosion Started !") 
-        async def send_messages_with_delays(guild, message_list, exception_channel_id=refuge_channel_id): #Lance l'explosion
-         await asyncio.sleep(1)
-         for message in message_list:
-          for channel in guild.channels:
-            if isinstance(channel, discord.TextChannel) and channel.id != exception_channel_id:
-                try:
-                    await channel.send(message)
-                except:
-                    # Handle any exceptions that may occur while sending the message to a channel
-                    pass
-        delay = random.randint(1, 5)  # Generate a random delay between 1 and 5 seconds
-        await asyncio.sleep(delay)
-        
-        guild = client.get_guild(server_id)
-        message = "💥💥💥💥💥"
-        await send_messages_with_delays(guild, message)
-        print(f"{printer_timestamp()} Explosion Ended !")
-
-        await asyncio.sleep(3)
-
-        print(f"{printer_timestamp()} Starting hidding channels...") 
-
-        #-------------------------------------------------------------------------------
-
-        explosion_command_embed_v2 = discord.Embed( #Crée l'embed v2
-        title="**🟢 Refuge 🟢**",
-        description="Ce salon vous permet de patienter jusqu'à ce que le serveur soit de nouveau accessible.",
-        color=discord.Color.from_rgb(158, 240, 91)        
-        )
-        explosion_command_embed_v2.set_footer(text=f"{version_note}")
-        explosion_command_embed_v2.add_field(name="Le serveur est inaccessible pendant *1* minute.", value=f"*On peut remercier{explosion_username} 👏👏*", inline=False)
-
-        await embed_message.edit(embed=explosion_command_embed_v2)
-
-        #-------------------------------------------------------------------------------
-
-        exception_channel_id = refuge_channel_id  #Cache les salons du serveur
-        for channel in guild.channels:
-         if channel.id == exception_channel_id:
-            await channel.set_permissions(interaction.guild.default_role, send_messages=True, view_channel=True)
-         else:
-            await channel.set_permissions(interaction.guild.default_role, send_messages=False, view_channel=False)
-            print(f"{printer_timestamp()} The channel {channel.name} has been hidden !")
-
-        print(f"{printer_timestamp()} All channels have been correctly hidden !")
-        print(f"{printer_timestamp()} Waiting time started !")
-
-        await channel.set_permissions(role, send_messages=False) #Bloque les messages dans le salon
-
-        waitmessage = await channel.send(":lock:")
-
-        await asyncio.sleep(2)
-
-        await waitmessage.edit(content=":clock12: ")
-        print(f"{printer_timestamp()} 60s remaining")
-
-        await channel.set_permissions(role, send_messages=False)
-
-        await asyncio.sleep(15)
-
-        await waitmessage.edit(content=":clock3:")  #Actualise le message
-        print(f"{printer_timestamp()} 45s remaining")
-
-        await asyncio.sleep(15)
-
-        await waitmessage.edit(content=":clock1230:")
-        print(f"{printer_timestamp()} 30s remaining")
-
-        await asyncio.sleep(15)
-
-        await waitmessage.edit(content=":clock9: ")
-        print(f"{printer_timestamp()} 15s remaining")
-
-        await asyncio.sleep(15)
-
-        await waitmessage.edit(content=":unlock:")
-        print(f"{printer_timestamp()} Waiting time ended !")
-
-        await asyncio.sleep(2)
-
-        #-------------------------------------------------------------------------------
-
-        for channel in guild.channels:
-           await channel.set_permissions(interaction.guild.default_role, send_messages=True, view_channel=True)
-           print(f"{printer_timestamp()} Server channel {channel.name} with the id {channel_id} has been unhidden !")
-
-        explosion_command_embed_v3 = discord.Embed( #Crée l'embed v3
-        title="**🟢 Explosion Terminée 🟢**",
-        description="Le serveur est de nouveau accessible !",
-        color=discord.Color.from_rgb(158, 240, 91)        
-        )
-        explosion_command_embed_v3.add_field(name="Ce salon se supprimera dans quelques instants...", value="", inline=False)
-        explosion_command_embed_v3.set_footer(text=f"{version_note}")
-        
-
-        await embed_message.edit(embed=explosion_command_embed_v3)
-
-        await asyncio.sleep(10)     #Montre les salons a nouveau
-
-        await channel.delete()
-        await category.delete()
-        print(f"{printer_timestamp()} Refuge channel and refuge category have been deleted !") #Supprime le refuge
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion system launching...")
+        await explosion_command_system(interaction)
 
 #--------------------------------------------------------
 #BUTTON LEVEL 2
@@ -785,193 +615,34 @@ class ButtonView_explosion_command(discord.ui.View):
           
     @discord.ui.button(style=discord.ButtonStyle.primary, label="2", custom_id="force2", emoji="🌋")
     async def button2_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-     username_button_pressed = interaction.user.mention
-     print(f"{printer_timestamp()} Level 2")
+     guild = interaction.guild
+      
+     choosen_level = 2
 
      view = self
      for child in view.children:
-      if isinstance(child, discord.ui.Button):
         child.disabled = True
 
      await interaction.response.edit_message(view=view)
 
-
      await asyncio.sleep(1)
         
      await interaction.message.add_reaction("🌋")
-       
 
-     await asyncio.sleep(3)
-     guild = interaction.guild
-     category = await guild.create_category("🏡Refuge🏡") #Crée la categorie
+     data = {
+     "guild_id": guild.id,
+     "guild_name": guild.name,
+     "choosen_level": choosen_level ,
+     "username_button_pressed": interaction.user.mention
+     }
 
-       
-     channel = await guild.create_text_channel("❗venez❗", category=category) #Crée le salon
-     await category.edit(position=0) #Met la categorie en haut de la liste
+# Write data to the JSON file
+     file_name = "JSON Files/Explosion_Command_Data/level_info_explosion_command.json"
+     with open(file_name, 'w') as json_file:
+        json.dump(data, json_file)
+     print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion system launching...")
+     await explosion_command_system(interaction)
 
-     for role in channel.guild.roles:
-      await channel.set_permissions(role, send_messages=False)
-
-     await asyncio.sleep(5)
-     await channel.edit(name="🔰Refuge🔰") #Renome le salon
-
-     await asyncio.sleep(3)
-
-     refuge_channel_id = channel.id  #Recupere l'id du salon
-     print(f"{printer_timestamp()} <#{refuge_channel_id}>")
-
-     await asyncio.sleep(2)
-
-
-     with open("user_explosion.txt", "w") as f: #Crée un .txt avec l'id de la personne qui a pressé le bouton
-      f.write(f"{username_button_pressed}")
-
-     await interaction.channel.send(f"@here! Rejoignez le salon <#{refuge_channel_id}> !")
-
-     await asyncio.sleep(2)
-
-     #-------------------------------------------------------------------------------
-     #Explosion Command Embed 
-     with open("user_explosion.txt", 'r') as file:
-      explosion_username = file.read()
-
-     await asyncio.sleep(1)
-
-     explosion_command_embed = discord.Embed( #Crée l'embed
-     title="**🟢 Refuge 🟢**",
-     description="Ce salon vous permet de patienter jusqu'à la fin des explosions.",
-     color=discord.Color.from_rgb(158, 240, 91)        
-     )
-     explosion_command_embed.set_footer(text=f"{version_note}")
-     explosion_command_embed.add_field(name="Le serveur va être inaccessible pendant *5* minutes.", value=f"*On peut remercier{explosion_username} 👏👏*", inline=False)
-        
-
-     #-------------------------------------------------------------------------------
-     channel_id = refuge_channel_id # Replace with the ID of the channel you want to send a message to
-
-     await asyncio.sleep(2)
-
-     refuge_channel = client.get_channel(channel_id)
-     embed_message = await channel.send(embed=explosion_command_embed) #Envoi l'embed
-
-     os.remove("user_explosion.txt") #Supprime le fichier .txt
-
-     await asyncio.sleep(2)
-   
-     refuge_channel = client.get_channel(refuge_channel_id)
-      
-     await asyncio.sleep(2)
-
-     for role in channel.guild.roles:
-        await channel.set_permissions(role, send_messages=False) #Empeche les utilisateurs d'envoyer des messages
-
-        await asyncio.sleep(1)
-
-       #-------------------------------------------------------------------------------
-
-        print(f"{printer_timestamp()} Explosion Started !") 
-        async def send_messages_with_delays(guild, message_list, exception_channel_id=refuge_channel_id): #Lance l'explosion
-         await asyncio.sleep(1)
-         for message in message_list:
-          for channel in guild.channels:
-            if isinstance(channel, discord.TextChannel) and channel.id != exception_channel_id:
-                try:
-                    await channel.send(message)
-                except:
-                    # Handle any exceptions that may occur while sending the message to a channel
-                    pass
-        delay = random.randint(1, 5)  # Generate a random delay between 1 and 5 seconds
-        await asyncio.sleep(delay)
-        
-        guild = client.get_guild(server_id)
-        message = "💥💥💥💥💥💥💥💥💥💥"
-        await send_messages_with_delays(guild, message)
-        print(f"{printer_timestamp()} Explosion Ended !")
-
-        await asyncio.sleep(3)
-
-        print(f"{printer_timestamp()} Starting hidding channels...") 
-
-        #-------------------------------------------------------------------------------
-
-        explosion_command_embed_v2 = discord.Embed( #Crée l'embed v2
-        title="**🟢 Refuge 🟢**",
-        description="Ce salon vous permet de patienter jusqu'à ce que le serveur soit de nouveau accessible.",
-        color=discord.Color.from_rgb(158, 240, 91)        
-        )
-        explosion_command_embed_v2.set_footer(text=f"{version_note}")
-        explosion_command_embed_v2.add_field(name="Le serveur est inaccessible pendant *5* minutes.", value=f"*On peut remercier{explosion_username} 👏👏*", inline=False)
-
-        await embed_message.edit(embed=explosion_command_embed_v2)
-
-        #-------------------------------------------------------------------------------
-
-        exception_channel_id = refuge_channel_id  #Cache les salons du serveur
-        for channel in guild.channels:
-         if channel.id == exception_channel_id:
-            await channel.set_permissions(interaction.guild.default_role, send_messages=True, view_channel=True)
-         else:
-            await channel.set_permissions(interaction.guild.default_role, send_messages=False, view_channel=False)
-            print(f"{printer_timestamp()} The channel {channel.name} has been hidden !")
-
-        print(f"{printer_timestamp()} All channels have been correctly hidden !")
-        print(f"{printer_timestamp()} Waiting time started !")
-
-        await channel.set_permissions(role, send_messages=False) #Bloque les messages dans le salon
-
-        waitmessage = await channel.send(":lock:")
-
-        await asyncio.sleep(2)
-
-        await waitmessage.edit(content=":clock12: ")
-        print(f"{printer_timestamp()} 5m reamaining")
-
-        await channel.set_permissions(role, send_messages=False)
-
-        await asyncio.sleep(75)
-
-        await waitmessage.edit(content=":clock3:")  #Actualise le message
-        print(f"{printer_timestamp()} 3m and 75s reamaining")
-
-        await asyncio.sleep(75)
-
-        await waitmessage.edit(content=":clock1230:")
-        print(f"{printer_timestamp()} 2m and 5s reamaining")
-
-        await asyncio.sleep(75)
-
-        await waitmessage.edit(content=":clock9: ")
-        print(f"{printer_timestamp()} 1m and 25s reamaining")
-
-        await asyncio.sleep(75)
-
-        await waitmessage.edit(content=":unlock:")
-        print(f"{printer_timestamp()} Waiting time ended !")
-
-        await asyncio.sleep(2)
-
-        #-------------------------------------------------------------------------------
-
-        for channel in guild.channels:
-           await channel.set_permissions(interaction.guild.default_role, send_messages=True, view_channel=True)
-           print(f"{printer_timestamp()} Server channel {channel.name} with the id {channel_id} has been unhidden !")
-
-        explosion_command_embed_v3 = discord.Embed( #Crée l'embed v3
-        title="**🟢 Explosion Terminée 🟢**",
-        description="Le serveur est de nouveau accessible !",
-        color=discord.Color.from_rgb(158, 240, 91)        
-        )
-        explosion_command_embed_v3.add_field(name="Ce salon se supprimera dans quelques instants...", value="", inline=False)
-        explosion_command_embed_v3.set_footer(text=f"{version_note}")
-        
-
-        await embed_message.edit(embed=explosion_command_embed_v3)
-
-        await asyncio.sleep(10)   
-
-        await channel.delete()
-        await category.delete()
-        print(f"{printer_timestamp()} Refuge channel and refuge category have been deleted !") #Supprime le refuge
    
 #--------------------------------------------------------
 #BUTTON LEVEL 3
@@ -979,193 +650,33 @@ class ButtonView_explosion_command(discord.ui.View):
 
     @discord.ui.button(style=discord.ButtonStyle.primary, label="3", custom_id="force3", emoji="🌪️")
     async def button3_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        username_button_pressed = interaction.user.mention
-        print(f"{printer_timestamp()} Level 3")
+             guild = interaction.guild
+             choosen_level = 3
 
-        view = self
-        for child in view.children:
-         if isinstance(child, discord.ui.Button):
-          child.disabled = True
+             view = self
+             for child in view.children:
+               child.disabled = True
 
-        await interaction.response.edit_message(view=view)
+             await interaction.response.edit_message(view=view)
 
-        await asyncio.sleep(1)
+             await asyncio.sleep(1)
         
-        await interaction.message.add_reaction("🌪️")
-       
+             await interaction.message.add_reaction("🌪️")
 
-        await asyncio.sleep(3)
-        guild = interaction.guild
-        category = await guild.create_category("🏡Refuge🏡") #Crée la categorie
+             data = {
+             "guild_id": guild.id,
+             "guild_name": guild.name,
+             "choosen_level": choosen_level ,
+             "username_button_pressed": interaction.user.mention
+             }
 
-       
-        channel = await guild.create_text_channel("❗venez❗", category=category) #Crée le salon
-        await category.edit(position=0) #Met la categorie en haut de la liste
-
-        for role in channel.guild.roles:
-         await channel.set_permissions(role, send_messages=False)
-
-        await asyncio.sleep(5)
-        await channel.edit(name="🔰Refuge🔰") #Renome le salon
-
-        await asyncio.sleep(3)
-
-        refuge_channel_id = channel.id  #Recupere l'id du salon
-        print(f"{printer_timestamp()} <#{refuge_channel_id}>")
-
-        await asyncio.sleep(2)
+             file_name = "JSON Files/Explosion_Command_Data/level_info_explosion_command.json"
 
 
-        with open("user_explosion.txt", "w") as f: #Crée un .txt avec l'id de la personne qui a pressé le bouton
-         f.write(f"{username_button_pressed}")
-
-        await interaction.channel.send(f"@here ! Rejoignez le salon <#{refuge_channel_id}> !")
-
-        await asyncio.sleep(2)
-
-        #-------------------------------------------------------------------------------
-        #Explosion Command Embed 
-        with open("user_explosion.txt", 'r') as file:
-         explosion_username = file.read()
-
-        await asyncio.sleep(1)
-
-        explosion_command_embed = discord.Embed( #Crée l'embed
-        title="**🟢 Refuge 🟢**",
-        description="Ce salon vous permet de patienter jusqu'à la fin des explosions.",
-        color=discord.Color.from_rgb(158, 240, 91)        
-        )
-        explosion_command_embed.set_footer(text=f"{version_note}")
-        explosion_command_embed.add_field(name="Le serveur va être inaccessible pendant *10* minutes.", value=f"*On peut remercier{explosion_username} 👏👏*", inline=False)
-        
-
-        #-------------------------------------------------------------------------------
-        channel_id = refuge_channel_id # Replace with the ID of the channel you want to send a message to
-
-        await asyncio.sleep(2)
-
-        refuge_channel = client.get_channel(channel_id)
-        embed_message = await channel.send(embed=explosion_command_embed) #Envoi l'embed
-
-        os.remove("user_explosion.txt") #Supprime le fichier .txt
-
-        await asyncio.sleep(2)
-   
-        refuge_channel = client.get_channel(refuge_channel_id)
-      
-        await asyncio.sleep(2)
-
-        for role in channel.guild.roles:
-         await channel.set_permissions(role, send_messages=False) #Empeche les utilisateurs d'envoyer des messages
-
-         await asyncio.sleep(1)
-
-       #-------------------------------------------------------------------------------
-
-        print(f"{printer_timestamp()} Explosion Started !") 
-        async def send_messages_with_delays(guild, message_list, exception_channel_id=refuge_channel_id): #Lance l'explosion
-         await asyncio.sleep(1)
-         for message in message_list:
-          for channel in guild.channels:
-            if isinstance(channel, discord.TextChannel) and channel.id != exception_channel_id:
-                try:
-                    await channel.send(message)
-                except:
-                    # Handle any exceptions that may occur while sending the message to a channel
-                    pass
-        delay = random.randint(1, 5)  # Generate a random delay between 1 and 5 seconds
-        await asyncio.sleep(delay)
-        
-        guild = client.get_guild(server_id)
-        message = "💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥"
-        await send_messages_with_delays(guild, message)
-        print(f"{printer_timestamp()} Explosion Ended !")
-
-        await asyncio.sleep(3)
-
-        print(f"{printer_timestamp()} Starting hidding channels...") 
-
-        #-------------------------------------------------------------------------------
-
-        explosion_command_embed_v2 = discord.Embed( #Crée l'embed v2
-        title="**🟢 Refuge 🟢**",
-        description="Ce salon vous permet de patienter jusqu'à ce que le serveur soit de nouveau accessible.",
-        color=discord.Color.from_rgb(158, 240, 91)        
-        )
-        explosion_command_embed_v2.set_footer(text=f"{version_note}")
-        explosion_command_embed_v2.add_field(name="Le serveur est inaccessible pendant *10* minutes.", value=f"*On peut remercier{explosion_username} 👏👏*", inline=False)
-
-        await embed_message.edit(embed=explosion_command_embed_v2)
-
-        #-------------------------------------------------------------------------------
-
-        exception_channel_id = refuge_channel_id  #Cache les salons du serveur
-        for channel in guild.channels:
-         if channel.id == exception_channel_id:
-            await channel.set_permissions(interaction.guild.default_role, send_messages=True, view_channel=True)
-         else:
-            await channel.set_permissions(interaction.guild.default_role, send_messages=False, view_channel=False)
-            print(f"{printer_timestamp()} The channel {channel.name} has been hidden !")
-
-        print(f"{printer_timestamp()} All channels have been correctly hidden !")
-        print(f"{printer_timestamp()} Waiting time started !")
-
-        await channel.set_permissions(role, send_messages=False) #Bloque les messages dans le salon
-
-        waitmessage = await channel.send(":lock:")
-
-        await asyncio.sleep(2)
-
-        await waitmessage.edit(content=":clock12: ")
-        print(f"{printer_timestamp()} 10m remaining")
-
-        await channel.set_permissions(role, send_messages=False)
-
-        await asyncio.sleep(150)
-
-        await waitmessage.edit(content=":clock3:")  #Actualise le message
-        print(f"{printer_timestamp()} 7m and 5s remaining")
-
-        await asyncio.sleep(150)
-
-        await waitmessage.edit(content=":clock1230:")
-        print(f"{printer_timestamp()} 5m remaining")
-
-        await asyncio.sleep(150)
-
-        await waitmessage.edit(content=":clock9: ")
-        print(f"{printer_timestamp()} 2m and 5s remaining")
-
-        await asyncio.sleep(150)
-
-        await waitmessage.edit(content=":unlock:")
-        print(f"{printer_timestamp()} Waiting time ended !")
-
-        await asyncio.sleep(3)
-
-        #-------------------------------------------------------------------------------
-
-        for channel in guild.channels:
-           await channel.set_permissions(interaction.guild.default_role, send_messages=True, view_channel=True) #Montre les salons a nouveau
-           print(f"{printer_timestamp()} Server channel {channel.name} with the id {channel_id} has been unhidden !") 
-
-        explosion_command_embed_v3 = discord.Embed( #Crée l'embed v3
-        title="**🟢 Explosion Terminée 🟢**",
-        description="Le serveur est de nouveau accessible !",
-        color=discord.Color.from_rgb(158, 240, 91)        
-        )
-        explosion_command_embed_v3.add_field(name="Ce salon se supprimera dans quelques instants...", value="", inline=False)
-        explosion_command_embed_v3.set_footer(text=f"{version_note}")
-        
-
-        await embed_message.edit(embed=explosion_command_embed_v3)
-
-        await asyncio.sleep(10)   
-
-
-        await channel.delete()
-        await category.delete()
-        print(f"{printer_timestamp()} Refuge channel and refuge category have been deleted !") #Supprime le refuge
+             with open(file_name, 'w') as json_file:
+              json.dump(data, json_file)
+             print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion system launching...")
+             await explosion_command_system(interaction)
 
  #Button View Roles Give
 
@@ -1305,7 +816,7 @@ async def delete_dm(interaction: discord.Interaction):
 
         await interaction.edit_original_response(content="L'ensemble des messages du bot ont étés supprimés :white_check_mark: !")
     else:
-        await interaction.response.send_message("Cette commande n'est utilisable que dans les DM", ephemeral=True)
+        await interaction.response.send_message("Cette commande n'est utilisable que dans les DM !", ephemeral=True)
 
 @tree.command(name="admin", description="Affiche le panel d'administration du bot")
 async def admin_panel(interaction: discord.Interaction):
@@ -1352,50 +863,79 @@ async def admin_panel(interaction: discord.Interaction):
 @tree.command(name="explosion", description="Boum !")
 async def explosion_command(interaction: discord.Interaction):
 
-    if explosion_command_avalaible == False :
+    try:
+        with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'r') as f:
+            explosion_command_cooldown = json.load(f)
+    except FileNotFoundError:
+        explosion_command_cooldown = {}
 
-     await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
+    # Check for cooldown
+    guild_id = str(interaction.guild_id)
 
-    elif explosion_command_avalaible == True :
+    if guild_id not in explosion_command_cooldown:
+        explosion_command_cooldown[guild_id] = 0
 
-     user_id = interaction.user.id
+    current_time = time.time()
+    cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
 
-     command_name = interaction.data['name']
+    if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
+        # Server is on cooldown, inform users
+        remaining_time_seconds = int(cooldown_time - (current_time - explosion_command_cooldown[guild_id]))
 
-     command_id = interaction.data['id']
+        remaining_days, remaining_seconds = divmod(remaining_time_seconds, 24 * 60 * 60)
+        remaining_hours, remaining_seconds = divmod(remaining_seconds, 60 * 60)
+        remaining_minutes, remaining_seconds = divmod(remaining_seconds, 60)
 
-     guild_name = interaction.guild.name
+        remaining_time_formatted = f"{remaining_days} jours, {remaining_hours} heures, {remaining_minutes} minutes et {remaining_seconds} secondes"
 
-     TGA25_ID = "845327664143532053"  
-     USER_DM = await client.fetch_user(TGA25_ID)
-  
-
-
-     try:
-      if maintenance_mode:
-        await interaction.response.send_message(embed=maintenance_embed)
+        await interaction.response.send_message(f"Veuillez attendre {remaining_time_formatted} avant de refaire exploser ce serveur... :hourglass_flowing_sand:", ephemeral=True)
         return
-      await interaction.response.send_message(content="Sélectionnez une force d'explosion :",view=ButtonView_explosion_command(), embed=explosion_force_embed)
 
-     except Exception as e:
-        error_dminfo_embed = discord.Embed( 
-        title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
-        description=f"**Erreur causée par** <@{user_id}>",
-        color=discord.Color.from_rgb(245, 170, 66)        
-        )
-        
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
-        error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
-        error_dminfo_embed.set_footer(text=f"{version_note}")
+    explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
 
-        
-        await USER_DM.send(embed=error_dminfo_embed)
-        await interaction.response.send_message(embed=error_embed, ephemeral=True)
+    if explosion_command_avalaible == False:
+        await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
+    elif explosion_command_avalaible == True:
+        user_id = interaction.user.id
+        command_name = interaction.data['name']
+        command_id = interaction.data['id']
+        guild_name = interaction.guild.name
+        TGA25_ID = "845327664143532053"
+        USER_DM = await client.fetch_user(TGA25_ID)
+
+        try:
+            if maintenance_mode:
+                await interaction.response.send_message(embed=maintenance_embed)
+                return
+            await interaction.response.send_message(content="Sélectionnez une force d'explosion :",
+                                                     view=ButtonView_explosion_command(), embed=explosion_force_embed)
+
+        except Exception as e:
+            error_dminfo_embed = discord.Embed(
+                title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
+                description=f"**Erreur causée par** <@{user_id}>",
+                color=discord.Color.from_rgb(245, 170, 66)
+            )
+
+            error_dminfo_embed.add_field(name="Details :",
+                                         value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
+                                         inline=True)
+            error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
+            error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
+            error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
+            error_dminfo_embed.set_footer(text=f"{version_note}")
+
+            await USER_DM.send(embed=error_dminfo_embed)
+            await interaction.response.send_message(embed=error_embed, ephemeral=True)
+
+    # Save the updated server cooldown data to the JSON file
+    with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
+        json.dump(explosion_command_cooldown, f)
 
 
-# ... (imports and constants)
+
+
+
 
 @tree.command(name="vol", description="Vole le nom d'un utilisateur")
 async def vol_command(interaction: discord.Interaction, user: discord.Member):
@@ -1772,107 +1312,483 @@ async def twitch_loop():
 
 
 
-
-
-
-
-
 async def explosion_command_system(interaction: discord.Interaction):
-    await interaction.response.send_message(embed=explosion_force_embed, view=ButtonView_explosion_command)
+
+    # Load data from JSON file
+    with open("JSON Files/Explosion_Command_Data/level_info_explosion_command.json", 'r') as json_file:
+        loaded_data = json.load(json_file)
+
+    # Extract relevant data from loaded JSON
+    explosion_command_system_choosen_level = loaded_data.get("choosen_level")
+    username_button_pressed = loaded_data.get("username_button_pressed")
+
+    # Display information about the loaded data
+    print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion level is level {explosion_command_system_choosen_level} !")
 
     try:
-        # Create a new role
-        explosion_role = await interaction.guild.create_role(name="Explosion", hoist=True, mentionable=False, color=discord.Color.from_rgb(242, 153, 51))
-        print("The explosion role has been created!")
+        guild_id = interaction.guild_id
+        guild = client.get_guild(guild_id)
 
-        # Add the new_role to all non-bot members
+        # Create the 'Explosion' role
+        explosion_role = await interaction.guild.create_role(name="Explosion", hoist=True, mentionable=False, color=discord.Color.from_rgb(242, 153, 51))
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} The explosion role has been created !")
+
+        try:
+            # Set the position of the 'Explosion' role
+            bot_highest_role = interaction.guild.me.top_role
+            desired_position = bot_highest_role.position - 1
+
+            test_positions = {
+                explosion_role: desired_position,
+            }
+
+            await interaction.guild.edit_role_positions(positions=test_positions)
+
+        except Exception as position_role_error:
+            print(f"{printer_timestamp()} An error has occurred while trying to change role position: {position_role_error}")
+
+        # Get non-bot members in the guild and assign the 'Explosion' role
         members = [member for member in interaction.guild.members if not member.bot]
         for member in members:
-            await member.add_roles(explosion_role)
-            
-        total_roles = len([role for role in interaction.guild.roles if role.name != '@everyone'])
+            if member != guild.owner:
+                await member.add_roles(explosion_role)
 
-        # Set the desired position as the second role from the end
-        desired_position = total_roles - 1
-
-        test_positions = {
-            explosion_role: desired_position,
-        }
-
-        await interaction.guild.edit_role_positions(positions=test_positions)
-
-        # Filter out bot members
-        members = [member for member in interaction.guild.members if not member.bot]
-
-        # Store the roles
+        # Store roles of all members before removing certain roles
         stored_roles = {member.id: [role.id for role in member.roles] for member in members}
 
-        # Remove roles that still exist
+        # Identify roles to be removed
         removed_roles = []
         for role_ids in stored_roles.values():
             for role_id in role_ids:
                 role = discord.utils.get(interaction.guild.roles, id=role_id)
-
-                # Add an exception for the @everyone role and the new_role
                 if role is not None and role.name not in ["@everyone", explosion_role.name]:
-                    removed_roles.append(role)
+                    if member != guild.owner:
+                     removed_roles.append(role)
 
+        # Remove identified roles from all members
         if removed_roles:
-            # Remove roles for each member
-            for member_id, roles in stored_roles.items():
+             for member_id, roles in stored_roles.items():
                 member = interaction.guild.get_member(member_id)
                 if member:
-                    await member.remove_roles(*removed_roles)
-                    print(f"Roles removed for {member.display_name}")
+                    try:
+                        if member != guild.owner:
+                         await member.remove_roles(*removed_roles)
+                    except Exception as e:
+                        print(f"{printer_timestamp()} Error removing roles for {member.display_name}: {e}")
 
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Roles removal process completed for all guild members !")
 
-            guild_id = interaction.guild_id  # Replace with your server's ID
-            guild = client.get_guild(guild_id)
+        # Create 'Refuge' category and channel
+        refuge_category = await guild.create_category("🏡Refuge🏡")
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Refuge category has been created !")
 
-            if guild:
-             channel_name = "DEFAULT"
-        
-        # Create a text channel
-            new_channel = await guild.create_text_channel(channel_name)
+        refuge_channel = await guild.create_text_channel("❗venez❗", category=refuge_category)
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Refuge channel has been created !")
+        await refuge_category.edit(position=0)
 
-        # Move the new channel to the top of the channel list
-            channels = guild.channels
-            await new_channel.edit(position=0)
+        # Set permissions for 'Explosion' role in the 'Refuge' channel
+        await refuge_channel.set_permissions(explosion_role, send_messages=False)
 
+        # Pause for a moment
+        await asyncio.sleep(10)
+
+        # Update the name of the 'Refuge' channel
+        await refuge_channel.edit(name="🔰Refuge🔰")
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Refuge category name has been updated !")
+
+        # Pause for a moment
+        await asyncio.sleep(0.5)
+
+        refuge_channel_id = refuge_channel.id
+
+        # Pause for a moment
+        await asyncio.sleep(0.5)
+
+        # Check if guild_id is present in welcome_data
+        if guild_id not in welcome_data or not welcome_data[guild_id]:
+            default_channel = guild.system_channel
+            fallback_channel = get_fallback_channel(guild)
+
+            # Send a message to the default or fallback channel
+            if default_channel:
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Message sending to :{default_channel.name} ({default_channel.id})")
+                await default_channel.send(content=f"@hee ! Rejoignez le salon <#{refuge_channel_id}> !")
+            elif fallback_channel:
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Message sending to fallback channel: {fallback_channel.name} ({fallback_channel.id})")
+                await fallback_channel.send(content=f"@her ! Rejoignez le salon <#{refuge_channel_id}> !")
+
+            # Create an Embed for the 'Refuge' channel
+            explosion_refuge_embed = discord.Embed(
+                title="**🟢 Refuge 🟢**",
+                description="Ce salon vous permet de patienter jusqu'à la fin des explosions.",
+                color=discord.Color.from_rgb(158, 240, 91)
+            )
+
+            # Add fields based on the explosion level
+            if explosion_command_system_choosen_level == 1:
+                explosion_refuge_embed.add_field(name="Le serveur va être inaccessible pendant *1* minute.",
+                                                value=f"*On peut remercier {username_button_pressed} ... 👏👏*",
+                                                inline=False)
+            elif explosion_command_system_choosen_level == 2:
+                explosion_refuge_embed.add_field(name="Le serveur va être inaccessible pendant *5* minutes.",
+                                                value=f"*On peut remercier {username_button_pressed} ... 👏👏*",
+                                                inline=False)
+            else:
+                explosion_refuge_embed.add_field(name="Le serveur va être inaccessible pendant *10* minutes.",
+                                                value=f"*On peut remercier {username_button_pressed} ... 👏👏*",
+                                                inline=False)
+
+            # Set footer text
+            explosion_refuge_embed.set_footer(text=f"{version_note}")
+
+            # Send the Embed to the 'Refuge' channel
+            refuge_embed_message = await refuge_channel.send(embed=explosion_refuge_embed)
+
+            # Pause for a moment
             await asyncio.sleep(5)
 
-            await new_channel.edit(name="MODIF")       
+            print(f"{printer_timestamp()} Explosion Started !") 
 
-            # Wait for 20 seconds (adjusted according to your comment)
-            await asyncio.sleep(15)
+            print(f"{printer_timestamp()} Explosion Ended !")
 
-            # Restore the removed roles for each member, excluding the new_role
-            for member_id, roles in stored_roles.items():
-                member = interaction.guild.get_member(member_id)
-                if member:
-                    await member.add_roles(*[interaction.guild.get_role(role_id) for role_id in roles if role_id != interaction.guild.default_role.id])
-                    print(f"Roles restored for {member.display_name}")
 
-    except discord.errors.NotFound as e:
-        print(f"An error occurred: {e}")
-    finally:
-        # Delete the new_role even if an exception occurs
-        await explosion_role.delete()
-        await new_channel.delete()
+           
+
+   
+                 
 
 
 
+            await asyncio.sleep(15)            
+
+            # Update the 'Refuge' Embed after sending messages to channels
+            if explosion_command_system_choosen_level == 1:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est inaccessible pendant *1* minute.",
+                                                    value=f"*Vous pouvez désormais envoyer des messages dans ce salon :pen_ballpoint:*",
+                                                    inline=False)
+            elif explosion_command_system_choosen_level == 2:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est inaccessible pendant *5* minutes.",
+                                                    value=f"*Vous pouvez désormais envoyer des messages dans ce salon :pen_ballpoint:*",
+                                                    inline=False)
+            else:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est inaccessible pendant *10* minutes.",
+                                                    value=f"*Vous pouvez désormais envoyer des messages dans ce salon :pen_ballpoint:*",
+                                                    inline=False)
+
+            # Edit the 'Refuge' Embed message with the updated information
+            await refuge_embed_message.edit(embed=explosion_refuge_embed)
+
+             # Allow people to send messages in the 'Refuge' channel
+            await refuge_channel.set_permissions(explosion_role, send_messages=True)
+
+            print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Channel hiding started...")
+
+            # Hide all channels (except 'Refuge') for the 'Explosion' role
+            for channel in guild.text_channels:
+                if channel.id != refuge_channel_id:
+                    try:
+                        await channel.set_permissions(explosion_role, view_channel=False)
+                    except Exception as e:
+                        print(f"{printer_timestamp()} Error hiding channel {channel}: {e}")
+
+            print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} All channels have been successfully hidden !")
+
+            await asyncio.sleep(20)
+
+            print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Waiting time starting...")
 
 
+            if explosion_command_system_choosen_level == 1:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction. :construction_site:",
+                                                    value=f"",
+                                                    inline=False)
+                explosion_refuge_embed.set_thumbnail(url=lock_icon_url)
+
+            elif explosion_command_system_choosen_level == 2:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction. :construction_site:",
+                                                    value=f"",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=lock_icon_url)
+                
+
+            else:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction. :construction_site:",
+                                                    value=f"",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=lock_icon_url)
+
+            # Edit the 'Refuge' Embed message with the updated information
+            await refuge_embed_message.edit(embed=explosion_refuge_embed)
+
+            await asyncio.sleep(10)
+
+            if explosion_command_system_choosen_level == 1:
+               sleep_time = 15
+
+            elif explosion_command_system_choosen_level == 2:
+                sleep_time = 75
+
+            else:
+                sleep_time = 150      
+
+            if explosion_command_system_choosen_level == 1:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction.. :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 1 minute* ",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock12_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 60s")
+
+            elif explosion_command_system_choosen_level == 2:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction.. :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 5 minutes*",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock12_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 5min")
+            else:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction.. :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 10 minutes*",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock12_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 10min")
+
+            # Edit the 'Refuge' Embed message with the updated information
+            await refuge_embed_message.edit(embed=explosion_refuge_embed)
+
+            
+
+            # Pause for a specified duration
+            await asyncio.sleep(sleep_time)
+
+
+            if explosion_command_system_choosen_level == 1:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction... :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 45 secondes* ",
+                                                    inline=False)
+                
+
+                explosion_refuge_embed.set_thumbnail(url=clock3_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 45s")
+
+
+            elif explosion_command_system_choosen_level == 2:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction... :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 3 minutes*",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock3_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 3min")
+            else:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction... :construction_site:",
+                                                    value=f"*Temps d'attente restant: 7 minutes*",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock3_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 7min")
+
+            # Edit the 'Refuge' Embed message with the updated information
+            await refuge_embed_message.edit(embed=explosion_refuge_embed)
+
+            await asyncio.sleep(sleep_time)
+
+            if explosion_command_system_choosen_level == 1:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction.. :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 30 secondes* ",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock1230_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 30s")
+
+            elif explosion_command_system_choosen_level == 2:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction.. :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 2 minutes*",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock1230_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 2min")
+
+            else:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction.. :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 5 minutes*",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock1230_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 5min")
+
+            # Edit the 'Refuge' Embed message with the updated information
+            await refuge_embed_message.edit(embed=explosion_refuge_embed)
+
+            await asyncio.sleep(sleep_time)
+
+            if explosion_command_system_choosen_level == 1:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction. :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 15 secondes* ",
+                                                    inline=False)
+
+                explosion_refuge_embed.set_thumbnail(url=clock9_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 15s")
+            
+            elif explosion_command_system_choosen_level == 2:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction. :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 75 secondes*",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock9_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 75s")
+                                                    
+            else:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur est en cours de reconstruction. :construction_site:",
+                                                    value=f"*Temps d'attente restant: environ 2 minutes*",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=clock9_icon_url)
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Remaining time : 2min")
+
+            # Edit the 'Refuge' Embed message with the updated information
+            await refuge_embed_message.edit(embed=explosion_refuge_embed)
+
+            await asyncio.sleep(sleep_time)
+
+            if explosion_command_system_choosen_level == 1:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur va progressivement redevenir accessible... :hourglass_flowing_sand:",
+                                                    value=f"",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=unlock_icon_url)
+
+            elif explosion_command_system_choosen_level == 2:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur va progressivement redevenir accessible... :hourglass_flowing_sand:",
+                                                    value=f"",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=unlock_icon_url)
+            else:
+                explosion_refuge_embed.set_field_at(0, name="Le serveur va progressivement redevenir accessible... :hourglass_flowing_sand:",
+                                                    value=f"",
+                                                    inline=False)
+                
+                explosion_refuge_embed.set_thumbnail(url=unlock_icon_url)
+
+            await refuge_embed_message.edit(embed=explosion_refuge_embed)
+
+            print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Waiting time ended !")
+            await asyncio.sleep(5)
+
+   
+            if explosion_command_system_choosen_level == 1:
+               explosion_message_delete_limit = 2
+                    
+
+            elif explosion_command_system_choosen_level == 2:
+                explosion_message_delete_limit = 4
+                  
+                
+            else:
+               explosion_message_delete_limit = 8
+
+           
+            # Delete bot messages from all channels
+            for channel in guild.text_channels:
+             if channel.id != refuge_channel_id:
+              try:
+               messages_to_delete = []
+               async for message in channel.history(limit=explosion_message_delete_limit):
+                if message.author == client.user:
+                    messages_to_delete.append(message)
+                else:
+                    # If you want to stop when you encounter a user message, break the loop here
+                    pass
+
+            # Bulk delete the bot messages
+               if messages_to_delete:
+                await channel.delete_messages(messages_to_delete)
+                await asyncio.sleep(1.5 * len(messages_to_delete))
+              except discord.Forbidden:
+               print(f"Missing permissions to delete messages in #{channel.name} of {guild.name}")
+
+            print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} All bot messages have been erased!")
+
+
+
+            print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} All explosion messages have been erased !")            
+
+            # Pause for a specified duration
+            await asyncio.sleep(10)
+
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Channel unhiding started...")
+
+
+
+        # Unhide all channels for the 'Explosion' role
+        for channel in guild.text_channels:
+            if channel.id != refuge_channel_id:
+                try:
+                    await channel.set_permissions(explosion_role, view_channel=True)
+                except Exception as e:
+                    print(f"{printer_timestamp()} Error unhiding channel {channel}: {e}")
+
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} All channels have been successfully unhidden !")
 
         
 
-    
+        explosion_refuge_embed.title = "**🟢 Explosion Terminée 🟢**"
+        explosion_refuge_embed.description = "Le serveur est de nouveau accessible !"
 
-   
+        explosion_refuge_embed.set_field_at(0, name=f"Merci à tous d'avoir participé ! :grin:",
+                                                    value=f"Ce salon ainsi que le role <@&{explosion_role.id}> se supprimeront dans quelques instants...",
+                                                    inline=False)
+                
+        explosion_refuge_embed.set_thumbnail(url=tada_icon_url)
+        await refuge_embed_message.edit(embed=explosion_refuge_embed)
 
-    
+
+        # Set permissions for 'Explosion' role in the 'Refuge' channel
+        await refuge_channel.set_permissions(explosion_role, send_messages=False)
+
+        # Restore original roles for all members
+        for member_id, roles in stored_roles.items():
+            member = interaction.guild.get_member(member_id)
+            if member:
+                try:
+                    await member.add_roles(*[interaction.guild.get_role(role_id) for role_id in roles if role_id != interaction.guild.default_role.id])
+                except Exception as e:
+                    print(f"{printer_timestamp()} Error while restoring roles for {member}: {e}")
+
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} All members' roles have been restored !")
+
+        # Pause for a specified duration
+        await asyncio.sleep(30)
+
+        # Delete the 'Refuge' channel
+        await refuge_channel.delete()
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Refuge channel deleted !")
+
+        # Delete the 'Refuge' category
+        await refuge_category.delete()
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Refuge category deleted !")
+
+        # Remove the 'Explosion' role from all members
+        for member in members:
+            if member != guild.owner:
+                try:
+                    await member.remove_roles(explosion_role)
+                except Exception as e:
+                    print(f"{printer_timestamp()} Error while removing the explosion role from {member}: {e}")
+
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} The explosion role has been removed from all members !")
+
+        # Delete the 'Explosion' role
+        await explosion_role.delete()
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion role deleted !")
+
+    except Exception as global_explosion_system_error:
+        print(global_explosion_system_error)
+        pass
 
 
-
+        
 client.run(token)
