@@ -9,6 +9,7 @@ import requests
 import dotenv
 import json
 import time
+import re
 
 #PATH
 
@@ -202,7 +203,14 @@ def generate_current_time_timestamp():
 
 
 
- 
+
+
+
+
+
+
+
+
 
 
 
@@ -237,6 +245,19 @@ admin_command_id = 1098204837612617733
 
 
 #EVENTS
+
+@client.event
+async def on_message(message):
+    greeting_trigger_pattern = re.compile(r"\b(?:hi|hello|salut|bonjour|hey|salutation|salutations)\b", re.IGNORECASE)
+
+    # Make sure the bot doesn't respond to its own messages
+    if message.author == client.user:
+        return
+
+    # Check if any trigger word is present in the message content
+    if greeting_trigger_pattern.search(message.content):
+        # Add a reaction to the message
+        await message.add_reaction("👋")
 
 try:
     with open("JSON Files/welcome_data_file.json", 'r') as f:
@@ -1447,16 +1468,9 @@ async def explosion_command_system(interaction: discord.Interaction):
             # Pause for a moment
             await asyncio.sleep(5)
 
-            print(f"{printer_timestamp()} Explosion Started !") 
+            print(f"{printer_timestamp()} Explosion Started !")
 
             print(f"{printer_timestamp()} Explosion Ended !")
-
-
-           
-
-   
-                 
-
 
 
             await asyncio.sleep(15)            
