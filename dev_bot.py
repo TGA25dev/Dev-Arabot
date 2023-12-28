@@ -448,6 +448,7 @@ tos_not_accepted_embed = discord.Embed(
    color=discord.Color.from_rgb(66, 135, 245),
    
 )
+tos_not_accepted_embed.add_field(name="", value="*Dura lex sed lex* (La loi est dure, mais c'est la loi) ")
 tos_not_accepted_embed.set_footer(text=version_note)
 
 #BUTTON VIEWS
@@ -917,7 +918,7 @@ async def delete_dm(interaction: discord.Interaction):
         guild_id = str(interaction.guild.id)
         is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
         if not is_tos_accepted:   
-         await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+         await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
 
         else:
          await interaction.response.send_message("Cette commande n'est utilisable que dans les DM !", ephemeral=True)
@@ -975,7 +976,7 @@ async def explosion_command(interaction: discord.Interaction):
     is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
 
     if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
     else:   
 
      try:
@@ -1062,7 +1063,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
     is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
 
     if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
 
     else: 
        
@@ -1215,7 +1216,7 @@ async def embed_command(interaction: discord.Interaction):
     is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
 
     if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
 
     else: 
        
@@ -1273,7 +1274,7 @@ async def embed_command(interaction: discord.Interaction):
     is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
 
     if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
 
     else:    
 
@@ -1338,7 +1339,7 @@ async def dev_info_command(interaction: discord.Interaction):
     is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
 
     if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
 
     else: 
        #
