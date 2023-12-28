@@ -444,7 +444,7 @@ unavaileble_command_embed.set_footer(text=version_note)
 
 tos_not_accepted_embed = discord.Embed(
    title="Vous n'avez pas accepté les conditions d'utilisation !",
-   description="*Pour utiliser le bot, veuillez accepter les conditions en exécutant la commande `/setup`*\nSi vous préférez ne pas les accepter, vous avez la possibilité de supprimer le bot en cliquant sur le bouton ci-dessous :x:",
+   description="*Pour utiliser le bot, veuillez accepter les conditions en exécutant la commande* `/conditions`\n**Si vous préférez ne pas les accepter, vous ne pourrez pas utiliser les commandes** :x:",
    color=discord.Color.from_rgb(66, 135, 245),
    
 )
@@ -457,41 +457,6 @@ tos_not_accepted_embed.set_footer(text=version_note)
 
 
  #Button View Status
-
-class ButtonView_delete_bot(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-        self.bot = client
-
-    @discord.ui.button(style=discord.ButtonStyle.danger, label="Supprimer le bot", custom_id="delete_bot_button")
-    async def button_delete_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(content="**Êtes-vous sûr ?** (Le bot pourra être ajouté à nouveau avec un lien d'invitation)\nRépondez `oui` pour supprimer le bot de ce serveur. :grey_question:", ephemeral=True, delete_after=35)
-
-        try:
-            confirm_response = await self.bot.wait_for(
-                "message",
-                check=lambda m: m.author == interaction.user and m.channel == interaction.channel,
-                timeout=30  # You can adjust the timeout duration
-            )
-
-            if confirm_response.content.lower() == "oui":
-                # Delete the bot from the server
-               await confirm_response.delete()
-               print(f"{printer_timestamp()} Bot deleted from server: {interaction.guild.name} ({interaction.guild.id})")
-               await interaction.edit_original_response(content="**Le bot a bien été supprimé de ce serveur !** :white_check_mark:")
-
-               await interaction.guild.leave()
-                
-            else:
-                await interaction.edit_original_response(content="**Opération annulée...** :x:")
-                await confirm_response.delete()
-        
-        except asyncio.TimeoutError:
-            await interaction.edit_original_response(content="***Temps écoulé.*** Veuillez réessayer. :alarm_clock:")
-            
-
-
-
 
 class ButtonView_status(discord.ui.View):
     def __init__(self, message):
@@ -545,6 +510,33 @@ class ButtonView_status(discord.ui.View):
 class ButtonView_settings(discord.ui.View):
     def __init__(self, interaction: discord.Interaction):
         super().__init__(timeout=None)
+        self.bot = client
+
+    @discord.ui.button(style=discord.ButtonStyle.danger, label="Supprimer le bot", custom_id="delete_bot_button")
+    async def button_delete_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message(content="**Êtes-vous sûr ?** (Le bot pourra être ajouté à nouveau avec un lien d'invitation)\nRépondez `oui` pour supprimer le bot de ce serveur. :grey_question:", ephemeral=True, delete_after=35)
+
+        try:
+            confirm_response = await self.bot.wait_for(
+                "message",
+                check=lambda m: m.author == interaction.user and m.channel == interaction.channel,
+                timeout=30  # You can adjust the timeout duration
+            )
+
+            if confirm_response.content.lower() == "oui":
+                # Delete the bot from the server
+               await confirm_response.delete()
+               print(f"{printer_timestamp()} Bot deleted from server: {interaction.guild.name} ({interaction.guild.id})")
+               await interaction.edit_original_response(content="**Le bot a bien été supprimé... **:cry:")
+
+               await interaction.guild.leave()
+                
+            else:
+                await interaction.edit_original_response(content="**Opération annulée...** :x:")
+                await confirm_response.delete()
+        
+        except asyncio.TimeoutError:
+            await interaction.edit_original_response(content="***Temps écoulé.*** Veuillez réessayer. :alarm_clock:")    
         
 
     @discord.ui.button(style=discord.ButtonStyle.primary, label="Réinitialiser le profil", custom_id="button_reset", emoji="🔄")
@@ -804,45 +796,31 @@ class ButtonView_setup_tos(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    custom_accept_emoji = discord.PartialEmoji(name="rule_logo", id=1189622492357214249, animated=False)
-
+    custom_accept_emoji = discord.PartialEmoji(name="rules_logo", id=1190051921365573803, animated=False)
     custom_refuse_emoji = discord.PartialEmoji(name="refuse_logo", id=1189625708838916207, animated=False)
 
     @discord.ui.button(style=discord.ButtonStyle.green, label="J'ai lu et j'accepte", custom_id="button_accept_tos", emoji=custom_accept_emoji)
     async def button_accept_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        print(f"{printer_timestamp()} {interaction.user.global_name} {interaction.user.id} TOS have been accepted !")
+        await interaction.response.send_message(content="Vous avez accepté les conditions d'utilisation...\nMerci ! :grin:", ephemeral=True)
 
-        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} TOS have been accepted !")
-
-        try:
-         with open("JSON Files/TOS_info_data.json", 'r') as f:
-            tos_data_file = json.load(f)
-        except FileNotFoundError:
-         tos_data_file = {}
-
-
-        tos_data_file[interaction.guild.id] = {"accepted_tos": True} 
-
+        tos_data = {interaction.user.id: {"accepted_tos": True}}
 
         with open("JSON Files/TOS_info_data.json", 'w') as f:
-         json.dump(tos_data_file, f)
-
+            json.dump(tos_data, f)
 
     @discord.ui.button(style=discord.ButtonStyle.blurple, label="Je refuse", custom_id="button_deny_tos", emoji=custom_refuse_emoji)
     async def button_refuse_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} TOS have been denied...")
+        print(f"{printer_timestamp()} {interaction.user.global_name} {interaction.user.id} TOS have been denied...")
+        await interaction.response.send_message(content="Vous avez refusé les conditions d'utilisation... :x:", ephemeral=True)
 
-        try:
-         with open("JSON Files/TOS_info_data.json", 'r') as f:
-            tos_data_file = json.load(f)
-        except FileNotFoundError:
-         tos_data_file = {}
-
-
-        tos_data_file[interaction.guild.id] = {"accepted_tos": False} 
-
+        tos_data = {interaction.user.id: {"accepted_tos": False}}
 
         with open("JSON Files/TOS_info_data.json", 'w') as f:
-         json.dump(tos_data_file, f)
+            json.dump(tos_data, f)
+
+
+   
 
 
 
@@ -914,20 +892,8 @@ async def setup(interaction: discord.Interaction):
 @tree.command(name="effacer-dm", description="Supprime tout DM du bot")
 async def delete_dm(interaction: discord.Interaction):
 
-    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-     loaded_data = json.load(json_file)
-
-    # Extract relevant data from loaded JSON using the specific guild ID
-    guild_id = str(interaction.guild.id)
-    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
-
-    if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
-
-    else:   
-
     # Check if the command is sent in a DM
-     if isinstance(interaction.channel, discord.DMChannel):
+    if isinstance(interaction.channel, discord.DMChannel):
         await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages du bot sont en cours de suppression.....\n\n(La vitesse de suppression est limitée à 1 message par seconde pour ne pas surcharger le bot :information_source:)", ephemeral=True)
 
         # Fetch the bot's sent messages in the DM
@@ -942,8 +908,19 @@ async def delete_dm(interaction: discord.Interaction):
             await asyncio.sleep(1)
 
         await interaction.edit_original_response(content="L'ensemble des messages du bot ont étés supprimés :white_check_mark: !")
-     else:
-        await interaction.response.send_message("Cette commande n'est utilisable que dans les DM !", ephemeral=True)
+    else:
+
+        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+         loaded_data = json.load(json_file)
+
+        # Extract relevant data from loaded JSON using the specific guild ID
+        guild_id = str(interaction.guild.id)
+        is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+        if not is_tos_accepted:   
+         await interaction.response.send_message(embed=tos_not_accepted_embed, view=ButtonView_delete_bot(), ephemeral=True)
+
+        else:
+         await interaction.response.send_message("Cette commande n'est utilisable que dans les DM !", ephemeral=True)
 
 @tree.command(name="admin", description="Affiche le panel d'administration du bot")
 async def admin_panel(interaction: discord.Interaction):
