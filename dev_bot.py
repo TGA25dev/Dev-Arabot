@@ -37,7 +37,7 @@ print(f"\033[1m{printer_timestamp()} Token has been loaded ! \033[0m")
 TGA25_ID = 845327664143532053
 
 
-USER2_ID = 8482442444342559029
+
 
 
 class aclient(discord.Client):
@@ -384,7 +384,7 @@ error_embed = discord.Embed(
     color=discord.Color.from_rgb(235, 64, 52)
         
 )
-error_embed.add_field(name= "L'erreur a été transmise au développeur :electric_plug:", value="")
+error_embed.add_field(name= "L'erreur a été transmise au développeur :electric_plug:", value="*Ceci ne devrait pas arriver...*\nVous pouvez rejoindre le serveur support en cliquant [ici](https://discord.gg/uGWkqYazzw)")
 error_embed.set_footer(text=version_note)
 
 
@@ -455,11 +455,27 @@ tos_not_accepted_embed = discord.Embed(
 tos_not_accepted_embed.add_field(name="", value="*Dura lex sed lex (La loi est dure, mais c'est la loi)*")
 tos_not_accepted_embed.set_footer(text=version_note)
 
+
+tos_embed = discord.Embed(
+   title="🤖 Conditions d'utilisation 🤖",
+   description="*Veuillez lire attentivement ce qui suit :*",
+   color=discord.Color.from_rgb(66, 135, 245),
+   
+)
+tos_embed.add_field
+tos_embed.add_field(name="__1-Utilisation conforme__", value="*Vous êtes responsable de l'utilisation de l'Arabot de manière conforme aux règlements en vigueur. Nous déclinons toute responsabilité en cas d'utilisation inappropriée du bot.* 🤖❌", inline=True)
+tos_embed.add_field(name="__2-Respect d'autrui__", value="*Utilisez les commandes de manière respectueuse et évitez tout contenu offensant. Gardez à l'esprit que l'humour au second degré ne doit pas franchir les limites du respect.* 🤝", inline=True)
+tos_embed.add_field(name="__3-Bot humoristique__", value="*Le bot a été créé dans une optique satirique visant à ridiculiser les stéréotypes absurdes. L'utilisation de l'Arabot dans ce contexte satirique implique une compréhension du second degré et de l'objectif de dénonciation des stéréotypes stupides.* 🤔", inline=True)
+tos_embed.add_field(name="__4-Changements possibles__", value="*Parfois, quelques ajustements sont nécessaires. Restez informé en consultant nos annonces sur le [serveur support.](https://discord.gg/uGWkqYazzw)* 🛠️📢", inline=True)
+tos_embed.add_field(name="__5-Utilisation de l'Arabot__", value="**En acceptant ces termes, vous adhérez aux règles.**\n*Si celles-ci ne correspondent pas à vos attentes, aucun problème. Cependant, vous ne devriez pas utiliser l'Arabot. *⚠️", inline=False)
+
+tos_embed.set_footer(text=version_note)
+
+
 #BUTTON VIEWS
 
  #Button View Delete Bot
-
-
+        
 
  #Button View Status
 
@@ -617,7 +633,7 @@ class ButtonView_settings(discord.ui.View):
 
     @discord.ui.button(style=discord.ButtonStyle.primary, label="Setup Auto_Role", custom_id="button_give_role")
     async def button5_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-       if interaction.user.id == TGA25_ID or USER2_ID:
+       if interaction.user.id == TGA25_ID:
          try:
           
          
@@ -892,17 +908,33 @@ class AdminSelectMenu(discord.ui.View):
 
 @tree.command(name="setup", description="Configuration du bot")
 async def setup(interaction: discord.Interaction):
-   if isinstance(interaction.channel, discord.DMChannel):
-      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+    if isinstance(interaction.channel, discord.DMChannel):
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+    else:
+        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+            loaded_data = json.load(json_file)
 
-   
-   else:  
-    await interaction.response.send_message("Setup", ephemeral=True)
+        # Extract relevant data from loaded JSON using the specific guild ID
+        user_id = str(interaction.user.id)
+        user_data = loaded_data.get(user_id, {})
+        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+
+        if not user_data:
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
+        else:
+
+         if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+         else:
+          await interaction.response.send_message("Setup", ephemeral=True)
 
 
 @tree.command(name="conditions", description="Affiche les conditions d'utilisation du bot")
 async def conditions_command(interaction: discord.Interaction):
-    await interaction.response.send_message(view=ButtonView_setup_tos(), ephemeral=True)
+    if isinstance(interaction.channel, discord.DMChannel):
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+    else:
+     await interaction.response.send_message(embed=tos_embed, view=ButtonView_setup_tos(), ephemeral=True)
 
 @tree.command(name="effacer-dm", description="Supprime tout DM du bot")
 async def delete_dm(interaction: discord.Interaction):
@@ -928,11 +960,16 @@ async def delete_dm(interaction: discord.Interaction):
 
         # Extract relevant data from loaded JSON using the specific guild ID
         user_id = str(interaction.user.id)
+        user_data = loaded_data.get(user_id, {})
         is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
-        
-        if not is_tos_accepted:
-            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+
+        if not user_data:
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
         else:
+        
+         if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+         else:
             await interaction.response.send_message("Cette commande n'est utilisable que dans les DM !", ephemeral=True)
 
 
@@ -945,13 +982,13 @@ async def admin_panel(interaction: discord.Interaction):
         user_id = interaction.user.id
         command_id = interaction.data['id']
         guild_name = interaction.guild.name
-        TGA25_ID = "845327664143532053"
+        
         USER_DM = await client.fetch_user(TGA25_ID)
 
         try:
-            if interaction.user.id in [TGA25_ID, USER2_ID]:
+            if interaction.user.id == TGA25_ID:
                 view = AdminSelectMenu()
-                message = await interaction.response.send_message(content="Administration du bot :", view=view)
+                await interaction.response.send_message(content="Administration du bot :", view=view)
             else:
                 await interaction.response.send_message("Tu n'es pas autorisé a utiliser cette commande :no_entry_sign: ", ephemeral=True)
 
@@ -986,11 +1023,16 @@ async def explosion_command(interaction: discord.Interaction):
 
         # Extract relevant data from loaded JSON using the specific guild ID
         user_id = str(interaction.user.id)
+        user_data = loaded_data.get(user_id, {})
         is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-        if not is_tos_accepted:
-            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        if not user_data:
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
         else:
+
+         if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+         else:
             try:
                 with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'r') as f:
                     explosion_command_cooldown = json.load(f)
@@ -1076,11 +1118,16 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
 
         # Extract relevant data from loaded JSON using the specific guild ID
         user_id = str(interaction.user.id)
+        user_data = loaded_data.get(user_id, {})
         is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-        if not is_tos_accepted:
-            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        if not user_data:
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
         else:
+
+         if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+         else:
             if vol_command_avalaible == False:
                 await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
             elif vol_command_avalaible == True:
@@ -1236,11 +1283,16 @@ async def embed_command(interaction: discord.Interaction):
 
         # Extract relevant data from loaded JSON using the specific guild ID
         user_id = str(interaction.user.id)
+        user_data = loaded_data.get(user_id, {})
         is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-        if not is_tos_accepted:
-            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        if not user_data:
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
         else:
+
+         if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+         else:
             # Rest of the code for when TOS is accepted
             # ...
 
@@ -1295,11 +1347,16 @@ async def embed_command(interaction: discord.Interaction):
 
         # Extract relevant data from loaded JSON using the specific guild ID
         user_id = str(interaction.user.id)
+        user_data = loaded_data.get(user_id, {})
         is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-        if not is_tos_accepted:
-            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        if not user_data:
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
         else:
+
+         if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+         else:
             # The code that should execute when terms of service are accepted
             user_id = interaction.user.id
             command_name = interaction.data['name']
@@ -1357,11 +1414,16 @@ async def dev_info_command(interaction: discord.Interaction):
 
         # Extract relevant data from loaded JSON using the specific guild ID
         user_id = str(interaction.user.id)
+        user_data = loaded_data.get(user_id, {})
         is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-        if not is_tos_accepted:
-            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        if not user_data:
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
         else:
+
+         if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+         else:
             command_name = interaction.data['name']
             user_id = interaction.user.id
             command_id = interaction.data['id']
@@ -1490,7 +1552,7 @@ async def twitch_loop():
 
 @tree.command(name="test", description="test_command")
 async def test_command(interaction: discord.Interaction):
-    await interaction.response.send_message(view=ButtonView_setup_tos())
+    await interaction.response.send_message(embed=tos_embed)
 
 
 async def explosion_command_system(interaction: discord.Interaction):
