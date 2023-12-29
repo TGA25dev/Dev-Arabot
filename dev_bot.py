@@ -336,11 +336,11 @@ help_embed.add_field(name=f"</info:{info_command_id}>", value="Affiche les infor
 
 help_embed.add_field(name=f"</devinfo:{dev_info_command_id}>", value="Affiche des informations sur le développeur du bot", inline=False)
 
+help_embed.add_field(name=f"</help:{help_command_id}>", value="Affiche ceci", inline=False)
+
 help_embed.add_field(name=f"</conditions:{conditions_command_id}>", value="Affiche les conditions d'utilisation du bot", inline=False)
 
 help_embed.add_field(name=f"</setup:{setup_command_id}>", value="Affiche l'interface de configuration du bot", inline=False)
-
-help_embed.add_field(name=f"</help:{help_command_id}>", value="Affiche ceci", inline=False)
 
 help_embed.add_field(name=f"</admin:{admin_command_id}>", value="Affiche le panel d'administration du bot ***Commande réservée aux admins du bot***", inline=False)
 
