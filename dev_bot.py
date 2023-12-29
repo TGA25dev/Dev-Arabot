@@ -243,6 +243,8 @@ dev_info_command_id = 1108432433830965340
 
 admin_command_id = 1098204837612617733
 
+conditions_command_id = 1190253770379120722
+
 
 #EVENTS
 
@@ -333,6 +335,8 @@ help_embed.add_field(name=f"</effacer-dm:{effacer_dm_command_id}>", value="Suppr
 help_embed.add_field(name=f"</info:{info_command_id}>", value="Affiche les informations du bot", inline=False)
 
 help_embed.add_field(name=f"</devinfo:{dev_info_command_id}>", value="Affiche des informations sur le développeur du bot", inline=False)
+
+help_embed.add_field(name=f"</conditions:{conditions_command_id}>", value="Affiche les conditions d'utilisation du bot", inline=False)
 
 help_embed.add_field(name=f"</setup:{setup_command_id}>", value="Affiche l'interface de configuration du bot", inline=False)
 
