@@ -895,9 +895,13 @@ async def setup(interaction: discord.Interaction):
    else:  
     await interaction.response.send_message("Setup", ephemeral=True)
 
+
+@tree.command(name="conditions", description="Affiche les conditions d'utilisation du bot")
+async def conditions_command(interaction: discord.Interaction):
+    await interaction.response.send_message(view=ButtonView_setup_tos(), ephemeral=True)
+
 @tree.command(name="effacer-dm", description="Supprime tout DM du bot")
 async def delete_dm(interaction: discord.Interaction):
-
     # Check if the command is sent in a DM
     if isinstance(interaction.channel, discord.DMChannel):
         await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages du bot sont en cours de suppression.....\n\n(La vitesse de suppression est limitée à 1 message par seconde pour ne pas surcharger le bot :information_source:)", ephemeral=True)
@@ -915,131 +919,37 @@ async def delete_dm(interaction: discord.Interaction):
 
         await interaction.edit_original_response(content="L'ensemble des messages du bot ont étés supprimés :white_check_mark: !")
     else:
-
         with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-         loaded_data = json.load(json_file)
+            loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
         user_id = str(interaction.user.id)
         is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
-        if not is_tos_accepted:   
-         await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
-
+        
+        if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
         else:
-         await interaction.response.send_message("Cette commande n'est utilisable que dans les DM !", ephemeral=True)
+            await interaction.response.send_message("Cette commande n'est utilisable que dans les DM !", ephemeral=True)
+
 
 @tree.command(name="admin", description="Affiche le panel d'administration du bot")
 async def admin_panel(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
-      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
-
-   
-    else:  
-     command_name = interaction.data['name']
-
-     user_id = interaction.user.id
-
-     command_id = interaction.data['id']
-
-     guild_name = interaction.guild.name
-
-     TGA25_ID = "845327664143532053"  
-     USER_DM = await client.fetch_user(TGA25_ID)
-
-     try:
-      if interaction.user.id == TGA25_ID or USER2_ID:
-         view = AdminSelectMenu()
-         message = await interaction.response.send_message(content="Administration du bot :",view=view)
-
-      else:
-       await interaction.response.send_message("Tu n'es pas autorisé a utiliser cette commande :no_entry_sign: ", ephemeral=True)
-      
-   
-     except Exception as e:
-
-        error_dminfo_embed = discord.Embed( 
-        title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
-        description=f"**Erreur causée par** <@{user_id}>",
-        color=discord.Color.from_rgb(245, 170, 66)        
-        )
-        
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
-        error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
-        error_dminfo_embed.set_footer(text=f"{version_note}")
-
-        
-        await USER_DM.send(embed=error_dminfo_embed)
-        await interaction.response.send_message(embed=error_embed, ephemeral=True)
-      
-
-
-@tree.command(name="explosion", description="Boum !")
-async def explosion_command(interaction: discord.Interaction):
-    if isinstance(interaction.channel, discord.DMChannel):
-      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
-
-   
-    else:  
-      
-     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-      loaded_data = json.load(json_file)
-
-      # Extract relevant data from loaded JSON using the specific guild ID
-     user_id = str(interaction.user.id)
-     is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
-
-     if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
-     else:   
-
-      try:
-        with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'r') as f:
-            explosion_command_cooldown = json.load(f)
-      except FileNotFoundError:
-        explosion_command_cooldown = {}
-
-    # Check for cooldown
-      guild_id = str(interaction.guild_id)
-
-      if guild_id not in explosion_command_cooldown:
-        explosion_command_cooldown[guild_id] = 0
-
-      current_time = time.time()
-      cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
-
-      if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
-        # Server is on cooldown, inform users
-        remaining_time_seconds = int(cooldown_time - (current_time - explosion_command_cooldown[guild_id]))
-
-        remaining_days, remaining_seconds = divmod(remaining_time_seconds, 24 * 60 * 60)
-        remaining_hours, remaining_seconds = divmod(remaining_seconds, 60 * 60)
-        remaining_minutes, remaining_seconds = divmod(remaining_seconds, 60)
-
-        remaining_time_formatted = f"{remaining_days} jours, {remaining_hours} heures, {remaining_minutes} minutes et {remaining_seconds} secondes"
-
-        await interaction.response.send_message(f"Veuillez attendre {remaining_time_formatted} avant de refaire exploser ce serveur... :hourglass_flowing_sand:", ephemeral=True)
-        return
-
-      explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
-
-      if explosion_command_avalaible == False:
-        await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
-      elif explosion_command_avalaible == True:
-        user_id = interaction.user.id
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+    else:
         command_name = interaction.data['name']
+        user_id = interaction.user.id
         command_id = interaction.data['id']
         guild_name = interaction.guild.name
         TGA25_ID = "845327664143532053"
         USER_DM = await client.fetch_user(TGA25_ID)
 
         try:
-            if maintenance_mode:
-                await interaction.response.send_message(embed=maintenance_embed)
-                return
-            await interaction.response.send_message(content="Sélectionnez une force d'explosion :",
-                                                     view=ButtonView_explosion_command(), embed=explosion_force_embed)
+            if interaction.user.id in [TGA25_ID, USER2_ID]:
+                view = AdminSelectMenu()
+                message = await interaction.response.send_message(content="Administration du bot :", view=view)
+            else:
+                await interaction.response.send_message("Tu n'es pas autorisé a utiliser cette commande :no_entry_sign: ", ephemeral=True)
 
         except Exception as e:
             error_dminfo_embed = discord.Embed(
@@ -1059,9 +969,93 @@ async def explosion_command(interaction: discord.Interaction):
             await USER_DM.send(embed=error_dminfo_embed)
             await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
-     # Save the updated server cooldown data to the JSON file
-      with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
-        json.dump(explosion_command_cooldown, f)
+      
+
+
+@tree.command(name="explosion", description="Boum !")
+async def explosion_command(interaction: discord.Interaction):
+    if isinstance(interaction.channel, discord.DMChannel):
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+    else:
+        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+            loaded_data = json.load(json_file)
+
+        # Extract relevant data from loaded JSON using the specific guild ID
+        user_id = str(interaction.user.id)
+        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+
+        if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        else:
+            try:
+                with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'r') as f:
+                    explosion_command_cooldown = json.load(f)
+            except FileNotFoundError:
+                explosion_command_cooldown = {}
+
+            # Check for cooldown
+            guild_id = str(interaction.guild_id)
+
+            if guild_id not in explosion_command_cooldown:
+                explosion_command_cooldown[guild_id] = 0
+
+            current_time = time.time()
+            cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
+
+            if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
+                # Server is on cooldown, inform users
+                remaining_time_seconds = int(cooldown_time - (current_time - explosion_command_cooldown[guild_id]))
+
+                remaining_days, remaining_seconds = divmod(remaining_time_seconds, 24 * 60 * 60)
+                remaining_hours, remaining_seconds = divmod(remaining_seconds, 60 * 60)
+                remaining_minutes, remaining_seconds = divmod(remaining_seconds, 60)
+
+                remaining_time_formatted = f"{remaining_days} jours, {remaining_hours} heures, {remaining_minutes} minutes et {remaining_seconds} secondes"
+
+                await interaction.response.send_message(f"Veuillez attendre {remaining_time_formatted} avant de refaire exploser ce serveur... :hourglass_flowing_sand:", ephemeral=True)
+                return
+
+            explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
+
+            if explosion_command_avalaible == False:
+                await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
+            elif explosion_command_avalaible == True:
+                user_id = interaction.user.id
+                command_name = interaction.data['name']
+                command_id = interaction.data['id']
+                guild_name = interaction.guild.name
+                TGA25_ID = "845327664143532053"
+                USER_DM = await client.fetch_user(TGA25_ID)
+
+                try:
+                    if maintenance_mode:
+                        await interaction.response.send_message(embed=maintenance_embed)
+                        return
+                    await interaction.response.send_message(content="Sélectionnez une force d'explosion :",
+                                                             view=ButtonView_explosion_command(), embed=explosion_force_embed)
+
+                except Exception as e:
+                    error_dminfo_embed = discord.Embed(
+                        title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
+                        description=f"**Erreur causée par** <@{user_id}>",
+                        color=discord.Color.from_rgb(245, 170, 66)
+                    )
+
+                    error_dminfo_embed.add_field(name="Details :",
+                                                 value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
+                                                 inline=True)
+                    error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
+                    error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
+                    error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
+                    error_dminfo_embed.set_footer(text=f"{version_note}")
+
+                    await USER_DM.send(embed=error_dminfo_embed)
+                    await interaction.response.send_message(embed=error_embed, ephemeral=True)
+
+            # Save the updated server cooldown data to the JSON file
+            with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
+                json.dump(explosion_command_cooldown, f)
+
 
 
 
@@ -1071,157 +1065,157 @@ async def explosion_command(interaction: discord.Interaction):
 @tree.command(name="vol", description="Vole le nom d'un utilisateur")
 async def vol_command(interaction: discord.Interaction, user: discord.Member):
     if isinstance(interaction.channel, discord.DMChannel):
-      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+    else:
+        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+            loaded_data = json.load(json_file)
 
-   
-    else:  
-     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-      loaded_data = json.load(json_file)
+        # Extract relevant data from loaded JSON using the specific guild ID
+        user_id = str(interaction.user.id)
+        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-    # Extract relevant data from loaded JSON using the specific guild ID
-    user_id = str(interaction.user.id)
-    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+        if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        else:
+            if vol_command_avalaible == False:
+                await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
+            elif vol_command_avalaible == True:
+                user_id = interaction.user.id
+                command_name = interaction.data['name']
+                command_id = interaction.data['id']
+                guild_name = interaction.guild.name
+                TGA25_ID = "845327664143532053"
+                USER_DM = await client.fetch_user(TGA25_ID)
 
-    if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
-
-    else: 
-       
-     if vol_command_avalaible == False:
-        await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
-     elif vol_command_avalaible == True:
-        user_id = interaction.user.id
-        command_name = interaction.data['name']
-        command_id = interaction.data['id']
-        guild_name = interaction.guild.name
-        TGA25_ID = "845327664143532053"
-        USER_DM = await client.fetch_user(TGA25_ID)
-
-        try:
-            if maintenance_mode:
-                await interaction.response.send_message(embed=maintenance_embed)
-            else:
                 try:
-                    with open("JSON Files/vol_command_cooldown.json", 'r') as f:
-                        server_cooldowns = json.load(f)
-                except FileNotFoundError:
-                    server_cooldowns = {}
-
-                guild_id = str(interaction.guild_id)
-
-                if guild_id not in server_cooldowns:
-                    server_cooldowns[guild_id] = 0
-
-                current_time = time.time()
-                cooldown_time = 300  # Change this to the desired cooldown time in seconds
-
-                if current_time - server_cooldowns[guild_id] > cooldown_time:
-                    bot_user = interaction.guild.me
-                    choosen_user_id = user.id
-                    choosen_user = await client.fetch_user(choosen_user_id)
-                    choosen_user_avatar_url = choosen_user.avatar.url
-                    response = requests.get(choosen_user_avatar_url)
-
-                    if response.status_code == 200:
-                        # Save the image to disk
-                        with open(f"Images/{choosen_user}.png", "wb") as f:
-                            f.write(response.content)
-                            print(f"{printer_timestamp()} Image downloaded successfully!")
+                    if maintenance_mode:
+                        await interaction.response.send_message(embed=maintenance_embed)
                     else:
-                        print(f"{printer_timestamp()} Failed to download image.")
+                        try:
+                            with open("JSON Files/vol_command_cooldown.json", 'r') as f:
+                                server_cooldowns = json.load(f)
+                        except FileNotFoundError:
+                            server_cooldowns = {}
 
-                    # Update the bot's username to match the username of the mentioned user
-                    profile_image_path = f"Images/{choosen_user}.png"
-                    profile_image = open(profile_image_path, 'rb')
-                    pfp = profile_image.read()
+                        guild_id = str(interaction.guild_id)
 
-                    await interaction.response.send_message(f"J'ai temporairement 'volé' le profil de <@{user.id}> :tada::tada: ! ", ephemeral=True)
+                        if guild_id not in server_cooldowns:
+                            server_cooldowns[guild_id] = 0
 
-                    try:
-                        await client.user.edit(avatar=pfp)
-                        print(f"{printer_timestamp()} The avatar has been successfully changed to: {user.avatar}")
-                    except Exception as rate_limit_error:
-                        if "You are changing your avatar too fast" in str(rate_limit_error):
-                            print(f"{printer_timestamp()} ! Rate limit avatar !")
-                            await interaction.edit_original_response(
-                                content=":red_circle: Une erreur est survenue durant la modification de la photo de profil... :red_circle: ")
-                            pass
+                        current_time = time.time()
+                        cooldown_time = 300  # Change this to the desired cooldown time in seconds
 
-                    if user.bot:
-                        await bot_user.edit(nick=user.name)
-                        print(f"{printer_timestamp()} The nickname has been successfully changed to {user.name} #{user.id} (Bot)")
-                    else:
-                        await bot_user.edit(nick=user.global_name)
-                        print(f"{printer_timestamp()} The nickname has been successfully changed to {user.name} #{user.id} (Normal User)")
+                        if current_time - server_cooldowns[guild_id] > cooldown_time:
+                            bot_user = interaction.guild.me
+                            choosen_user_id = user.id
+                            choosen_user = await client.fetch_user(choosen_user_id)
+                            choosen_user_avatar_url = choosen_user.avatar.url
+                            response = requests.get(choosen_user_avatar_url)
 
-                    print(f"{printer_timestamp()} The profile of {user.name} #{user.id} has been stolen! (profile resetting in 30s)")
-                    await asyncio.sleep(30)
+                            if response.status_code == 200:
+                                # Save the image to disk
+                                with open(f"Images/{choosen_user}.png", "wb") as f:
+                                    f.write(response.content)
+                                    print(f"{printer_timestamp()} Image downloaded successfully!")
+                            else:
+                                print(f"{printer_timestamp()} Failed to download image.")
 
-                    # Reset the profile after 30s
-                    try:
-                        profile_image_path = f"{IMAGES_PATH}/default_image_{bot_mode_lc}_bot.png"
-                        profile_image = open(profile_image_path, "rb")
-                        pfp = profile_image.read()
+                            # Update the bot's username to match the username of the mentioned user
+                            profile_image_path = f"Images/{choosen_user}.png"
+                            profile_image = open(profile_image_path, 'rb')
+                            pfp = profile_image.read()
 
-                        await client.user.edit(avatar=pfp)
-                        print(f"{printer_timestamp()} Profile image successfully reestablished to default!")
+                            await interaction.response.send_message(f"J'ai temporairement 'volé' le profil de <@{user.id}> :tada::tada: ! ", ephemeral=True)
 
-                        await bot_user.edit(nick=default_bot_nick)
-                        print(f"{printer_timestamp()} Nickname successfully reestablished to default!")
+                            try:
+                                await client.user.edit(avatar=pfp)
+                                print(f"{printer_timestamp()} The avatar has been successfully changed to: {user.avatar}")
+                            except Exception as rate_limit_error:
+                                if "You are changing your avatar too fast" in str(rate_limit_error):
+                                    print(f"{printer_timestamp()} ! Rate limit avatar !")
+                                    await interaction.edit_original_response(
+                                        content=":red_circle: Une erreur est survenue durant la modification de la photo de profil... :red_circle: ")
+                                    pass
 
-                        await interaction.edit_original_response(content="Mon profil a correctement été réinitialisé :white_check_mark: !")
-                        server_cooldowns[guild_id] = current_time
+                            if user.bot:
+                                await bot_user.edit(nick=user.name)
+                                print(f"{printer_timestamp()} The nickname has been successfully changed to {user.name} #{user.id} (Bot)")
+                            else:
+                                await bot_user.edit(nick=user.global_name)
+                                print(f"{printer_timestamp()} The nickname has been successfully changed to {user.name} #{user.id} (Normal User)")
 
+                            print(f"{printer_timestamp()} The profile of {user.name} #{user.id} has been stolen! (profile resetting in 30s)")
+                            await asyncio.sleep(30)
 
+                            # Reset the profile after 30s
+                            try:
+                                profile_image_path = f"{IMAGES_PATH}/default_image_{bot_mode_lc}_bot.png"
+                                profile_image = open(profile_image_path, "rb")
+                                pfp = profile_image.read()
 
-                    except Exception as rate_limit_error:
-                        if "You are changing your avatar too fast" in str(rate_limit_error):
-                            print(f"{printer_timestamp()} ! Rate limit avatar !")
-                            pass
+                                await client.user.edit(avatar=pfp)
+                                print(f"{printer_timestamp()} Profile image successfully reestablished to default!")
 
-                            await bot_user.edit(nick=default_bot_nick)
-                            print(f"{printer_timestamp()} Nickname successfully reestablished to default!")
+                                await bot_user.edit(nick=default_bot_nick)
+                                print(f"{printer_timestamp()} Nickname successfully reestablished to default!")
 
-                            await interaction.edit_original_response(
-                                content="Mon profil a partiellement été réinitialisé :ballot_box_with_check: !")
-                            server_cooldowns[guild_id] = current_time
+                                await interaction.edit_original_response(
+                                    content="Mon profil a correctement été réinitialisé :white_check_mark: !")
+                                server_cooldowns[guild_id] = current_time
+
+                            except Exception as rate_limit_error:
+                                if "You are changing your avatar too fast" in str(rate_limit_error):
+                                    print(f"{printer_timestamp()} ! Rate limit avatar !")
+                                    pass
+
+                                    await bot_user.edit(nick=default_bot_nick)
+                                    print(f"{printer_timestamp()} Nickname successfully reestablished to default!")
+
+                                    await interaction.edit_original_response(
+                                        content="Mon profil a partiellement été réinitialisé :ballot_box_with_check: !")
+                                    server_cooldowns[guild_id] = current_time
+                                else:
+                                    await bot_user.edit(nick=default_bot_nick)
+                                    print(f"{printer_timestamp()} Nickname successfully reestablished to default!")
+
+                                    await interaction.edit_original_response(
+                                        content="Mon profil a correctement été réinitialisé :white_check_mark: !")
+                                    server_cooldowns[guild_id] = current_time
                         else:
-                            await bot_user.edit(nick=default_bot_nick)
-                            print(f"{printer_timestamp()} Nickname successfully reestablished to default!")
+                            remaining_time = int(cooldown_time - (current_time - server_cooldowns[guild_id]))
 
-                            await interaction.edit_original_response(
-                                content="Mon profil a correctement été réinitialisé :white_check_mark: !")
-                            server_cooldowns[guild_id] = current_time
-                else:
-                    remaining_time = int(cooldown_time - (current_time - server_cooldowns[guild_id]))
+                            remaining_minutes = remaining_time // 60
+                            remaining_seconds = remaining_time % 60
 
-                    remaining_minutes = remaining_time // 60
-                    remaining_seconds = remaining_time % 60
+                            await interaction.response.send_message(
+                                f"Veuillez patienter ***{remaining_minutes} minutes*** et ***{remaining_seconds} secondes*** avant de pouvoir réutiliser cette commande.", ephemeral=True)
 
-                    await interaction.response.send_message(f"Veuillez patienter ***{remaining_minutes} minutes*** et ***{remaining_seconds} secondes*** avant de pouvoir réutiliser cette commande.", ephemeral=True)
+                        # Save the updated server cooldown data to the JSON file
+                        with open("JSON Files/vol_command_cooldown.json", 'w') as f:
+                            json.dump(server_cooldowns, f)
 
-                # Save the updated server cooldown data to the JSON file
-                with open("JSON Files/vol_command_cooldown.json", 'w') as f:
-                    json.dump(server_cooldowns, f)
+                except Exception as e:
+                    print(e)
+                    error_dminfo_embed = discord.Embed(
+                        title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
+                        description=f"**Erreur causée par** <@{user.id}>",
+                        color=discord.Color.from_rgb(245, 170, 66)
+                    )
 
-        except Exception as e:
-            print(e)
-            error_dminfo_embed = discord.Embed(
-                title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
-                description=f"**Erreur causée par** <@{user.id}>",
-                color=discord.Color.from_rgb(245, 170, 66)
-            )
+                    error_dminfo_embed.add_field(
+                        name="Details :", value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
+                        inline=True)
+                    error_dminfo_embed.add_field(
+                        name="**Commande :**", value=f"`{command_name}`", inline=True)
+                    error_dminfo_embed.add_field(
+                        name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
+                    error_dminfo_embed.add_field(
+                        name="Erreur :", value=f"`{e}`", inline=False)
+                    error_dminfo_embed.set_footer(text=f"{version_note}")
 
-            error_dminfo_embed.add_field(name="Details :",
-                                         value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
-                                         inline=True)
-            error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
-            error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
-            error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
-            error_dminfo_embed.set_footer(text=f"{version_note}")
+                    await USER_DM.send(embed=error_dminfo_embed)
+                    await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
-            await USER_DM.send(embed=error_dminfo_embed)
-            await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
           
 
@@ -1229,59 +1223,57 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
 @tree.command(name="help", description="Affiche les commandes disponibles")
 async def embed_command(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
-      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les DM ! :no_entry_sign:", ephemeral=True)
+    else:
+        # Define loaded_data outside the else block
+        loaded_data = {}
+        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+            loaded_data = json.load(json_file)
 
-   
-    else:  
-     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-      loaded_data = json.load(json_file)
+        # Extract relevant data from loaded JSON using the specific guild ID
+        user_id = str(interaction.user.id)
+        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-    # Extract relevant data from loaded JSON using the specific guild ID
-    user_id = str(interaction.user.id)
-    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+        if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        else:
+            # Rest of the code for when TOS is accepted
+            # ...
 
-    if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+            user_id = interaction.user.id
+            command_name = interaction.data['name']
+            command_id = interaction.data['id']
+            guild_name = interaction.guild.name
+            TGA25_ID = "845327664143532053"
+            USER_DM = await client.fetch_user(TGA25_ID)
 
-    else: 
-       
-     user_id = interaction.user.id
+            if maintenance_mode:
+                await interaction.response.send_message(embed=maintenance_embed)
+                return
 
-     command_name = interaction.data['name']
+            try:
+                await interaction.response.send_message(embed=help_embed, ephemeral=False)
+            except Exception as e:
+                error_dminfo_embed = discord.Embed(
+                    title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
+                    description=f"**Erreur causée par** <@{user_id}>",
+                    color=discord.Color.from_rgb(245, 170, 66)
+                )
 
-     command_id = interaction.data['id']
+                error_dminfo_embed.add_field(
+                    name="Details :", value=f"Erreur survenue il y a <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
+                error_dminfo_embed.add_field(
+                    name="**Commande :**", value=f"`{command_name}`", inline=True)
+                error_dminfo_embed.add_field(
+                    name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
+                error_dminfo_embed.add_field(
+                    name="Erreur :", value=f"`{e}`", inline=False)
+                error_dminfo_embed.set_footer(text=f"{version_note}")
 
-     guild_name = interaction.guild.name
+                await USER_DM.send(embed=error_dminfo_embed)
+                await interaction.response.send_message(
+                    embed=error_embed, ephemeral=True)
 
-     TGA25_ID = "845327664143532053"  
-     USER_DM = await client.fetch_user(TGA25_ID)
-
-
-
-
-
-     if maintenance_mode:
-        await interaction.response.send_message(embed=maintenance_embed)
-        return
-     try:
-      await interaction.response.send_message(embed=help_embed, ephemeral=False)
-
-     except Exception as e:
-        error_dminfo_embed = discord.Embed( 
-        title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
-        description=f"**Erreur causée par** <@{user_id}>",
-        color=discord.Color.from_rgb(245, 170, 66)        
-        )
-        
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
-        error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
-        error_dminfo_embed.set_footer(text=f"{version_note}")
-
-        
-        await USER_DM.send(embed=error_dminfo_embed)
-        await interaction.response.send_message(embed=error_embed, ephemeral=True)
         
 
     
@@ -1292,128 +1284,112 @@ async def embed_command(interaction: discord.Interaction):
 @tree.command(name="info", description="Affiche des informations à propos du bot")
 async def embed_command(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
-      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+    else:
+        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+            loaded_data = json.load(json_file)
 
-   
-    else:  
-     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-      loaded_data = json.load(json_file)
+        # Extract relevant data from loaded JSON using the specific guild ID
+        user_id = str(interaction.user.id)
+        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-    # Extract relevant data from loaded JSON using the specific guild ID
-    user_id = str(interaction.user.id)
-    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
-    
+        if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        else:
+            # The code that should execute when terms of service are accepted
+            user_id = interaction.user.id
+            command_name = interaction.data['name']
+            command_id = interaction.data['id']
+            guild_name = interaction.guild.name
+            TGA25_ID = "845327664143532053"
+            USER_DM = await client.fetch_user(TGA25_ID)
 
-    if is_tos_accepted is False:
-     await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
-    elif is_tos_accepted:  # Alternatively, you can use "elif is_tos_accepted is True:"
-    # The code that should execute when terms of service are accepted
+            if maintenance_mode:
+                await interaction.response.send_message(embed=maintenance_embed)
+                return
 
+            try:
+                # Create the embed
+                info_embed2 = discord.Embed(
+                    title="Infos",
+                    color=discord.Color.from_rgb(60, 240, 132)
+                )
+                info_embed2.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 2)}* ms de latence", inline=False)
+                info_embed2.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>", inline=False)
+                info_embed2.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>", inline=False)
+                info_embed2.add_field(name="**Langage de programmation 🌐**", value="*Python* <:logo_python_arabot:1108367929457791116>", inline=False)
+                info_embed2.set_footer(text=version_note)
 
-     user_id = interaction.user.id
+                await interaction.response.send_message(embed=info_embed2, ephemeral=False)
 
-     command_name = interaction.data['name']
+            except Exception as e:
+                error_dminfo_embed = discord.Embed(
+                    title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
+                    description=f"**Erreur causée par** <@{user_id}>",
+                    color=discord.Color.from_rgb(245, 170, 66)
+                )
 
-     command_id = interaction.data['id']
+                error_dminfo_embed.add_field(
+                    name="Details :", value=f"Erreur survenue il y a à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
+                error_dminfo_embed.add_field(
+                    name="**Commande :**", value=f"`{command_name}`", inline=True)
+                error_dminfo_embed.add_field(
+                    name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
+                error_dminfo_embed.add_field(
+                    name="Erreur :", value=f"`{e}`", inline=False)
+                error_dminfo_embed.set_footer(text=f"{version_note}")
 
-     guild_name = interaction.guild.name
+                await USER_DM.send(embed=error_dminfo_embed)
+                await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
-     TGA25_ID = "845327664143532053"  
-     USER_DM = await client.fetch_user(TGA25_ID)
-
-
-
-
-     if maintenance_mode:
-        await interaction.response.send_message(embed=maintenance_embed)
-        return
-     try:
-
-     
-
-    # Create the embed
-      info_embed2 = discord.Embed(
-      title="Infos",
-      color=discord.Color.from_rgb(60, 240, 132)
-      )
-      info_embed2.add_field(name="**Ping 🏓**", value=f"*{round(client.latency, 2)}* ms de latence", inline=False)
-      info_embed2.add_field(name="**Date & Heure 🕐**", value=f"Nous sommes le <t:{generate_current_time_timestamp()}:D> et il est <t:{generate_current_time_timestamp()}:t>", inline=False)
-      info_embed2.add_field(name="**Dernier redémarrage 🔄**", value=f"<t:{int(restart_time.timestamp())}>", inline=False) # Bot restart date and time field
-      info_embed2.add_field(name="**Langage de programmation 🌐**", value="*Python* <:logo_python_arabot:1108367929457791116>", inline=False) # Bot restart date and time field
-      info_embed2.set_footer(text=version_note)
-
-      await interaction.response.send_message(embed=info_embed2, ephemeral=False)
-
-     except Exception as e:
-        error_dminfo_embed = discord.Embed( 
-        title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
-        description=f"**Erreur causée par** <@{user_id}>",
-        color=discord.Color.from_rgb(245, 170, 66)        
-        )
-        
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
-        error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
-        error_dminfo_embed.set_footer(text=f"{version_note}")
-
-        
-        await USER_DM.send(embed=error_dminfo_embed)
-        await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
 @tree.command(name="devinfo", description="Affiche des informations à propos du développeur")
 async def dev_info_command(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
-      await interaction.reponse.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+    else:
+        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+            loaded_data = json.load(json_file)
 
-   
-    else:  
-     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-      loaded_data = json.load(json_file)
+        # Extract relevant data from loaded JSON using the specific guild ID
+        user_id = str(interaction.user.id)
+        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-    # Extract relevant data from loaded JSON using the specific guild ID
-    user_id = str(interaction.user.id)
-    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+        if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+        else:
+            command_name = interaction.data['name']
+            user_id = interaction.user.id
+            command_id = interaction.data['id']
+            guild_name = interaction.guild.name
+            TGA25_ID = "845327664143532053"
+            USER_DM = await client.fetch_user(TGA25_ID)
 
-    if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+            try:
+                emoji_id = 1107235074757373963  # Replace with the ID of your custom emoji
+                myemoji = client.get_emoji(emoji_id)
+                await interaction.response.send_message(content=myemoji, embed=dev_info_embed)
 
-    else: 
-       
-     command_name = interaction.data['name']
+            except Exception as e:
+                error_dminfo_embed = discord.Embed(
+                    title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
+                    description=f"**Erreur causée par** <@{user_id}>",
+                    color=discord.Color.from_rgb(245, 170, 66)
+                )
 
-     user_id = interaction.user.id
+                error_dminfo_embed.add_field(
+                    name="Details :", value=f"Erreur survenue il y a à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
+                error_dminfo_embed.add_field(
+                    name="**Commande :**", value=f"`{command_name}`", inline=True)
+                error_dminfo_embed.add_field(
+                    name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
+                error_dminfo_embed.add_field(
+                    name="Erreur :", value=f"`{e}`", inline=False)
+                error_dminfo_embed.set_footer(text=f"{version_note}")
 
-     command_id = interaction.data['id']
+                await USER_DM.send(embed=error_dminfo_embed)
+                await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
-     guild_name = interaction.guild.name
-
-     TGA25_ID = "845327664143532053"  
-     USER_DM = await client.fetch_user(TGA25_ID)
-   
-   
-
-     try:
-       emoji_id = 1107235074757373963 # Replace with the ID of your custom emoji
-       myemoji = client.get_emoji(emoji_id)
-       await interaction.response.send_message(content= myemoji, embed=dev_info_embed)
-
-     except Exception as e:
-        error_dminfo_embed = discord.Embed( 
-        title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
-        description=f"**Erreur causée par** <@{user_id}>",
-        color=discord.Color.from_rgb(245, 170, 66)        
-        )
-        
-        error_dminfo_embed.add_field(name="Details :", value=f"Erreur survenue il y a à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
-        error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
-        error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
-        error_dminfo_embed.set_footer(text=f"{version_note}")
-
-        
-        await USER_DM.send(embed=error_dminfo_embed)
-        await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
 #Twitch Live Alert Loop
 
