@@ -444,11 +444,11 @@ unavaileble_command_embed.set_footer(text=version_note)
 
 tos_not_accepted_embed = discord.Embed(
    title="Vous n'avez pas accepté les conditions d'utilisation !",
-   description="*Pour utiliser le bot, veuillez accepter les conditions en exécutant la commande* `/conditions`\n**Si vous préférez ne pas les accepter, vous ne pourrez pas utiliser les commandes** :x:",
+   description="*Pour utiliser le bot, veuillez les accepter en exécutant la commande* `/conditions`\n\n**Si vous préférez ne pas les accepter, vous ne pourrez pas utiliser les commandes** :x:",
    color=discord.Color.from_rgb(66, 135, 245),
    
 )
-tos_not_accepted_embed.add_field(name="", value="*Dura lex sed lex* (La loi est dure, mais c'est la loi) ")
+tos_not_accepted_embed.add_field(name="", value="*Dura lex sed lex (La loi est dure, mais c'est la loi)*")
 tos_not_accepted_embed.set_footer(text=version_note)
 
 #BUTTON VIEWS
@@ -915,8 +915,8 @@ async def delete_dm(interaction: discord.Interaction):
          loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
-        guild_id = str(interaction.guild.id)
-        is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+        user_id = str(interaction.user.id)
+        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
         if not is_tos_accepted:   
          await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
 
@@ -972,8 +972,8 @@ async def explosion_command(interaction: discord.Interaction):
      loaded_data = json.load(json_file)
 
       # Extract relevant data from loaded JSON using the specific guild ID
-    guild_id = str(interaction.guild.id)
-    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+    user_id = str(interaction.user.id)
+    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
     if not is_tos_accepted:
        await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
@@ -1059,8 +1059,8 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
      loaded_data = json.load(json_file)
 
     # Extract relevant data from loaded JSON using the specific guild ID
-    guild_id = str(interaction.guild.id)
-    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+    user_id = str(interaction.user.id)
+    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
     if not is_tos_accepted:
        await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
@@ -1212,8 +1212,8 @@ async def embed_command(interaction: discord.Interaction):
      loaded_data = json.load(json_file)
 
     # Extract relevant data from loaded JSON using the specific guild ID
-    guild_id = str(interaction.guild.id)
-    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+    user_id = str(interaction.user.id)
+    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
     if not is_tos_accepted:
        await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
@@ -1270,13 +1270,15 @@ async def embed_command(interaction: discord.Interaction):
      loaded_data = json.load(json_file)
 
     # Extract relevant data from loaded JSON using the specific guild ID
-    guild_id = str(interaction.guild.id)
-    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+    user_id = str(interaction.user.id)
+    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+    
 
-    if not is_tos_accepted:
-       await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+    if is_tos_accepted is False:
+     await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+    elif is_tos_accepted:  # Alternatively, you can use "elif is_tos_accepted is True:"
+    # The code that should execute when terms of service are accepted
 
-    else:    
 
      user_id = interaction.user.id
 
@@ -1335,8 +1337,8 @@ async def dev_info_command(interaction: discord.Interaction):
      loaded_data = json.load(json_file)
 
     # Extract relevant data from loaded JSON using the specific guild ID
-    guild_id = str(interaction.guild.id)
-    is_tos_accepted = loaded_data.get(guild_id, {}).get("accepted_tos", False)
+    user_id = str(interaction.user.id)
+    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
     if not is_tos_accepted:
        await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
