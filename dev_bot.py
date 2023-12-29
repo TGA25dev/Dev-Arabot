@@ -888,7 +888,12 @@ class AdminSelectMenu(discord.ui.View):
 
 @tree.command(name="setup", description="Configuration du bot")
 async def setup(interaction: discord.Interaction):
-   await interaction.response.send_message("Setup", ephemeral=True)
+   if isinstance(interaction.channel, discord.DMChannel):
+      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+
+   
+   else:  
+    await interaction.response.send_message("Setup", ephemeral=True)
 
 @tree.command(name="effacer-dm", description="Supprime tout DM du bot")
 async def delete_dm(interaction: discord.Interaction):
@@ -925,27 +930,32 @@ async def delete_dm(interaction: discord.Interaction):
 
 @tree.command(name="admin", description="Affiche le panel d'administration du bot")
 async def admin_panel(interaction: discord.Interaction):
-    command_name = interaction.data['name']
+    if isinstance(interaction.channel, discord.DMChannel):
+      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
 
-    user_id = interaction.user.id
+   
+    else:  
+     command_name = interaction.data['name']
 
-    command_id = interaction.data['id']
+     user_id = interaction.user.id
 
-    guild_name = interaction.guild.name
+     command_id = interaction.data['id']
 
-    TGA25_ID = "845327664143532053"  
-    USER_DM = await client.fetch_user(TGA25_ID)
+     guild_name = interaction.guild.name
 
-    try:
-     if interaction.user.id == TGA25_ID or USER2_ID:
+     TGA25_ID = "845327664143532053"  
+     USER_DM = await client.fetch_user(TGA25_ID)
+
+     try:
+      if interaction.user.id == TGA25_ID or USER2_ID:
          view = AdminSelectMenu()
          message = await interaction.response.send_message(content="Administration du bot :",view=view)
 
-     else:
-      await interaction.response.send_message("Tu n'es pas autorisé a utiliser cette commande :no_entry_sign: ", ephemeral=True)
+      else:
+       await interaction.response.send_message("Tu n'es pas autorisé a utiliser cette commande :no_entry_sign: ", ephemeral=True)
       
    
-    except Exception as e:
+     except Exception as e:
 
         error_dminfo_embed = discord.Embed( 
         title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
@@ -967,34 +977,39 @@ async def admin_panel(interaction: discord.Interaction):
 
 @tree.command(name="explosion", description="Boum !")
 async def explosion_command(interaction: discord.Interaction):
+    if isinstance(interaction.channel, discord.DMChannel):
+      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+
+   
+    else:  
       
-    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-     loaded_data = json.load(json_file)
+     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+      loaded_data = json.load(json_file)
 
       # Extract relevant data from loaded JSON using the specific guild ID
-    user_id = str(interaction.user.id)
-    is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+     user_id = str(interaction.user.id)
+     is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-    if not is_tos_accepted:
+     if not is_tos_accepted:
        await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
-    else:   
+     else:   
 
-     try:
+      try:
         with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'r') as f:
             explosion_command_cooldown = json.load(f)
-     except FileNotFoundError:
+      except FileNotFoundError:
         explosion_command_cooldown = {}
 
     # Check for cooldown
-     guild_id = str(interaction.guild_id)
+      guild_id = str(interaction.guild_id)
 
-     if guild_id not in explosion_command_cooldown:
+      if guild_id not in explosion_command_cooldown:
         explosion_command_cooldown[guild_id] = 0
 
-     current_time = time.time()
-     cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
+      current_time = time.time()
+      cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
 
-     if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
+      if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
         # Server is on cooldown, inform users
         remaining_time_seconds = int(cooldown_time - (current_time - explosion_command_cooldown[guild_id]))
 
@@ -1007,11 +1022,11 @@ async def explosion_command(interaction: discord.Interaction):
         await interaction.response.send_message(f"Veuillez attendre {remaining_time_formatted} avant de refaire exploser ce serveur... :hourglass_flowing_sand:", ephemeral=True)
         return
 
-     explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
+      explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
 
-     if explosion_command_avalaible == False:
+      if explosion_command_avalaible == False:
         await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
-     elif explosion_command_avalaible == True:
+      elif explosion_command_avalaible == True:
         user_id = interaction.user.id
         command_name = interaction.data['name']
         command_id = interaction.data['id']
@@ -1045,7 +1060,7 @@ async def explosion_command(interaction: discord.Interaction):
             await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
      # Save the updated server cooldown data to the JSON file
-     with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
+      with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
         json.dump(explosion_command_cooldown, f)
 
 
@@ -1055,8 +1070,13 @@ async def explosion_command(interaction: discord.Interaction):
 
 @tree.command(name="vol", description="Vole le nom d'un utilisateur")
 async def vol_command(interaction: discord.Interaction, user: discord.Member):
-    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-     loaded_data = json.load(json_file)
+    if isinstance(interaction.channel, discord.DMChannel):
+      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+
+   
+    else:  
+     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+      loaded_data = json.load(json_file)
 
     # Extract relevant data from loaded JSON using the specific guild ID
     user_id = str(interaction.user.id)
@@ -1208,8 +1228,13 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
         
 @tree.command(name="help", description="Affiche les commandes disponibles")
 async def embed_command(interaction: discord.Interaction):
-    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-     loaded_data = json.load(json_file)
+    if isinstance(interaction.channel, discord.DMChannel):
+      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+
+   
+    else:  
+     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+      loaded_data = json.load(json_file)
 
     # Extract relevant data from loaded JSON using the specific guild ID
     user_id = str(interaction.user.id)
@@ -1266,8 +1291,13 @@ async def embed_command(interaction: discord.Interaction):
 
 @tree.command(name="info", description="Affiche des informations à propos du bot")
 async def embed_command(interaction: discord.Interaction):
-    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-     loaded_data = json.load(json_file)
+    if isinstance(interaction.channel, discord.DMChannel):
+      await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+
+   
+    else:  
+     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+      loaded_data = json.load(json_file)
 
     # Extract relevant data from loaded JSON using the specific guild ID
     user_id = str(interaction.user.id)
@@ -1333,8 +1363,13 @@ async def embed_command(interaction: discord.Interaction):
 
 @tree.command(name="devinfo", description="Affiche des informations à propos du développeur")
 async def dev_info_command(interaction: discord.Interaction):
-    with open("JSON Files/TOS_info_data.json", 'r') as json_file:
-     loaded_data = json.load(json_file)
+    if isinstance(interaction.channel, discord.DMChannel):
+      await interaction.reponse.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+
+   
+    else:  
+     with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+      loaded_data = json.load(json_file)
 
     # Extract relevant data from loaded JSON using the specific guild ID
     user_id = str(interaction.user.id)
@@ -1344,7 +1379,7 @@ async def dev_info_command(interaction: discord.Interaction):
        await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
 
     else: 
-       #
+       
      command_name = interaction.data['name']
 
      user_id = interaction.user.id
