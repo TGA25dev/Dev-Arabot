@@ -10,6 +10,8 @@ import dotenv
 import json
 import time
 import re
+from blagues_api import BlaguesAPI
+from blagues_api import BlagueType
 
 #PATH
 
@@ -22,6 +24,9 @@ TEXT_PATH = f"Text_Files"
 bot_mode_lc ="dev"
 bot_mode_hc = "DEV"
 bot_mode_def = "Dev"
+
+
+
 
 def printer_timestamp():
    return datetime.now().strftime("\033[1;90m %Y-%m-%d %H:%M:%S \033[0m")
@@ -1649,8 +1654,11 @@ async def test_command(interaction: discord.Interaction):
 
     # await interaction.response.send_message(view=TESTSelectMenu(roles))
 
-     # Utilise l'API "icanhazdadjoke" pour obtenir une blague de papa aléatoire
-    print("test")
+    blagues = BlaguesAPI("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODQ1MzI3NjY0MTQzNTMyMDUzIiwibGltaXQiOjEwMCwia2V5IjoiUHNkUnpUb0QxS1FuYXpOc0NoVTBQRDNENWpDVUwwQ0E0cjB2RERyeUJ0MXA2ZDNuTlMiLCJjcmVhdGVkX2F0IjoiMjAyMy0xMi0zMFQyMjoxMjo1MyswMDowMCIsImlhdCI6MTcwMzk3NDM3M30.76XCBH-4KsIVNy_Wy_qmG6HHDhJ63n_1BJA-SCtGYmw")
+
+    blague = await blagues.random_categorized(BlagueType.BEAUF)
+
+    await interaction.response.send_message(blague)
 
     
 
