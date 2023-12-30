@@ -1656,9 +1656,16 @@ async def test_command(interaction: discord.Interaction):
 
     blagues = BlaguesAPI("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODQ1MzI3NjY0MTQzNTMyMDUzIiwibGltaXQiOjEwMCwia2V5IjoiUHNkUnpUb0QxS1FuYXpOc0NoVTBQRDNENWpDVUwwQ0E0cjB2RERyeUJ0MXA2ZDNuTlMiLCJjcmVhdGVkX2F0IjoiMjAyMy0xMi0zMFQyMjoxMjo1MyswMDowMCIsImlhdCI6MTcwMzk3NDM3M30.76XCBH-4KsIVNy_Wy_qmG6HHDhJ63n_1BJA-SCtGYmw")
 
-    blague = await blagues.random_categorized(BlagueType.BEAUF)
+    blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV, BlagueType.LIMIT]) #global, dev, dark, limit, beauf, blondes
 
-    await interaction.response.send_message(blague)
+    joke = blague.joke
+    answer = blague.answer
+
+    await interaction.response.send_message(content=joke)
+
+    # Envoie la blague en tant que suivi
+    await asyncio.sleep(5)
+    await interaction.followup.send(content=answer)
 
     
 
