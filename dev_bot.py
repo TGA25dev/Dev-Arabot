@@ -43,6 +43,7 @@ TGA25_ID = 845327664143532053
 class aclient(discord.Client):
     def __init__(self):
         super().__init__(intents = discord.Intents.all())
+        discord.Intents.messages = True
         
         self.synced = False 
 
@@ -214,8 +215,8 @@ def generate_current_time_timestamp():
 
 
 
-explosion_command_avalaible = True
-vol_command_avalaible = True
+explosion_command_avalaible = False
+vol_command_avalaible = False
 
 #ID'S VARIABLES
 
@@ -250,7 +251,7 @@ conditions_command_id = 1190253770379120722
 
 @client.event
 async def on_message(message):
-    greeting_trigger_pattern = re.compile(r"\b(?:hi|hello|salut|bonjour|hey|salutation|salutations)\b", re.IGNORECASE)
+    greeting_trigger_pattern = re.compile(r"\b(?:hi|hello|salut|bonjour|hey|helo|salu|salutation|salutations)\b", re.IGNORECASE)
 
     # Make sure the bot doesn't respond to its own messages
     if message.author == client.user:
@@ -847,6 +848,36 @@ class ButtonView_setup_tos(discord.ui.View):
 
 #SELECT VIEWS  
 
+class TESTSelectMenu(discord.ui.View):
+    def __init__(self, roles):
+        super().__init__(timeout=None)
+
+        
+       
+        self.roles = roles
+
+        # Create a select dropdown with role options
+        self.select = discord.ui.Select(placeholder="Select a role", options=[
+                discord.SelectOption(label=role.name, value=str(role.id)) for role in roles
+        ])
+            
+        # Add the select dropdown to the view
+        self.add_item(self.select)
+
+       
+
+    async def select_callback(self, component: discord.ui.Select):
+        selected_role_id = int(component.values[0])
+        selected_role = discord.utils.get(self.roles, id=selected_role_id)
+
+        if selected_role:
+            # Perform actions with the selected role
+            print(f"You have selected role {selected_role}.")
+        else:
+            print("Error")
+
+
+
  #Select Admin Menu
 
 # Create the embed
@@ -857,6 +888,8 @@ class AdminSelectMenu(discord.ui.View):
         super().__init__(timeout=10)
 
 
+
+ 
         options = [
             discord.SelectOption(label="Statuts", value="status_embed_option", emoji="🟢"),
             discord.SelectOption(label="Paramètres", value="parameters_embed_option", emoji="⚙️"),
@@ -906,6 +939,64 @@ class AdminSelectMenu(discord.ui.View):
 
 #COMMANDS
 
+@tree.command(name="info-serveur", description="Affiche les informations du serveur")
+async def setup(interaction: discord.Interaction):
+    if isinstance(interaction.channel, discord.DMChannel):
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+    else:
+        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+            loaded_data = json.load(json_file)
+
+        # Extract relevant data from loaded JSON using the specific guild ID
+        user_id = str(interaction.user.id)
+        user_data = loaded_data.get(user_id, {})
+        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+
+        if not user_data:
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
+        else:
+
+         if not is_tos_accepted:
+            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+         else:
+             #
+            if interaction.guild.premium_tier == 0:
+             guild_boost_level = f"Aucun boost"
+
+            elif interaction.guild.premium_tier == 1:
+             guild_boost_level = f"Niveau 1 {interaction.guild.premium_subscription_count} boost(s)"
+
+            elif interaction.guild.premium_tier == 2:
+             guild_boost_level = f"Niveau 2 {interaction.guild.premium_subscription_count} boost(s)"
+
+            elif interaction.guild.premium_tier == 3:
+             guild_boost_level = f"Niveau 3 {interaction.guild.premium_subscription_count} boost(s)"             
+
+            bot_members = [member for member in interaction.guild.members if member.bot]
+            server_stat_embed = discord.Embed(
+            title="Quelques infos sur ce serveur :information_source:",
+        
+            description=f"*__{interaction.guild.name} ({interaction.guild.id})__*\n**{len(interaction.guild.channels)} salons • {len(interaction.guild.threads)} fils • {len(interaction.guild.roles)} roles • {len(bot_members)} bots**",
+            color=discord.Color.from_rgb(3, 165, 252)
+            )
+            server_stat_embed.set_thumbnail(url=interaction.guild.icon)
+
+            server_stat_embed.add_field(name="Membres :", value=interaction.guild.member_count, inline=True)
+
+            server_stat_embed.add_field(name="Propriétaire :", value=f"<@{interaction.guild.owner.id}>", inline=True)
+
+            server_stat_embed.add_field(name="Boost :", value=guild_boost_level)
+
+            server_stat_embed.add_field(name="Création du serveur", value=f"<t:{int(interaction.guild.created_at.timestamp())}:F>")
+
+            bot_member = interaction.guild.get_member(client.user.id)
+
+            server_stat_embed.add_field(name="Date d'ajout de l'Arabot :", value=f"<t:{(int(bot_member.joined_at.timestamp()))}:F>")
+                      
+            server_stat_embed.set_footer(text=version_note)
+
+            await interaction.response.send_message(embed=server_stat_embed)
+
 @tree.command(name="setup", description="Configuration du bot")
 async def setup(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
@@ -953,7 +1044,7 @@ async def delete_dm(interaction: discord.Interaction):
             await message.delete()
             await asyncio.sleep(1)
 
-        await interaction.edit_original_response(content="L'ensemble des messages du bot ont étés supprimés :white_check_mark: !")
+        await interaction.edit_original_response(content="Tous les messages du bot ont étés supprimés :white_check_mark: !")
     else:
         with open("JSON Files/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
@@ -1016,7 +1107,7 @@ async def admin_panel(interaction: discord.Interaction):
 @tree.command(name="explosion", description="Boum !")
 async def explosion_command(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
-        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les DM ! :no_entry_sign:", ephemeral=True)
     else:
         with open("JSON Files/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
@@ -1027,80 +1118,82 @@ async def explosion_command(interaction: discord.Interaction):
         is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
         if not user_data:
-            await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !", ephemeral=True)
         else:
+            if not is_tos_accepted:
+                await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+            else:
+                if explosion_command_avalaible == False:
+                    await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
+                else:
+                    try:
+                        with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'r') as f:
+                            explosion_command_cooldown = json.load(f)
+                    except FileNotFoundError:
+                        explosion_command_cooldown = {}
 
-         if not is_tos_accepted:
-            await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
-         else:
-            try:
-                with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'r') as f:
-                    explosion_command_cooldown = json.load(f)
-            except FileNotFoundError:
-                explosion_command_cooldown = {}
+                    # Check for cooldown
+                    guild_id = str(interaction.guild_id)
 
-            # Check for cooldown
-            guild_id = str(interaction.guild_id)
+                    if guild_id not in explosion_command_cooldown:
+                        explosion_command_cooldown[guild_id] = 0
 
-            if guild_id not in explosion_command_cooldown:
-                explosion_command_cooldown[guild_id] = 0
+                    current_time = time.time()
+                    cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
 
-            current_time = time.time()
-            cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
+                    if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
+                        # Server is on cooldown, inform users
+                        remaining_time_seconds = int(cooldown_time - (current_time - explosion_command_cooldown[guild_id]))
 
-            if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
-                # Server is on cooldown, inform users
-                remaining_time_seconds = int(cooldown_time - (current_time - explosion_command_cooldown[guild_id]))
+                        remaining_days, remaining_seconds = divmod(remaining_time_seconds, 24 * 60 * 60)
+                        remaining_hours, remaining_seconds = divmod(remaining_seconds, 60 * 60)
+                        remaining_minutes, remaining_seconds = divmod(remaining_seconds, 60)
 
-                remaining_days, remaining_seconds = divmod(remaining_time_seconds, 24 * 60 * 60)
-                remaining_hours, remaining_seconds = divmod(remaining_seconds, 60 * 60)
-                remaining_minutes, remaining_seconds = divmod(remaining_seconds, 60)
+                        remaining_time_formatted = (
+                            f"{remaining_days} jours, {remaining_hours} heures, {remaining_minutes} minutes et {remaining_seconds} secondes"
+                        )
 
-                remaining_time_formatted = f"{remaining_days} jours, {remaining_hours} heures, {remaining_minutes} minutes et {remaining_seconds} secondes"
-
-                await interaction.response.send_message(f"Veuillez attendre {remaining_time_formatted} avant de refaire exploser ce serveur... :hourglass_flowing_sand:", ephemeral=True)
-                return
-
-            explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
-
-            if explosion_command_avalaible == False:
-                await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
-            elif explosion_command_avalaible == True:
-                user_id = interaction.user.id
-                command_name = interaction.data['name']
-                command_id = interaction.data['id']
-                guild_name = interaction.guild.name
-                TGA25_ID = "845327664143532053"
-                USER_DM = await client.fetch_user(TGA25_ID)
-
-                try:
-                    if maintenance_mode:
-                        await interaction.response.send_message(embed=maintenance_embed)
+                        await interaction.response.send_message(f"Veuillez attendre {remaining_time_formatted} avant de refaire exploser ce serveur... :hourglass_flowing_sand:", ephemeral=True)
                         return
-                    await interaction.response.send_message(content="Sélectionnez une force d'explosion :",
-                                                             view=ButtonView_explosion_command(), embed=explosion_force_embed)
 
-                except Exception as e:
-                    error_dminfo_embed = discord.Embed(
-                        title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
-                        description=f"**Erreur causée par** <@{user_id}>",
-                        color=discord.Color.from_rgb(245, 170, 66)
-                    )
+                    explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
 
-                    error_dminfo_embed.add_field(name="Details :",
-                                                 value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
-                                                 inline=True)
-                    error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
-                    error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
-                    error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
-                    error_dminfo_embed.set_footer(text=f"{version_note}")
+                    user_id = interaction.user.id
+                    command_name = interaction.data['name']
+                    command_id = interaction.data['id']
+                    guild_name = interaction.guild.name
+                    TGA25_ID = "845327664143532053"
+                    USER_DM = await client.fetch_user(TGA25_ID)
 
-                    await USER_DM.send(embed=error_dminfo_embed)
-                    await interaction.response.send_message(embed=error_embed, ephemeral=True)
+                    try:
+                        if maintenance_mode:
+                            await interaction.response.send_message(embed=maintenance_embed)
+                            return
+                        await interaction.response.send_message(content="Sélectionnez une force d'explosion :",
+                                                                 view=ButtonView_explosion_command(), embed=explosion_force_embed)
 
-            # Save the updated server cooldown data to the JSON file
-            with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
-                json.dump(explosion_command_cooldown, f)
+                    except Exception as e:
+                        error_dminfo_embed = discord.Embed(
+                            title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
+                            description=f"**Erreur causée par** <@{user_id}>",
+                            color=discord.Color.from_rgb(245, 170, 66)
+                        )
+
+                        error_dminfo_embed.add_field(name="Details :",
+                                                     value=f"Erreur survenue il y a <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
+                                                     inline=True)
+                        error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
+                        error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
+                        error_dminfo_embed.add_field(name="Erreur :", value=f"`{e}`", inline=False)
+                        error_dminfo_embed.set_footer(text=f"{version_note}")
+
+                        await USER_DM.send(embed=error_dminfo_embed)
+                        await interaction.response.send_message(embed=error_embed, ephemeral=True)
+
+                    # Save the updated server cooldown data to the JSON file
+                    with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
+                        json.dump(explosion_command_cooldown, f)
+
 
 
 
@@ -1552,7 +1645,14 @@ async def twitch_loop():
 
 @tree.command(name="test", description="test_command")
 async def test_command(interaction: discord.Interaction):
-    await interaction.response.send_message(embed=tos_embed)
+    # roles = [role for role in interaction.guild.roles if role.name != "@everyone" and not role.is_bot_managed()]
+
+    # await interaction.response.send_message(view=TESTSelectMenu(roles))
+
+     # Utilise l'API "icanhazdadjoke" pour obtenir une blague de papa aléatoire
+    print("test")
+
+    
 
 
 async def explosion_command_system(interaction: discord.Interaction):
