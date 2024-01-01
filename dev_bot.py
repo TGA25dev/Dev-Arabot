@@ -176,15 +176,21 @@ async def on_ready():
      is_ready = True
 
     except Exception as e:
-       print(f"{printer_timestamp()} \033[1;91m Une erreur s'est produite durant le lancement du bot : \033[0m \033[91m{e} \033[0m")
+       print(f"{printer_timestamp()} \033[1;91mAn error has occured during bot starting : \033[0m \033[91m{e} \033[0m")
        bot_start_error = discord.Embed(
           title="**:red_circle: Une erreur est survenue lors du démarage du bot :red_circle: **",
-          description=f"**Detail de l'erreur :** `{e}` " 
+          description=f"**Detail de l'erreur :** `{e}` "
           
        )
        USER_DM = await client.fetch_user(TGA25_ID)
        await USER_DM.send(embed=bot_start_error)
-       pass
+       print(f"{printer_timestamp()} \033[1;34mWaiting....\033[0m")
+
+       await asyncio.sleep(10)
+       print(f"{printer_timestamp()} \033[1;33mBot stoping....\033[0m")
+
+       await client.close()
+       os._exit(status=0)
        
 
 #VARIABLES   
