@@ -48,11 +48,16 @@ TGA25_ID = 845327664143532053
 class aclient(discord.Client):
     def __init__(self):
         super().__init__(intents = discord.Intents.all())
-        discord.Intents.messages = True
+        # discord.Intents.messages = True
         
         self.synced = False 
 
 client = aclient()
+
+dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/blagues_api.env")
+blagues_token = os.getenv(f"Blagues_Token")
+
+print(f"{printer_timestamp()} Blagues API token has been loaded !")
 
 dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/twitch_authorization.env")
 twitch_authorization = os.getenv(f"Twitch_Authorization")
@@ -944,6 +949,68 @@ class AdminSelectMenu(discord.ui.View):
 
 #COMMANDS
 
+
+
+@tree.command(name="couscous", description="Partage un couscous avec quelqu'un")
+async def share_couscous_command(interaction: discord.Interaction, utilisateur: discord.User): 
+    couscous_gifs = [
+        "https://i.postimg.cc/0NzhwZ0T/couscous-gif-01.gif",
+        "https://i.postimg.cc/wM4GMmsq/couscous-gif-02.gif",
+        "https://i.postimg.cc/bv8cK1xW/couscous-gif-03.gif",
+        "https://i.postimg.cc/rs9QRt00/couscous-gif-04.gif"
+    ]
+
+    random_couscous_gif = random.choice(couscous_gifs)
+    
+    if isinstance(interaction.channel, discord.DMChannel):
+        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les DM ! :no_entry_sign:", ephemeral=True)
+    else:
+        # Create random messages
+        random_messages = [
+            f"**{interaction.user.global_name}** partage un succulent couscous avec **{utilisateur.global_name}** !\nBon appétit ! 🍲",
+            f"**{interaction.user.global_name}** t'offre un délicieux couscous.\nProfitez-en ! 🌟",
+            f"**{interaction.user.global_name}** a préparé un couscous spécial pour toi.\nC'est l'heure du festin ! 🎉",
+            f"**{interaction.user.global_name}** et **{utilisateur.global_name}** savourent un couscous ensemble.\nTu devrait essayer la recette ! 📖",
+        ]
+
+        random_message = random.choice(random_messages)
+
+        # Create an embed for the couscous
+        couscous_embed = discord.Embed(
+            title="",
+            color=discord.Color.green()
+        )
+        couscous_embed.add_field(name="", value=random_message)
+        couscous_embed.set_image(url=random_couscous_gif)
+        couscous_embed.set_footer(text=version_note)
+
+        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+            loaded_data = json.load(json_file)
+
+        # Extract relevant data from loaded JSON using the specific guild ID
+        user_id = str(interaction.user.id)
+        user_data = loaded_data.get(user_id, {})
+        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+
+        if not user_data:
+            await interaction.response.send_message(content="Faites `/conditions` et réessayez !", ephemeral=True)
+        else:
+            if not is_tos_accepted:
+                await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+            else:
+                if utilisateur.bot:
+                    no_couscous_bot_embed = discord.Embed(
+                    title="",
+                    description="**Pas sûr que les robots aiment le couscous...** 🤖🍲",
+                    color=discord.Color.orange()
+                    )
+                    await interaction.response.send_message(embed=no_couscous_bot_embed, ephemeral=True)
+                else:
+                    # Send the couscous embed with the random message
+                    await interaction.response.send_message(content=utilisateur.mention,embed=couscous_embed)
+   
+          
+
 @tree.command(name="info-serveur", description="Affiche les informations du serveur")
 async def setup(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
@@ -1036,7 +1103,7 @@ async def conditions_command(interaction: discord.Interaction):
 async def delete_dm(interaction: discord.Interaction):
     # Check if the command is sent in a DM
     if isinstance(interaction.channel, discord.DMChannel):
-        await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages du bot sont en cours de suppression.....\n\n(La vitesse de suppression est limitée à 1 message par seconde pour ne pas surcharger le bot :information_source:)", ephemeral=True)
+        await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages du bot sont en cours de suppression.....\n\n(On vous previendra quand ce sera fini :information_source:)", ephemeral=True)
 
         # Fetch the bot's sent messages in the DM
         bot_messages = []
@@ -1050,6 +1117,11 @@ async def delete_dm(interaction: discord.Interaction):
             await asyncio.sleep(1)
 
         await interaction.edit_original_response(content="Tous les messages du bot ont étés supprimés :white_check_mark: !")
+        user_to_dm = await client.fetch_user(interaction.user.id)
+        test = await user_to_dm.send(content="🔔")
+        test.delete()
+
+
     else:
         with open("JSON Files/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
@@ -1648,24 +1720,154 @@ async def twitch_loop():
     
 
 
+
 @tree.command(name="test", description="test_command")
 async def test_command(interaction: discord.Interaction):
-    # roles = [role for role in interaction.guild.roles if role.name != "@everyone" and not role.is_bot_managed()]
+    blagues = BlaguesAPI(blagues_token)
 
-    # await interaction.response.send_message(view=TESTSelectMenu(roles))
-
-    blagues = BlaguesAPI("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODQ1MzI3NjY0MTQzNTMyMDUzIiwibGltaXQiOjEwMCwia2V5IjoiUHNkUnpUb0QxS1FuYXpOc0NoVTBQRDNENWpDVUwwQ0E0cjB2RERyeUJ0MXA2ZDNuTlMiLCJjcmVhdGVkX2F0IjoiMjAyMy0xMi0zMFQyMjoxMjo1MyswMDowMCIsImlhdCI6MTcwMzk3NDM3M30.76XCBH-4KsIVNy_Wy_qmG6HHDhJ63n_1BJA-SCtGYmw")
-
-    blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV, BlagueType.LIMIT]) #global, dev, dark, limit, beauf, blondes
+    blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV, BlagueType.LIMIT])
 
     joke = blague.joke
     answer = blague.answer
 
-    await interaction.response.send_message(content=joke)
+    user_id_data = str(interaction.user.id)
+    joke_id_data = str(blague.id)
 
-    # Envoie la blague en tant que suivi
-    await asyncio.sleep(5)
-    await interaction.followup.send(content=answer)
+    class Favorite_Joke_ButtonView(discord.ui.View):
+        def __init__(self):
+            super().__init__(timeout=None)
+            self.bot = client
+
+        def is_joke_already_registered(self, user_id, joke_id, favorites_data):
+            user_data = next((entry for entry in favorites_data if entry["user_id"] == user_id), None)
+            if user_data and joke_id in user_data.get("joke_id", ""):
+                return True
+            return False
+
+        def get_user_favorite_count(self, user_id, favorites_data):
+            user_data = next((entry for entry in favorites_data if entry["user_id"] == user_id), None)
+            if user_data:
+                return len(user_data.get("joke_id", "").split(";"))
+            return 0
+
+        @discord.ui.button(style=discord.ButtonStyle.blurple, label="Favoris", custom_id="favorite_joke_button", emoji="➕", disabled=False)
+        async def button_favorite_joke_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+            # Load existing data from the JSON file
+            try:
+                with open("favorites.json", "r") as file:
+                    favorites_data = json.load(file)
+            except FileNotFoundError:
+                favorites_data = []
+
+            # Check if the joke ID is already registered for the user
+            if self.is_joke_already_registered(user_id_data, joke_id_data, favorites_data):
+                await interaction.response.send_message(content="Cette blague est déjà enregistrée dans tes favoris.", ephemeral=True)
+            else:
+                # Check if the user has reached the limit of 5 favorite jokes
+                if self.get_user_favorite_count(user_id_data, favorites_data) >= 5:
+                    await interaction.response.send_message(content="Tu as atteint la limite de 5 blagues préférées.", ephemeral=True)
+                else:
+                    await interaction.response.send_message(content="Tu as ajouté cette blague à tes favoris !", ephemeral=True)
+
+                    data = {"user_id": user_id_data, "joke_id": joke_id_data}
+
+                    # Check if the user ID already exists in the data
+                    user_exists = any(entry["user_id"] == user_id_data for entry in favorites_data)
+
+                    if user_exists:
+                        # Update the joke IDs for the existing user ID
+                        for entry in favorites_data:
+                            if entry["user_id"] == user_id_data:
+                                entry["joke_id"] += f"; {joke_id_data}"
+                    else:
+                        # Add the new data to the existing data
+                        favorites_data.append(data)
+
+                    # Save the updated data back to the JSON file
+                    with open("favorites.json", "w") as file:
+                        json.dump(favorites_data, file, indent=2)
+
+        @discord.ui.button(style=discord.ButtonStyle.blurple, label="Voir", custom_id="see_favorite_joke_button", emoji="⭐", disabled=False)
+        async def button_see_favorite_joke_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+            # Load existing data from the JSON file
+            try:
+                with open("favorites.json", "r") as file:
+                    favorites_data = json.load(file)
+            except FileNotFoundError:
+                favorites_data = []
+
+            user_id = str(interaction.user.id)
+
+            # Find the user in the data
+            user_data = next((entry for entry in favorites_data if entry["user_id"] == user_id), None)
+
+            if user_data:
+                class Delete_Favorite_Joke_ButtonView(discord.ui.View):
+                    def __init__(self, user_data):
+                        super().__init__(timeout=None)
+                        self.bot = client
+                        self.user_data = user_data
+
+                        for joke_id in self.user_data.get("joke_id", "").split(";"):
+                            self.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label=f"Remove {joke_id}", custom_id=f"delete_favorite_joke_button_{joke_id}", disabled=False))
+
+                    async def button_delete_favorite_joke_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+                        # Retrieve the joke ID from the button custom ID
+                        joke_id_to_remove = button.custom_id.replace("delete_favorite_joke_button_", "")
+
+                        # Remove the joke ID from the user's data
+                        self.user_data["joke_id"] = ";".join(joke for joke in self.user_data.get("joke_id", "").split(";") if joke != joke_id_to_remove)
+                        
+                        for i, entry in enumerate(favorites_data):
+                         if entry["user_id"] == self.user_data["user_id"]:
+                          favorites_data[i]["joke_id"] = self.user_data["joke_id"]
+
+                        # Save the updated data back to the JSON file
+                        with open("favorites.json", "w") as file:
+                            json.dump(favorites_data, file, indent=2)
+
+                        await interaction.channel.send(content=f"La blague n°{joke_id_to_remove} a été retirée de tes favoris.")
+
+                x = 0
+                joke_ids_str = user_data.get("joke_id", "")
+                joke_ids = joke_ids_str.split(";") if joke_ids_str else []
+                if joke_ids:
+                    favorite_joke_embed = discord.Embed(
+                        title=f"Voici tes blagues préférées :",
+                        color=discord.Color.from_rgb(3, 223, 252)
+                    )
+                    for joke_id in joke_ids:
+                        x += 1
+                        favorite_joke_global_data = await blagues.from_id(joke_id)
+                        favorite_joke = favorite_joke_global_data.joke
+                        favorite_joke_answer = favorite_joke_global_data.answer
+
+                        favorite_joke_embed.add_field(name=f"Blague n°{x}", value=f"{favorite_joke}\n||{favorite_joke_answer}||", inline=False)
+                        favorite_joke_embed.set_footer(text=f"Demandé à {datetime.now(france_tz).strftime('%H:%M')} par {interaction.user.global_name} | BlaguesAPI")
+
+                    delete_view = Delete_Favorite_Joke_ButtonView(user_data)
+                    
+                    await interaction.channel.send(content=interaction.user.mention, embed=favorite_joke_embed, view=delete_view)
+                else:
+                    await interaction.response.send_message(content="Tu n'as pas encore de blagues préférées.", ephemeral=True)
+            else:
+                await interaction.response.send_message(content="Tu n'as pas encore de blagues préférées.", ephemeral=True)
+
+    joke_embed = discord.Embed(
+        title="",
+        description="",
+        color=discord.Color.from_rgb(3, 223, 252)
+    )
+    joke_embed.add_field(name=f"{joke}", value=f"||{answer}||")
+    joke_embed.set_footer(text=f"Demandé à {datetime.now(france_tz).strftime('%H:%M')} par {interaction.user.global_name} | BlaguesAPI")
+
+    await interaction.response.send_message(embed=joke_embed, view=Favorite_Joke_ButtonView())
+
+
+
+
+
+
 
     
 
