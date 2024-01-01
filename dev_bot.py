@@ -1118,8 +1118,8 @@ async def delete_dm(interaction: discord.Interaction):
 
         await interaction.edit_original_response(content="Tous les messages du bot ont étés supprimés :white_check_mark: !")
         user_to_dm = await client.fetch_user(interaction.user.id)
-        test = await user_to_dm.send(content="🔔")
-        test.delete()
+        notification_message = await user_to_dm.send(content="🔔")
+        await notification_message.delete()
 
 
     else:
