@@ -12,6 +12,8 @@ import time
 import re
 from blagues_api import BlaguesAPI
 from blagues_api import BlagueType
+from PIL import Image, ImageDraw, ImageFont
+import arabic_reshaper
 
 #PATH
 
@@ -190,7 +192,7 @@ async def on_ready():
        print(f"{printer_timestamp()} \033[1;33mBot stoping....\033[0m")
 
        await client.close()
-       os._exit(status=0)
+       os._exit(0)
        
 
 #VARIABLES   
@@ -267,6 +269,7 @@ conditions_command_id = 1190253770379120722
 
 @client.event
 async def on_message(message):
+    couscous_trigger_pattern = re.compile(r"\b(?:tajine|couscous)\b", re.IGNORECASE)
     greeting_trigger_pattern = re.compile(r"\b(?:hi|hello|salut|bonjour|hey|helo|salu|salutation|salutations)\b", re.IGNORECASE)
 
     # Make sure the bot doesn't respond to its own messages
@@ -274,9 +277,14 @@ async def on_message(message):
         return
 
     # Check if any trigger word is present in the message content
-    if greeting_trigger_pattern.search(message.content):
-        # Add a reaction to the message
+    if couscous_trigger_pattern.search(message.content):
+        # Add a reaction for couscous trigger
+        await message.add_reaction("<:logo_python_arabot:1108367929457791116>")
+
+    elif greeting_trigger_pattern.search(message.content):
+        # Add a reaction for greeting trigger
         await message.add_reaction("👋")
+
 
 try:
     with open("JSON Files/welcome_data_file.json", 'r') as f:
@@ -955,6 +963,39 @@ class AdminSelectMenu(discord.ui.View):
 
 #COMMANDS
 
+@tree.command(name="test2", description="test2")
+async def test2(interaction: discord.Interaction, user: discord.User):
+    print(user)
+    if not username:
+        username = interaction.user.global_name
+
+    # Crée une image vide
+    image = Image.new('RGB', (400, 200), color='white')
+    draw = ImageDraw.Draw(image)
+
+    # Charge une police de calligraphie arabe (vous pouvez changer le chemin de la police selon votre besoin)
+    font_path = "Lateef-Regular.ttf"
+    font_size = 30
+    font = ImageFont.truetype(font_path, font_size)
+
+    # Reshape le nom d'utilisateur en calligraphie arabe
+    reshaped_username = arabic_reshaper.reshape(username)
+    bidi_text = arabic_reshaper.get_display(reshaped_username)
+
+    # Calcule la position pour centrer le texte
+    text_width, text_height = draw.textsize(bidi_text, font=font)
+    x = (image.width - text_width) / 2
+    y = (image.height - text_height) / 2
+
+    # Dessine le texte sur l'image
+    draw.text((x, y), bidi_text, font=font, fill='black')
+
+    # Enregistre l'image temporaire
+    image_path = 'temp.png'
+    image.save(image_path)
+
+    # Envoie l'image sur Discord en utilisant l'interaction
+    await interaction.response.send_message(file=discord.File(image_path))
 
 
 @tree.command(name="couscous", description="Partage un couscous avec quelqu'un")
@@ -973,10 +1014,10 @@ async def share_couscous_command(interaction: discord.Interaction, utilisateur: 
     else:
         # Create random messages
         random_messages = [
-            f"**{interaction.user.global_name}** partage un succulent couscous avec **{utilisateur.global_name}** !\nBon appétit ! 🍲",
+            f"**{interaction.user.global_name}** partage un succulent couscous avec toi !\nBon appétit ! 🍲",
             f"**{interaction.user.global_name}** t'offre un délicieux couscous.\nProfitez-en ! 🌟",
             f"**{interaction.user.global_name}** a préparé un couscous spécial pour toi.\nC'est l'heure du festin ! 🎉",
-            f"**{interaction.user.global_name}** et **{utilisateur.global_name}** savourent un couscous ensemble.\nTu devrait essayer la recette ! 📖",
+            f"**{interaction.user.global_name}** et **{utilisateur.global_name}** savourent un couscous ensemble.\nQuelqu'un veut la recette ! 📖",
         ]
 
         random_message = random.choice(random_messages)
