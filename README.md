@@ -36,7 +36,7 @@ ___Would you like to help me writing a description ... ?___
 - **Basic commands**
 
 
-## Aide
+## Help
 
 *If you need help join the support server by clicking __[here](https://discord.com/invite/uGWkqYazzw)__.*
 
