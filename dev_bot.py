@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
 from datetime import datetime
+from datetime import timedelta
 import pytz
 import asyncio
 import random
@@ -12,8 +13,8 @@ import time
 import re
 from blagues_api import BlaguesAPI
 from blagues_api import BlagueType
-from PIL import Image, ImageDraw, ImageFont
-import arabic_reshaper
+import aiohttp
+
 
 #PATH
 
@@ -61,21 +62,25 @@ blagues_token = os.getenv(f"Blagues_Token")
 
 print(f"{printer_timestamp()} Blagues API token has been loaded !")
 
-dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/twitch_authorization.env")
-twitch_authorization = os.getenv(f"Twitch_Authorization")
+dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/twitch_client_secret.env")
+twitch_client_secret = os.getenv(f"Twitch_Secret")
 
-print(f"{printer_timestamp()} Twitch authorization token has been loaded !")
+print(f"{printer_timestamp()} Twitch secret token has been loaded !")
 
 dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/twitch_client_id.env")
 twitch_client_id = os.getenv(f"Twitch_Client_Id")
 
 print(f"{printer_timestamp()} Twitch client id token has been loaded !")
 
-headers = {
-    'Client-Id': f'{twitch_client_id}',
-    'Authorization': f'Bearer {twitch_authorization}',
-    
+
+url = 'https://id.twitch.tv/oauth2/token'
+payload = {
+    'client_id': twitch_client_id,
+    'client_secret': twitch_client_secret,
+    'grant_type': 'client_credentials'
 }
+
+
 
 
 async def check_shutdown_file():
@@ -130,8 +135,8 @@ async def on_ready():
      await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"/help | {version_number}"))
      print(f"{printer_timestamp()} Bot Status has been corectly set up !")
 
-     # asyncio.create_task(twitch_loop())
-     # print(f"{printer_timestamp()} Twitch script has been corectly loaded ! ")
+     asyncio.create_task(twitch_loop())
+     print(f"{printer_timestamp()} Twitch loop has been corectly created ! ")
 
     
 
@@ -194,6 +199,22 @@ async def on_ready():
        await client.close()
        os._exit(0)
        
+
+#BOT DISCONECT EVENT HANDLING
+
+@client.event
+async def on_disconnect():
+    print(f"{printer_timestamp()} Bot disconnected. Reconnecting...")
+
+    while not client.is_closed():
+        try:
+            await client.login(token)
+            print(f"{printer_timestamp()} Reconnected successfully.")
+            break
+        except Exception as e:
+            print(f"{printer_timestamp()} Reconnect failed. Retrying in 5 seconds... Error: {e}")
+            await asyncio.sleep(30)
+
 
 #VARIABLES   
          
@@ -963,41 +984,6 @@ class AdminSelectMenu(discord.ui.View):
 
 #COMMANDS
 
-@tree.command(name="test2", description="test2")
-async def test2(interaction: discord.Interaction, user: discord.User):
-    print(user)
-    if not username:
-        username = interaction.user.global_name
-
-    # Crée une image vide
-    image = Image.new('RGB', (400, 200), color='white')
-    draw = ImageDraw.Draw(image)
-
-    # Charge une police de calligraphie arabe (vous pouvez changer le chemin de la police selon votre besoin)
-    font_path = "Lateef-Regular.ttf"
-    font_size = 30
-    font = ImageFont.truetype(font_path, font_size)
-
-    # Reshape le nom d'utilisateur en calligraphie arabe
-    reshaped_username = arabic_reshaper.reshape(username)
-    bidi_text = arabic_reshaper.get_display(reshaped_username)
-
-    # Calcule la position pour centrer le texte
-    text_width, text_height = draw.textsize(bidi_text, font=font)
-    x = (image.width - text_width) / 2
-    y = (image.height - text_height) / 2
-
-    # Dessine le texte sur l'image
-    draw.text((x, y), bidi_text, font=font, fill='black')
-
-    # Enregistre l'image temporaire
-    image_path = 'temp.png'
-    image.save(image_path)
-
-    # Envoie l'image sur Discord en utilisant l'interaction
-    await interaction.response.send_message(file=discord.File(image_path))
-
-
 @tree.command(name="couscous", description="Partage un couscous avec quelqu'un")
 async def share_couscous_command(interaction: discord.Interaction, utilisateur: discord.User): 
     couscous_gifs = [
@@ -1150,7 +1136,7 @@ async def conditions_command(interaction: discord.Interaction):
 async def delete_dm(interaction: discord.Interaction):
     # Check if the command is sent in a DM
     if isinstance(interaction.channel, discord.DMChannel):
-        await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages du bot sont en cours de suppression.....\n\n(On vous previendra quand ce sera fini :information_source:)", ephemeral=True)
+        await interaction.response.send_message(content=":hourglass_flowing_sand: Tous les messages du bot sont en cours de suppression.....\n\n(Vous serez notifié quand ce sera fini. :information_source:)", ephemeral=True)
 
         # Fetch the bot's sent messages in the DM
         bot_messages = []
@@ -1674,12 +1660,18 @@ async def dev_info_command(interaction: discord.Interaction):
                 await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
 
+
 #Twitch Live Alert Loop
 
 async def twitch_loop():
    while not is_ready:
         await asyncio.sleep(30)
         print(f"{printer_timestamp()} Twitch Loop has been started !")
+
+        headers = {
+        'Client-Id': f'{twitch_client_id}',
+        'Authorization': f'Bearer tyls5llqbqn0e61f8ckdyhhj29la8u',
+        }
 
    previous_status = None
 
@@ -1764,7 +1756,7 @@ async def twitch_loop():
          print(response.text)
 
      await asyncio.sleep(10)
-    
+
 
 
 
@@ -1772,7 +1764,7 @@ async def twitch_loop():
 async def test_command(interaction: discord.Interaction):
     blagues = BlaguesAPI(blagues_token)
 
-    blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV, BlagueType.LIMIT])
+    blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV, BlagueType.BLONDES])
 
     joke = blague.joke
     answer = blague.answer
