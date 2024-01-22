@@ -13,7 +13,6 @@ import time
 import re
 from blagues_api import BlaguesAPI
 from blagues_api import BlagueType
-import aiohttp
 
 
 #PATH

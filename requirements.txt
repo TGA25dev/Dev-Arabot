@@ -1,6 +1,6 @@
 discord
 datetime
-pytz
 asyncio
-requests
-python-dotenv
+dotenv
+re
+blagues_api
