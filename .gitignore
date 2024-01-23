@@ -15,3 +15,4 @@ twitch_refresh_token.txt
 
 explosion_command_old_code.txt
 *.ttf
+.pre-commit-config.yaml
