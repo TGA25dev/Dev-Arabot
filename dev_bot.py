@@ -72,6 +72,13 @@ twitch_client_id = os.getenv(f"Twitch_Client_Id")
 print(f"{printer_timestamp()} Twitch client id token has been loaded !")
 
 
+dotenv.load_dotenv(f"{DEFAULT_PATH}/Token/twitch_access_token.env")
+twitch_access_token = os.getenv(f"Twitch_Access_Token")
+
+print(f"{printer_timestamp()} Twitch access token has been loaded !")
+print(twitch_access_token)
+
+
 url = 'https://id.twitch.tv/oauth2/token'
 payload = {
     'client_id': twitch_client_id,
@@ -224,7 +231,7 @@ version_note = f"{bot_mode_def} Arabot v2.0|Ink Corp|✨TGA25✨"
 maintenance_mode = False
 default_bot_nick = f"{bot_mode_def} Arabot"
 version_number = "v2.0"
-streamer_name = ("Ponce")
+streamer_name = ("FlexingSeal")
 
 lock_icon_url = "https://i.postimg.cc/MTG44vm8/lock-icon.png"
 clock12_icon_url = "https://i.postimg.cc/nrCysCX1/clock12-icon.png"
@@ -1669,7 +1676,7 @@ async def twitch_loop():
 
         headers = {
         'Client-Id': f'{twitch_client_id}',
-        'Authorization': f'Bearer tyls5llqbqn0e61f8ckdyhhj29la8u',
+        'Authorization': f'Bearer {twitch_access_token}',
         }
 
    previous_status = None

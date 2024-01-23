@@ -10,7 +10,7 @@ ___Vous voulez pas m'aider à écrire une description ... ?___
 ![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)
 
 
-[**English**](README_EN.md) | [LICENSE](LICENSE)
+[**English**](README.md) | [LICENSE](LICENSE)
 
 ## Table des matières
 
