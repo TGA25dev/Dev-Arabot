@@ -1676,7 +1676,7 @@ async def twitch_loop():
 
         headers = {
         'Client-Id': f'{twitch_client_id}',
-        'Authorization': f'Bearer {twitch_access_token}',
+        'Authorization': f'Bearer z61nzwxjpp9wfnc6ffboehoqwm9gmx',
         }
 
    previous_status = None
