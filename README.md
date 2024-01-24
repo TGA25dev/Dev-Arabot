@@ -5,6 +5,7 @@
 
 ___Would you like to help me writing a description ... ?___
 
+![Version](https://img.shields.io/badge/version-2.0-blue.svg?style=for-the-badge)
 [![License](https://img.shields.io/github/license/Ileriayo/markdown-badges?style=for-the-badge)](./LICENSE)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)
@@ -13,11 +14,11 @@ ___Would you like to help me writing a description ... ?___
 
 [**Français**](README_FR.md) | [LICENSE](LICENSE)
 
-## Contents
+## Contents <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Clipboard.png" alt="Clipboard" width="25" height="25" />
 
 - [Installation](#Addingthebot)
-- [Screenshots](#Addingthebot)
-- [Features](#Screenshots)
+- [Screenshots](#Screenshots)
+- [Features](#Features)
 - [Help](#Help)
 - [License](#License)
 
