@@ -59,4 +59,4 @@ ___Vous voulez pas m'aider à écrire une description ... ?___
 
 [@TGA25](https://www.github.com/TGA25Dev)
 
-##### Emojis désignés par **[OxyZen](https://oxyzen.vercel.app/)**
+##### Les emojis proviennent de **[Animated-Fluent-Emoji](https://animated-fluent-emoji.vercel.app/)**

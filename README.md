@@ -60,4 +60,4 @@ ___Would you like to help me writing a description ... ?___
 
 [@TGA25](https://www.github.com/TGA25Dev)
 
-##### Emojis made by **[Animated-Fluent-Emoji](https://animated-fluent-emoji.vercel.app/)**
+##### Emojis are from **[Animated-Fluent-Emoji](https://animated-fluent-emoji.vercel.app/)**
