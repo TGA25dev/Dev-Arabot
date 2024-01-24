@@ -42,7 +42,7 @@ ___Would you like to help me writing a description ... ?___
 *If you need help join the support server by clicking __[here](https://discord.com/invite/uGWkqYazzw)__.*
 
 
-## FAQ
+## FAQ <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Person%20Raising%20Hand.png" alt="Person Raising Hand" width="25" height="25" />
 
 #### Is this usefull to have an FAQ ?
 
