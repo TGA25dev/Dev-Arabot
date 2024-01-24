@@ -10,6 +10,7 @@ ___Would you like to help me writing a description ... ?___
 ![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)
 
 
+
 [**Français**](README_FR.md) | [LICENSE](LICENSE)
 
 ## Contents
@@ -21,7 +22,7 @@ ___Would you like to help me writing a description ... ?___
 
 ## Adding the bot
 
-*The link will be available when everithing will be done !* 🚧 
+*The link will be available when everithing will be done !* <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Construction.png" alt="Construction" width="25" height="25" /> 
     
 ## Screenshots
 
