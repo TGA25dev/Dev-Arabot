@@ -16,11 +16,11 @@ ___Would you like to help me writing a description ... ?___
 
 ## Contents <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Clipboard.png" alt="Clipboard" width="25" height="25" />
 
-- [Installation](#Addingthebot)
-- [Screenshots](#Screenshots)
-- [Features](#Features)
-- [Help](#Help)
-- [License](#License)
+- [Installation](https://github.com/TGA25dev/Dev-Arabot?tab=readme-ov-file#adding-the-bot-)
+- [Screenshots](https://github.com/TGA25dev/Dev-Arabot?tab=readme-ov-file#screenshots-)
+- [Features](https://github.com/TGA25dev/Dev-Arabot?tab=readme-ov-file#features-)
+- [Help](https://github.com/TGA25dev/Dev-Arabot?tab=readme-ov-file#help-)
+- [License](https://github.com/TGA25dev/Dev-Arabot?tab=readme-ov-file#license-)
 
 ## Adding the bot <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Hammer%20and%20Wrench.png" alt="Hammer and Wrench" width="25" height="25" />
 
@@ -59,3 +59,5 @@ ___Would you like to help me writing a description ... ?___
 ## Developer <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Rocket.png" alt="Rocket" width="25" height="25" />
 
 [@TGA25](https://www.github.com/TGA25Dev)
+
+##### Emojis made by **[Animated-Fluent-Emoji](https://animated-fluent-emoji.vercel.app/)**
