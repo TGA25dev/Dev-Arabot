@@ -1,4 +1,4 @@
-![arabot logo](https://i.postimg.cc/4xBkDYLx/arabot-logo.png)
+![arabot logo](https://i.postimg.cc/7htk7SRL/arabot-logo.png)
 
 
 # Dev Arabot <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Sparkles.png" alt="Sparkles" width="25" height="25" />
