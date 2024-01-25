@@ -46,15 +46,15 @@ ___Would you like to help me writing a description ... ?___
 
 ## FAQ <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Person%20Raising%20Hand.png" alt="Person Raising Hand" width="25" height="25" />
 
-Q: What is the purpose of the Arabot?
+**Q: What is the purpose of the Arabot?**
 <br>
 
-A: The goal of the Arabot is to humorously mock certain type of stereotypes. The project as a whole adopts a tongue-in-cheek tone, implying that the elements, commands, and responses should not be interpreted literally.
+**A:** The goal of the Arabot is to humorously mock certain type of stereotypes. The project as a whole adopts a tongue-in-cheek tone, implying that the elements, commands, and responses should not be interpreted literally.
 <br>
 <br>
-Q: How does the "/explosion" command work?
+**Q: How does the "/explosion" command work ?**
 
-A: The "/explosion" command "blows up" the server for 1, 5, or 10 minutes. The server is thus "locked" during this duration. During this waiting period, the ability to send new messages in the server might be restricted for most users.
+**A:** The "/explosion" command "blows up" the server for 1, 5, or 10 minutes. The server is thus "locked" during this duration. During this waiting period, the ability to send new messages in the server might be restricted for most users.
 
 
 ## License <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Page%20with%20Curl.png" alt="Page with Curl" width="25" height="25" />
