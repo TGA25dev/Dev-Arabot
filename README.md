@@ -1,4 +1,4 @@
-![logo to finish](logo.png)
+![arabot logo](https://i.postimg.cc/4xBkDYLx/arabot-logo.png)
 
 
 # Dev Arabot <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Sparkles.png" alt="Sparkles" width="25" height="25" />
@@ -6,7 +6,7 @@
 ___Would you like to help me writing a description ... ?___
 
 ![Version](https://img.shields.io/badge/version-2.0-blue.svg?style=for-the-badge)
-[![License](https://img.shields.io/github/license/Ileriayo/markdown-badges?style=for-the-badge)](./LICENSE)
+[![License](https://img.shields.io/badge/License-CC_BY--NC--ND_4.0-green?style=for-the-badge)](./LICENSE)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)
 
@@ -46,9 +46,15 @@ ___Would you like to help me writing a description ... ?___
 
 ## FAQ <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Person%20Raising%20Hand.png" alt="Person Raising Hand" width="25" height="25" />
 
-#### Is this usefull to have an FAQ ?
+Q: What is the purpose of the Arabot?
+<br>
 
-...  
+A: The goal of the Arabot is to humorously mock certain type of stereotypes. The project as a whole adopts a tongue-in-cheek tone, implying that the elements, commands, and responses should not be interpreted literally.
+<br>
+<br>
+Q: How does the "/explosion" command work?
+
+A: The "/explosion" command "blows up" the server for 1, 5, or 10 minutes. The server is thus "locked" during this duration. During this waiting period, the ability to send new messages in the server might be restricted for most users.
 
 
 ## License <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Page%20with%20Curl.png" alt="Page with Curl" width="25" height="25" />

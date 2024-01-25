@@ -1,4 +1,4 @@
-![logo à finir](logo.png)
+![arabot logo](https://i.postimg.cc/4xBkDYLx/arabot-logo.png)
 
 
 # Dev Arabot <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Sparkles.png" alt="Sparkles" width="25" height="25" />
@@ -6,7 +6,7 @@
 ___Vous voulez pas m'aider à écrire une description ... ?___
 
 ![Version](https://img.shields.io/badge/version-2.0-blue.svg?style=for-the-badge)
-[![Licence](https://img.shields.io/github/license/Ileriayo/markdown-badges?style=for-the-badge)](./LICENSE)
+[![Licence](https://img.shields.io/badge/License-CC_BY--NC--ND_4.0-green?style=for-the-badge)](./LICENSE)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)
 
@@ -45,9 +45,15 @@ ___Vous voulez pas m'aider à écrire une description ... ?___
 
 ## FAQ <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Person%20Raising%20Hand.png" alt="Person Raising Hand" width="25" height="25" />
 
-#### C'est nécéssaire d'avoir une FAQ ?
+**Q: Quel est le but de l'Arabot ?**
+<br>
 
-...  
+**R:** L'objectif de l'Arabot est de tourner en dérision de manière humoristique certains stéréotypes. Le projet dans son ensemble adopte un ton au second degré, impliquant que les éléments, commandes et réponses ne devraient pas être interprétés de manière littérale.
+<br>
+<br>
+**Q: Comment fonctionne la commande /explosion ?**
+
+**R:** La commande "/explosion" fait "exploser" le serveur pendant 1, 5 ou 10 minutes. Le serveur est donc "verrouillé" pendant cette durée. Pendant cette période d'attente, la possibilité d'envoyer de nouveaux messages dans le serveur pourrait être restreinte pour la majorité des utilisateurs.
 
 
 ## Licence <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Page%20with%20Curl.png" alt="Page with Curl" width="25" height="25" />
@@ -59,4 +65,4 @@ ___Vous voulez pas m'aider à écrire une description ... ?___
 
 [@TGA25](https://www.github.com/TGA25Dev)
 
-##### Les emojis proviennent de **[Animated-Fluent-Emoji](https://animated-fluent-emoji.vercel.app/)**
+##### Emojis **[Animated-Fluent-Emoji](https://animated-fluent-emoji.vercel.app/)**
