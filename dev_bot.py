@@ -1401,6 +1401,7 @@ async def setup(interaction: discord.Interaction):
                         for entry in bot_setup_data:
                             if entry.get("Guild Name") == guild_name:
                                 entry["Status"] = "Finished"
+                                entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
                                 break  # Exit loop once the entry is found and updated
 
                         # Write the updated bot_setup_data to the JSON file
@@ -1419,6 +1420,12 @@ async def setup(interaction: discord.Interaction):
 
                         test_embed.title = ""
                         test_embed.description = "**Configuration Annulée !**"
+
+                        for entry in bot_setup_data:
+                         if entry.get("Guild Name") == guild_name:
+                          entry["Status"] = "Canceled"
+                          entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
+                          break  # Exit loop once the entry is found and updated
 
                         await interaction.response.edit_message(view=None, embed=test_embed)
 
