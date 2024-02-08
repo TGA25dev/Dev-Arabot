@@ -264,11 +264,14 @@ vol_command_avalaible = True
 
 #ID'S VARIABLES
 
-news_channel_id = 1193954102670020648
-                 
-server_id = 1060183015545913354
+#TO MODIFY !!!!
 
+goomink_news_channel_id = 1193954102670020648
+
+            
 bot_channel = 1120723328307581003
+
+
 
 setup_command_id = 1184232293691293726
 
@@ -659,9 +662,6 @@ class ButtonView_settings(discord.ui.View):
         maintenance_mode=True
         await interaction.response.send_message("Mode maintenance **activé** 👷 !", ephemeral=True)
         await client.change_presence(activity=discord.Activity(status=discord.Status.do_not_disturb ,name="la maintenance 👷", type=discord.ActivityType.watching))
-        filename = "maintenance_on.txt"
-        with open(filename, 'w') as f:
-         pass   
 
     @discord.ui.button(style=discord.ButtonStyle.primary, label="Fin de la maintenance", custom_id="button_end_maintenance", emoji="🛠️")
     async def button4_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -673,13 +673,41 @@ class ButtonView_settings(discord.ui.View):
      global maintenance_mode
      maintenance_mode=False
 
-     channel = client.get_channel(bot_channel)
-     if channel is not None:
-        await channel.send("", embed=end_maintenance_embed)
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"/help | {version_number}"))
-     else:
-        print(f"{printer_timestamp()} Channel not found!")
+     # Open the JSON file and read its contents
+     with open("JSON Files/setup_data.json", 'r') as file:
+      data = json.load(file)
+
+     # Iterate over each entry in the setup data
+     for entry in data:
+      guild_id = entry["Guild Id"]
+      channel_id = entry["Choosen Channel Id"]
+      news_role_id = entry["Created Role Id"]
+
+      # Find the guild object
+      guild = client.get_guild(guild_id)
+      if guild is None:
+        print(f"Guild with ID {guild_id} not found.")
+        continue
+
+      # Find the channel object
+      channel = guild.get_channel(channel_id)
+      if channel is None:
+        print(f"Channel with ID {channel_id} not found in guild {guild.name}.")
+        continue
+
+      # Find the role object
+      role = guild.get_role(news_role_id)
+      if role is None:
+        print(f"The news role was not found in guild {guild.name}.")
+        continue    
+
+      # Sending message to the channel
+      await channel.send(f"{role.mention}", embed=end_maintenance_embed)
+      await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"/help | {version_number}"))
+
+     # Update presence outside the loop
      await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"/help | {version_number}"))
+
 
 
 
@@ -1158,6 +1186,7 @@ async def setup(interaction: discord.Interaction):
                                 "Status": "Started",
                                 "Choosen Channel Name": "",
                                 "Choosen Channel Id": "",
+                                "Created Role Id": ""
                             })
 
                         with open("JSON Files/setup_data.json", 'w') as file:
@@ -1314,14 +1343,20 @@ async def setup(interaction: discord.Interaction):
                         existing_role = discord.utils.get(interaction.guild.roles, name=role_name)
 
                         if not existing_role:
+
                             global arabot_notif_role
+
                             arabot_notif_role = await interaction.guild.create_role(name="Arabot News", hoist=False, mentionable=True, color=discord.Color.from_rgb(245, 138, 66))
                             print("arabot notif role has been created!")
+
+                            global arabot_notif_role_id
+                            arabot_notif_role_id = arabot_notif_role.id
 
                             for entry in bot_setup_data:
                                 if entry.get("Guild Name") == guild_name:
                                     entry["Status"] = "News Role Creation Finished"
                                     entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
+                                    entry["Created Role Id"] = arabot_notif_role.id
                                     break  # Exit loop once the entry is found and updated
                         else:
                             print(f"Role '{role_name}' already exists!")
@@ -1606,7 +1641,7 @@ async def explosion_command(interaction: discord.Interaction):
 
                     try:
                         if maintenance_mode:
-                            await interaction.response.send_message(embed=maintenance_embed)
+                            await interaction.response.send_message(embed=maintenance_embed, ephemeral=True)
                             return
                         await interaction.response.send_message(content="Sélectionnez une force d'explosion :",
                                                                  view=ButtonView_explosion_command(), embed=explosion_force_embed)
@@ -1672,7 +1707,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
 
                 try:
                     if maintenance_mode:
-                        await interaction.response.send_message(embed=maintenance_embed)
+                        await interaction.response.send_message(embed=maintenance_embed, ephemeral=True)
                     else:
                         try:
                             with open("JSON Files/vol_command_cooldown.json", 'r') as f:
@@ -1836,7 +1871,7 @@ async def embed_command(interaction: discord.Interaction):
             USER_DM = await client.fetch_user(TGA25_ID)
 
             if maintenance_mode:
-                await interaction.response.send_message(embed=maintenance_embed)
+                await interaction.response.send_message(embed=maintenance_embed, ephemeral=True)
                 return
 
             try:
@@ -1898,7 +1933,7 @@ async def embed_command(interaction: discord.Interaction):
             USER_DM = await client.fetch_user(TGA25_ID)
 
             if maintenance_mode:
-                await interaction.response.send_message(embed=maintenance_embed)
+                await interaction.response.send_message(embed=maintenance_embed, ephemeral=True)
                 return
 
             try:
@@ -2048,7 +2083,8 @@ async def twitch_loop():
                 live_url = f"https://twitch.tv/{user_login}"
 
                  # Replace with your channel ID
-                twitch_message_channel = client.get_channel(news_channel_id)
+                twitch_message_channel = client.get_channel(goomink_news_channel_id)
+
 
                 if twitch_message_channel:
                  
