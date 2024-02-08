@@ -294,6 +294,8 @@ share_couscous_command_id = 1191482935258398774
 
 server_info_command_id = 1190775361009635428
 
+support_command_id = 1205262201229942795
+
 
 #EVENTS
 
@@ -381,9 +383,9 @@ help_embed = discord.Embed(
         description="Voici toutes mes commandes :",
         color=discord.Color.from_rgb(252, 165, 119)
 )
-help_embed.add_field(name=f"</explosion:{explosion_command_id}>", value="Fait 'exploser' le serveur (__*Temporairement indisponible*__)", inline=False)
+help_embed.add_field(name=f"</explosion:{explosion_command_id}>", value="Fait exploser le serveur", inline=False)
 
-help_embed.add_field(name=f"</vol:{vol_command_id}>", value="'Vole' le profil d'un membre du serveur", inline=False)
+help_embed.add_field(name=f"</vol:{vol_command_id}>", value="Vole le profil d'un membre du serveur", inline=False)
 
 help_embed.add_field(name=f"</blague:{joke_command_id}>", value="Raconte une blague", inline=False) 
 
@@ -393,7 +395,9 @@ help_embed.add_field(name=f"</info:{info_command_id}>", value="Affiche les infor
 
 help_embed.add_field(name=f"</devinfo:{dev_info_command_id}>", value="Affiche des informations sur le développeur du bot", inline=False)
 
-help_embed.add_field(name=f"</info-serveur :{server_info_command_id}>", value="Affiche des informations sur ce serveur", inline=False)
+help_embed.add_field(name=f"</info-serveur:{server_info_command_id}>", value="Affiche des informations sur ce serveur", inline=False)
+
+help_embed.add_field(name=f"</support:{support_command_id}>", value="Besoin d'aide ? Rejoignez le serveur support !", inline=False)
 
 help_embed.add_field(name=f"</help:{help_command_id}>", value="Affiche ceci", inline=False)
 
@@ -443,7 +447,7 @@ error_embed = discord.Embed(
     color=discord.Color.from_rgb(235, 64, 52)
         
 )
-error_embed.add_field(name= "L'erreur a été transmise au développeur :electric_plug:", value="*Ceci ne devrait pas arriver...*\nVous pouvez rejoindre le serveur support en cliquant [ici](https://discord.gg/uGWkqYazzw)")
+error_embed.add_field(name= "L'erreur a été transmise au développeur :electric_plug:", value="*Ceci ne devrait pas arriver...*\nVous pouvez rejoindre le serveur support avec la commande `/support` !")
 error_embed.set_footer(text=version_note)
 
 
@@ -456,9 +460,9 @@ explosion_force_embed = discord.Embed(
         color=discord.Color.from_rgb(252, 165, 3)
         
 )
-explosion_force_embed.add_field(name="**Niveau 1 💣**", value="Une explosion de force *1*. Rend inaccessible le serveur pendant 1 minute.", inline=False)
-explosion_force_embed.add_field(name="**Niveau 2 🌋**", value="Une explosion de force *2*. Rend inaccessible le serveur pendant 5 minutes.", inline=False)
-explosion_force_embed.add_field(name="**Niveau 3 🌪️**", value="Une explosion de force *3*. Rend inaccessible le serveur pendant 10 minutes.", inline=False)
+explosion_force_embed.add_field(name="**Niveau 1 💣**", value="Rend inaccessible le serveur pendant 1 minute.", inline=False)
+explosion_force_embed.add_field(name="**Niveau 2 🌋**", value="Rend inaccessible le serveur pendant 5 minutes.", inline=False)
+explosion_force_embed.add_field(name="**Niveau 3 🌪️**", value="Rend inaccessible le serveur pendant 10 minutes.", inline=False)
 explosion_force_embed.set_footer(text=version_note)
 
  #Dev Info Embed
@@ -1059,6 +1063,22 @@ async def server_info(interaction: discord.Interaction):
             server_stat_embed.set_footer(text=version_note)
 
             await interaction.response.send_message(embed=server_stat_embed)
+
+
+@tree.command(name="support", description="Besoin d'aide ? Rejoignez le serveur support !")
+async def support_command(interaction: discord.Interaction):
+
+    class ButtonView_test(discord.ui.View):                
+        def __init__(self):
+            super().__init__(timeout=None)
+        
+        @discord.ui.button(style=discord.ButtonStyle.link, label="TEST", url="https://www.google.com/")
+        async def button_aide(self, button: discord.ui.Button, interaction: discord.Interaction):
+            await interaction.response.send_message('Test')
+
+    await interaction.response.send_message("", view=ButtonView_test())
+
+
 
 @tree.command(name="setup", description="Configuration du bot")
 async def setup(interaction: discord.Interaction):
@@ -2231,9 +2251,30 @@ async def explosion_command_system(interaction: discord.Interaction):
             # Pause for a moment
             await asyncio.sleep(5)
 
-            print(f"{printer_timestamp()} Explosion Started !")
+            print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion Started !")
 
-            print(f"{printer_timestamp()} Explosion Ended !")
+            if explosion_command_system_choosen_level == 1:
+                explosion_message_content = "💥💥"
+
+            elif explosion_command_system_choosen_level == 2:
+                explosion_message_content = "💥💥💥💥"
+
+            else: 
+                explosion_message_content = "💥💥💥💥💥💥"  
+
+            for channel in guild.text_channels:
+             if channel.id == refuge_channel.id:
+                continue
+             try:
+                # Send "aaa" in separate messages to the text channel
+                delay = random.uniform(0.3, 1.3)
+                await channel.send(explosion_message_content)
+                await asyncio.sleep(delay)
+
+             except Exception as e:
+                print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Failed to send message to {channel.name} : {e}")
+
+            print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion Ended !")
 
 
             await asyncio.sleep(15)            
@@ -2465,7 +2506,7 @@ async def explosion_command_system(interaction: discord.Interaction):
                   
                 
             else:
-               explosion_message_delete_limit = 8
+               explosion_message_delete_limit = 6
 
            
             # Delete bot messages from all channels
@@ -2486,10 +2527,6 @@ async def explosion_command_system(interaction: discord.Interaction):
                 await asyncio.sleep(1.5 * len(messages_to_delete))
               except discord.Forbidden:
                print(f"Missing permissions to delete messages in #{channel.name} of {guild.name}")
-
-            print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} All bot messages have been erased!")
-
-
 
             print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} All explosion messages have been erased !")            
 
@@ -2561,6 +2598,8 @@ async def explosion_command_system(interaction: discord.Interaction):
         # Delete the 'Explosion' role
         await explosion_role.delete()
         print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion role deleted !")
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} \033[92mThe explosion command system has been succesfully finished !\033[92m")
+
 
     except Exception as global_explosion_system_error:
         print(global_explosion_system_error)
