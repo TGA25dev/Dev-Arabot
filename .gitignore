@@ -2,7 +2,7 @@
 
 Token/*.env
 JSON Files/*.json
-Images\Bot Logo\default_image_dev_bot.png
+Images\*.png
 
 favorites.json
 
