@@ -157,7 +157,7 @@ async def on_ready():
      await message.edit(embed=bot_started_embed)
 
      try:
-      with open("JSON Files/starting_time_average.json", 'r') as file:
+      with open("JSON Files/Global Data/starting_time_average.json", 'r') as file:
         time_data = json.load(file)
      except FileNotFoundError:
       time_data = []
@@ -172,7 +172,7 @@ async def on_ready():
      })
 
 # Save the updated data back to the file
-     with open("JSON Files/starting_time_average.json", 'w') as file:
+     with open("JSON Files/Global Data/starting_time_average.json", 'w') as file:
       json.dump(time_data, file)
 
      time_taken_values = [entry['time_taken'] for entry in time_data]
@@ -322,7 +322,7 @@ async def on_message(message):
 
 
 try:
-    with open("JSON Files/welcome_data_file.json", 'r') as f:
+    with open("JSON Files/Global Data/welcome_data_file.json", 'r') as f:
         welcome_data = json.load(f)
 except FileNotFoundError:
     welcome_data = {} 
@@ -674,7 +674,7 @@ class ButtonView_settings(discord.ui.View):
      maintenance_mode=False
 
      # Open the JSON file and read its contents
-     with open("JSON Files/setup_data.json", 'r') as file:
+     with open("JSON Files/Global Data/setup_data.json", 'r') as file:
       data = json.load(file)
 
      # Iterate over each entry in the setup data
@@ -841,7 +841,7 @@ class ButtonView_setup_tos(discord.ui.View):
 
         tos_data = {interaction.user.id: {"accepted_tos": True}}
 
-        with open("JSON Files/TOS_info_data.json", 'w') as f:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'w') as f:
             json.dump(tos_data, f)
 
     @discord.ui.button(style=discord.ButtonStyle.blurple, label="Je refuse", custom_id="button_deny_tos", emoji=custom_refuse_emoji)
@@ -851,7 +851,7 @@ class ButtonView_setup_tos(discord.ui.View):
 
         tos_data = {interaction.user.id: {"accepted_tos": False}}
 
-        with open("JSON Files/TOS_info_data.json", 'w') as f:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'w') as f:
             json.dump(tos_data, f)
 
 
@@ -1007,7 +1007,7 @@ async def share_couscous_command(interaction: discord.Interaction, utilisateur: 
         couscous_embed.set_image(url=random_couscous_gif)
         couscous_embed.set_footer(text=version_note)
 
-        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
@@ -1039,7 +1039,7 @@ async def server_info(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
         await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
     else:
-        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
@@ -1111,7 +1111,7 @@ async def setup(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
         await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
     else:
-        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
@@ -1139,7 +1139,7 @@ async def setup(interaction: discord.Interaction):
                     @discord.ui.button(style=discord.ButtonStyle.blurple, label="Commencer", custom_id="start", disabled=False)
                     async def button_start_callback(self, interaction: discord.Interaction, button):
                         try:
-                            with open("JSON Files/setup_data.json", 'r') as file:
+                            with open("JSON Files/Global Data/setup_data.json", 'r') as file:
                                 global bot_setup_data
                                 bot_setup_data = json.load(file)
                         except FileNotFoundError:
@@ -1187,7 +1187,7 @@ async def setup(interaction: discord.Interaction):
                                 "Created Role Id": ""
                             })
 
-                        with open("JSON Files/setup_data.json", 'w') as file:
+                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
                             json.dump(bot_setup_data, file)
 
                         if not has_admin_role:
@@ -1219,7 +1219,7 @@ async def setup(interaction: discord.Interaction):
                             test_embed.description = "Pour que le bot fonctionne correctement, il a besoin d'être en haut de la liste des rôles.\n\nPlacez-le en haut puis cliquez sur **Vérifier**"
 
                         # Write the updated bot_setup_data to the JSON file
-                        with open("JSON Files/setup_data.json", 'w') as file:
+                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
                             json.dump(bot_setup_data, file)
 
                         await interaction.response.edit_message(view=self, embed=test_embed)
@@ -1261,7 +1261,7 @@ async def setup(interaction: discord.Interaction):
                                     break  # Exit loop once the entry is found and updated  
 
                         # Write the updated bot_setup_data to the JSON file
-                        with open("JSON Files/setup_data.json", 'w') as file:
+                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
                             json.dump(bot_setup_data, file)
                         await interaction.response.edit_message(view=self, embed=test_embed)
 
@@ -1326,7 +1326,7 @@ async def setup(interaction: discord.Interaction):
 
                                 await interaction.response.edit_message(view=self, embed=test_embed)
                                 # Write the updated bot_setup_data to the JSON file
-                                with open("JSON Files/setup_data.json", 'w') as file:
+                                with open("JSON Files/Global Data/setup_data.json", 'w') as file:
                                     json.dump(bot_setup_data, file)
 
                         await interaction.response.send_modal(Feedback())
@@ -1518,7 +1518,7 @@ async def delete_dm(interaction: discord.Interaction):
 
 
     else:
-        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
@@ -1551,7 +1551,7 @@ async def admin_panel(interaction: discord.Interaction):
         try:
             if interaction.user.id == TGA25_ID:
                 view = AdminSelectMenu()
-                await interaction.response.send_message(content="Administration du bot :", view=view)
+                await interaction.response.send_message(content="Administration du bot :", view=view, ephemeral=True)
             else:
                 await interaction.response.send_message("Tu n'es pas autorisé a utiliser cette commande :no_entry_sign: ", ephemeral=True)
 
@@ -1581,7 +1581,7 @@ async def explosion_command(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
         await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les DM ! :no_entry_sign:", ephemeral=True)
     else:
-        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
@@ -1678,7 +1678,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
     if isinstance(interaction.channel, discord.DMChannel):
         await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
     else:
-        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
@@ -1708,7 +1708,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                         await interaction.response.send_message(embed=maintenance_embed, ephemeral=True)
                     else:
                         try:
-                            with open("JSON Files/vol_command_cooldown.json", 'r') as f:
+                            with open("JSON Files/Vol_Command_Data/vol_command_cooldown.json", 'r') as f:
                                 server_cooldowns = json.load(f)
                         except FileNotFoundError:
                             server_cooldowns = {}
@@ -1807,7 +1807,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                                 f"Veuillez patienter ***{remaining_minutes} minutes*** et ***{remaining_seconds} secondes*** avant de pouvoir réutiliser cette commande.", ephemeral=True)
 
                         # Save the updated server cooldown data to the JSON file
-                        with open("JSON Files/vol_command_cooldown.json", 'w') as f:
+                        with open("JSON Files/Vol_Command_Data/vol_command_cooldown.json", 'w') as f:
                             json.dump(server_cooldowns, f)
 
                 except Exception as e:
@@ -1843,7 +1843,7 @@ async def embed_command(interaction: discord.Interaction):
     else:
         # Define loaded_data outside the else block
         loaded_data = {}
-        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
@@ -1907,7 +1907,7 @@ async def embed_command(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
         await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
     else:
-        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
@@ -1974,7 +1974,7 @@ async def dev_info_command(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
         await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
     else:
-        with open("JSON Files/TOS_info_data.json", 'r') as json_file:
+        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
             loaded_data = json.load(json_file)
 
         # Extract relevant data from loaded JSON using the specific guild ID
