@@ -1096,15 +1096,13 @@ async def server_info(interaction: discord.Interaction):
 @tree.command(name="support", description="Besoin d'aide ? Rejoignez le serveur support !")
 async def support_command(interaction: discord.Interaction):
 
-    class ButtonView_test(discord.ui.View):                
+    class ButtonView_support(discord.ui.View):                
         def __init__(self):
             super().__init__(timeout=None)
-        
-        @discord.ui.button(style=discord.ButtonStyle.link, label="TEST", url="https://www.google.com/")
-        async def button_aide(self, button: discord.ui.Button, interaction: discord.Interaction):
-            await interaction.response.send_message('Test')
 
-    await interaction.response.send_message("", view=ButtonView_test())
+            super().add_item(discord.ui.Button(style=discord.ButtonStyle.link, label="Serveur Support", url="https://discord.com/invite/uGWkqYazzw"))
+
+    await interaction.response.send_message("Cliquez [ici](https://discord.com/invite/uGWkqYazzw) pour rejoindre le serveur support.", view=ButtonView_support(), ephemeral=True)
 
 
 
