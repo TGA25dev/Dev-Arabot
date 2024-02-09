@@ -1730,14 +1730,14 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
 
                             if response.status_code == 200:
                                 # Save the image to disk
-                                with open(f"Images/{choosen_user}.png", "wb") as f:
+                                with open(f"Images/Downloaded Images/{choosen_user}.png", "wb") as f:
                                     f.write(response.content)
                                     print(f"{printer_timestamp()} Image downloaded successfully!")
                             else:
                                 print(f"{printer_timestamp()} Failed to download image.")
 
                             # Update the bot's username to match the username of the mentioned user
-                            profile_image_path = f"Images/{choosen_user}.png"
+                            profile_image_path = f"Images/Downloaded Images/{choosen_user}.png"
                             profile_image = open(profile_image_path, 'rb')
                             pfp = profile_image.read()
 
