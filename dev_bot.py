@@ -44,14 +44,10 @@ print(f"\033[1m{printer_timestamp()} Token has been loaded ! \033[0m")
 TGA25_ID = 845327664143532053
 
 
-
-
-
 class aclient(discord.Client):
     def __init__(self):
         super().__init__(intents = discord.Intents.all())
-        # discord.Intents.messages = True
-        
+        discord.Intents.messages = True        
         self.synced = False 
 
 client = aclient()
@@ -84,20 +80,15 @@ payload = {
     'grant_type': 'client_credentials'
 }
 
-
-
-
 async def check_shutdown_file():
     if os.path.isfile("shutdown.txt"):
-        print(f"{printer_timestamp()} shutdown.txt file exist. \033[91m Bot stopping... \033[0m")
+        print(f"{printer_timestamp()} shutdown.txt file exist. \033[91m Bot is stopping... \033[0m")
         os.remove("shutdown.txt") 
         await client.close()
         await asyncio.sleep(5)  
         os._exit(0)
     else:
-        print(f"{printer_timestamp()} shutdown.txt file doesn't exist. \033[94m Bot starting... \033[0m")
-
-
+        print(f"{printer_timestamp()} shutdown.txt file doesn't exist. \033[94m Bot is starting... \033[0m")
 
 asyncio.run(check_shutdown_file())
 
@@ -110,8 +101,8 @@ async def on_ready():
 
     try:
      bot_starting_embed = discord.Embed(
-        title=":hourglass_flowing_sand: Lancement... :hourglass_flowing_sand: ",
-        description="**Le bot est en cours de lancement veuillez patienter....**"
+        title="**Lancement en cours... ⏳**",
+        description="**Le bot est en train de démarrer. Veuillez patienter...**"
 
      )
 
@@ -127,11 +118,8 @@ async def on_ready():
 
      profile_image = open(profile_image_path, "rb")
      pfp = profile_image.read()
-
-     
-
         
-     #await client.user.edit(avatar=pfp)
+     await client.user.edit(avatar=pfp)
 
      print(f"{printer_timestamp()} Profile image sucessfully restablished to default !")
 
@@ -142,13 +130,109 @@ async def on_ready():
      asyncio.create_task(twitch_loop())
      print(f"{printer_timestamp()} Twitch loop has been corectly created ! ")
 
+     # Open the JSON file and read its contents
+     with open("JSON Files/Global Data/setup_data.json", 'r') as file:
+      data = json.load(file)
+
+     # Iterate over each entry in the setup data
+     for entry in data:
+      guild_id = entry["Guild Id"]
+      guild_name = entry["Guild Name"]
+      news_role_id = entry["Created Role Id"]
+      channel_id = entry["Choosen Channel Id"]
+      autorole_mesage_id = entry["Autorole Mesage Id"]
+
+      if autorole_mesage_id == "":
+        continue
+
+      # Find the guild object
+      guild = client.get_guild(guild_id)
+      if guild is None:
+        print(f"Guild with ID {guild_id} not found.")
+        continue
+
+      # Find the channel object
+      channel = guild.get_channel(channel_id)
+      if channel is None:
+        print(f"Channel with ID {channel_id} not found in guild {guild.name}.")
+        continue
+      
+      # Find the role object
+      arabot_notif_role = guild.get_role(news_role_id)
+      if arabot_notif_role is None:
+
+        continue  
+
+      # Find the mesage object
+      old_mesage = await channel.fetch_message(autorole_mesage_id)
+      await old_mesage.delete()
+
+      # Give Role Embed
+      give_role_embed = discord.Embed(
+      title="**Auto Rôle**",
+      description=f"Cliquez sur le bouton ci-dessous pour obtenir le rôle <@&{arabot_notif_role.id}>",
+      color=discord.Color.from_rgb(3, 144, 252)
+      )
+      give_role_embed.add_field(name="A quoi ça sert ?", value=f"En obtenant le rôle <@&{arabot_notif_role.id}> vous êtes ainsi __abonnés__ aux *informations* concernant **l'Arabot**.")
+      give_role_embed.set_footer(text=version_note)
+
+      class ButtonView_give_roles(discord.ui.View):
+       def __init__(self):
+        super().__init__(timeout=None)
+
+       @discord.ui.button(style=discord.ButtonStyle.green, label="Obtenir", custom_id="button_obtain", emoji="➕")
+       async def button1_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        role = interaction.guild.get_role(arabot_notif_role.id)  # Get the role
+        await interaction.user.add_roles(role)  # Add the role to the user
+
+        given_autorole_embed = discord.Embed( 
+        title="",
+        description=f"{interaction.user.mention} tu as reçu le rôle <@&{arabot_notif_role.id}> !",
+        color=discord.Color.from_rgb(3, 144, 252)        
+        )
+
+        await interaction.response.send_message(embed=given_autorole_embed, ephemeral=True)
+
+       @discord.ui.button(style=discord.ButtonStyle.danger, label="Retirer", custom_id="button_remove", emoji="➖")
+       async def button2_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+         role = interaction.guild.get_role(arabot_notif_role.id)  # Get the role
+         user = interaction.user  # Get the user who clicked the button
+
+         await user.remove_roles(role)  # Remove the role from the user
+
+         removed_autorole_embed = discord.Embed( 
+         title="",
+         description=f"{user.mention} le rôle <@&{arabot_notif_role.id}> t'as été retiré !",
+         color=discord.Color.from_rgb(3, 144, 252)        
+         )
+         await interaction.response.send_message(embed=removed_autorole_embed, ephemeral=True)
+
+      # Find the channel object
+      channel = guild.get_channel(channel_id)
+
+      new_mesage = await channel.send(embed=give_role_embed, view=ButtonView_give_roles())
+
+      for entry in data:
+       if entry.get("Guild Name") == guild_name:
+        entry["Autorole Mesage Id"] = new_mesage.id
+        break
+
+      # Write the updated bot_setup_data to the JSON file
+      with open("JSON Files/Global Data/setup_data.json", 'w') as file:
+       json.dump(data, file)
+
+
+      
+
+
+
     
 
      print(f"{printer_timestamp()} Twitch Loop starting in 30 seconds...")
 
      bot_started_embed = discord.Embed(
         title=":green_circle: Succès ! :green_circle:",
-        description="**Le Bot a correctement démarré !**\n*__(N'oubliez pas de relancer les commandes nécessaires...)__* "
+        description="**Le bot a correctement démarré !**\n*__(N'oubliez pas de relancer les commandes nécessaires...)__* "
 
      )
 
@@ -898,7 +982,7 @@ class TESTSelectMenu(discord.ui.View):
 
 class AdminSelectMenu(discord.ui.View):
     def __init__(self):
-        super().__init__(timeout=10)
+        super().__init__(timeout=30)
 
 
 
@@ -954,81 +1038,96 @@ class AdminSelectMenu(discord.ui.View):
 
 @tree.command(name="blague", description="Raconte une blague")
 async def test_command(interaction: discord.Interaction):
-    blagues = BlaguesAPI(blagues_token)
+            with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
+              loaded_data = json.load(json_file)
 
-    blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV])
+            # Extract relevant data from loaded JSON using the specific guild ID
+            user_id = str(interaction.user.id)
+            user_data = loaded_data.get(user_id, {})
+            is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
 
-    joke = blague.joke
-    answer = blague.answer
-    type_blague = blague.type
+            if not user_data:
+              await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
+            else:
+              if not is_tos_accepted:    
+               await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+              else:  
+                blagues = BlaguesAPI(blagues_token)
 
-    hc_type_blague = type_blague[0].upper() + type_blague[1:]
+                blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV])
 
-    joke_embed = discord.Embed(
-        title="",
-        description="",
-        color=discord.Color.from_rgb(60, 240, 132)
-    )
-    joke_embed.add_field(name=f"{joke}", value=f"||{answer}||")
-    joke_embed.set_footer(text=f"{hc_type_blague} • Demandé à {datetime.now(france_tz).strftime('%H:%M')} par {interaction.user.global_name} | BlaguesAPI")
+                joke = blague.joke
+                answer = blague.answer
+                type_blague = blague.type
 
-    await interaction.response.send_message(embed=joke_embed)
+                hc_type_blague = type_blague[0].upper() + type_blague[1:]
+
+                joke_embed = discord.Embed(
+                 title="",
+                 description="",
+                 color=discord.Color.from_rgb(60, 240, 132)
+                )
+                joke_embed.add_field(name=f"{joke}", value=f"||{answer}||")
+                joke_embed.set_footer(text=f"{hc_type_blague} • Demandé à {datetime.now(france_tz).strftime('%H:%M')} par {interaction.user.global_name} | BlaguesAPI")
+
+                await interaction.response.send_message(embed=joke_embed)
 
 @tree.command(name="couscous", description="Partage un couscous avec quelqu'un")
-async def share_couscous_command(interaction: discord.Interaction, utilisateur: discord.User): 
-    couscous_gifs = [
-        "https://i.postimg.cc/0NzhwZ0T/couscous-gif-01.gif",
-        "https://i.postimg.cc/wM4GMmsq/couscous-gif-02.gif",
-        "https://i.postimg.cc/bv8cK1xW/couscous-gif-03.gif",
-        "https://i.postimg.cc/rs9QRt00/couscous-gif-04.gif"
-    ]
-
-    random_couscous_gif = random.choice(couscous_gifs)
-    
-    if isinstance(interaction.channel, discord.DMChannel):
-        await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les DM ! :no_entry_sign:", ephemeral=True)
-    else:
-        # Create random messages
-        random_messages = [
-            f"**{interaction.user.global_name}** partage un succulent couscous avec toi !\nBon appétit ! 🍲",
-            f"**{interaction.user.global_name}** t'offre un délicieux couscous.\nProfitez-en ! 🌟",
-            f"**{interaction.user.global_name}** a préparé un couscous spécial pour toi.\nC'est l'heure du festin ! 🎉",
-            f"**{interaction.user.global_name}** et **{utilisateur.global_name}** savourent un couscous ensemble.\nQuelqu'un veut la recette ! 📖",
-        ]
-
-        random_message = random.choice(random_messages)
-
-        # Create an embed for the couscous
-        couscous_embed = discord.Embed(
-            title="",
-            color=discord.Color.green()
-        )
-        couscous_embed.add_field(name="", value=random_message)
-        couscous_embed.set_image(url=random_couscous_gif)
-        couscous_embed.set_footer(text=version_note)
-
-        with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
-            loaded_data = json.load(json_file)
-
-        # Extract relevant data from loaded JSON using the specific guild ID
-        user_id = str(interaction.user.id)
-        user_data = loaded_data.get(user_id, {})
-        is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
-
-        if not user_data:
-            await interaction.response.send_message(content="Faites `/conditions` et réessayez !", ephemeral=True)
-        else:
-            if not is_tos_accepted:
-                await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+async def share_couscous_command(interaction: discord.Interaction, utilisateur: discord.User):
+            if isinstance(interaction.channel, discord.DMChannel):
+             await interaction.response.send_message(content="Vous ne pouvez pas utiliser cette commande dans les dm ! :no_entry_sign:", ephemeral=True)
             else:
-                if utilisateur.bot:
+
+             with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
+              loaded_data = json.load(json_file)
+
+             # Extract relevant data from loaded JSON using the specific guild ID
+             user_id = str(interaction.user.id)
+             user_data = loaded_data.get(user_id, {})
+             is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+
+             if not user_data:
+              await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
+             else:
+              if not is_tos_accepted:    
+               await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+              else:
+                 #
+                 couscous_gifs = [
+                 "https://i.postimg.cc/0NzhwZ0T/couscous-gif-01.gif",
+                 "https://i.postimg.cc/wM4GMmsq/couscous-gif-02.gif",
+                 "https://i.postimg.cc/bv8cK1xW/couscous-gif-03.gif",
+                 "https://i.postimg.cc/rs9QRt00/couscous-gif-04.gif"
+                 ]
+
+                 random_couscous_gif = random.choice(couscous_gifs)
+                 # Create random messages
+                 random_messages = [
+                 f"**{interaction.user.global_name}** partage un succulent couscous avec toi !\nBon appétit ! 🍲",
+                 f"**{interaction.user.global_name}** t'offre un délicieux couscous.\nProfitez-en ! 🌟",
+                 f"**{interaction.user.global_name}** a préparé un couscous spécial pour toi.\nC'est l'heure du festin ! 🎉",
+                 f"**{interaction.user.global_name}** et **{utilisateur.global_name}** savourent un couscous ensemble.\nQuelqu'un veut la recette ! 📖",
+                 ]
+
+                 random_message = random.choice(random_messages)
+
+                 # Create an embed for the couscous
+                 couscous_embed = discord.Embed(
+                    title="",
+                    color=discord.Color.green()
+                 )
+                 couscous_embed.add_field(name="", value=random_message)
+                 couscous_embed.set_image(url=random_couscous_gif)
+                 couscous_embed.set_footer(text=version_note)
+
+                 if utilisateur.bot:
                     no_couscous_bot_embed = discord.Embed(
                     title="",
                     description="**Pas sûr que les robots aiment le couscous...** 🤖🍲",
                     color=discord.Color.orange()
                     )
                     await interaction.response.send_message(embed=no_couscous_bot_embed, ephemeral=True)
-                else:
+                 else:
                     # Send the couscous embed with the random message
                     await interaction.response.send_message(content=utilisateur.mention,embed=couscous_embed)
    
@@ -1184,7 +1283,8 @@ async def setup(interaction: discord.Interaction):
                                 "Status": "Started",
                                 "Choosen Channel Name": "",
                                 "Choosen Channel Id": "",
-                                "Created Role Id": ""
+                                "Created Role Id": "",
+                                "Autorole Mesage Id": "",
                             })
 
                         with open("JSON Files/Global Data/setup_data.json", 'w') as file:
@@ -1334,7 +1434,7 @@ async def setup(interaction: discord.Interaction):
                     @discord.ui.button(style=discord.ButtonStyle.grey, label="Créer", custom_id="step_3", disabled=True)
                     async def button_step_3_callback(self, interaction: discord.Interaction, button):
                         print("Step 3")
-
+                        
                         role_name = "Arabot News"
 
                         global existing_role
@@ -1367,21 +1467,21 @@ async def setup(interaction: discord.Interaction):
 
                             arabot_notif_role = existing_role
 
-                            step_3_button = self.children[3]
-                            step_3_button.disabled = True
-                            step_3_button.style = discord.ButtonStyle.green
+                        step_3_button = self.children[3]
+                        step_3_button.disabled = True
+                        step_3_button.style = discord.ButtonStyle.green
 
-                            step_4_button = self.children[4]
-                            step_4_button.disabled = False
-                            step_4_button.style = discord.ButtonStyle.blurple
+                        step_4_button = self.children[4]
+                        step_4_button.disabled = False
+                        step_4_button.style = discord.ButtonStyle.blurple
 
-                            test_embed.title = f"4/4 Configuration du bot"
-                            test_embed.description = f"Vous y êtes presque !\n\nSi vous avez des questions ou simplement besoin d'aide, n'hésitez pas à rejoindre le [serveur support](https://discord.com/invite/uGWkqYazzw)."
+                        test_embed.title = f"4/4 Configuration du bot"
+                        test_embed.description = f"Vous y êtes presque !\n\nSi vous avez des questions ou simplement besoin d'aide, n'hésitez pas à rejoindre le [serveur support](https://discord.com/invite/uGWkqYazzw)."
 
                         await interaction.response.edit_message(view=self, embed=test_embed)
 
                         # Write the updated bot_setup_data to the JSON file
-                        with open("JSON Files/setup_data.json", 'w') as file:
+                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
                             json.dump(bot_setup_data, file)
 
                     @discord.ui.button(style=discord.ButtonStyle.grey, label="Ok", custom_id="step_4", disabled=True)
@@ -1436,36 +1536,39 @@ async def setup(interaction: discord.Interaction):
                         setup_modification_recap.add_field(name="", value=f"Le salon par défaut du bot est désormais le salon {choosen_channel_global_info.mention}.", inline=True)
 
                         if not existing_role:
-                            setup_modification_recap.add_field(name="", value=f"Le rôle {arabot_notif_role.mention} a été créé.", inline=False)
+                            setup_modification_recap.add_field(name="", value=f"Le rôle ***{arabot_notif_role.name}*** a été créé.", inline=False)
                         else:
-                            setup_modification_recap.add_field(name="", value=f"Le rôle {arabot_notif_role.mention} existait déjà sur le serveur, il n'a donc pas été créé à nouveau.", inline=False)
+                            setup_modification_recap.add_field(name="", value=f"Le rôle ***{arabot_notif_role.name}*** existait déjà sur le serveur, il n'a donc pas été créé à nouveau.", inline=False)
 
                         setup_modification_recap.set_author(name= interaction.user.global_name, icon_url= interaction.user.avatar.url)
 
                         setup_modification_recap.set_footer(text=f"{version_note}")
 
-                        setup_modification_recap_message = await choosen_channel_global_info.send(content=interaction.user.mention ,embed=setup_modification_recap)
+                        user_id = await client.fetch_user(interaction.user.id)
 
+                        setup_modification_recap_message = await user_id.send(embed=setup_modification_recap)
+
+            
                         test_embed.title = ""
                         test_embed.description = f"**Configuration Terminée !**\n*Cliquez [ici]({setup_modification_recap_message.jump_url}) pour accéder au récapitulatif des modifications.*"
 
-                        await choosen_channel_global_info.send(embed=give_role_embed, view=ButtonView_give_roles())
+                        autorole_message = await choosen_channel_global_info.send(embed=give_role_embed, view=ButtonView_give_roles())
 
                         for entry in bot_setup_data:
                             if entry.get("Guild Name") == guild_name:
                                 entry["Status"] = "Finished"
                                 entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
+                                entry["Autorole Mesage Id"] = autorole_message.id
+
                                 break  # Exit loop once the entry is found and updated
-
-                        # Write the updated bot_setup_data to the JSON file
-                        with open("JSON Files/setup_data.json", 'w') as file:
-                            json.dump(bot_setup_data, file)
-
                         step_4_button = self.children[4]
                         step_4_button.disabled = True
                         step_4_button.style = discord.ButtonStyle.grey
 
                         await interaction.response.edit_message(view=None, embed=test_embed)
+                        # Write the updated bot_setup_data to the JSON file
+                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
+                            json.dump(bot_setup_data, file)
 
                     @discord.ui.button(style=discord.ButtonStyle.red, label="Annuler", custom_id="cancel", disabled=False)
                     async def button_right_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -1479,6 +1582,10 @@ async def setup(interaction: discord.Interaction):
                           entry["Status"] = "Canceled"
                           entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
                           break  # Exit loop once the entry is found and updated
+
+                                                # Write the updated bot_setup_data to the JSON file
+                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
+                            json.dump(bot_setup_data, file)
 
                         await interaction.response.edit_message(view=None, embed=test_embed)
 
@@ -1553,7 +1660,7 @@ async def admin_panel(interaction: discord.Interaction):
                 view = AdminSelectMenu()
                 await interaction.response.send_message(content="Administration du bot :", view=view, ephemeral=True)
             else:
-                await interaction.response.send_message("Tu n'es pas autorisé a utiliser cette commande :no_entry_sign: ", ephemeral=True)
+                await interaction.response.send_message("Tu n'es pas autorisé a utiliser cette commande ! :no_entry_sign: ", ephemeral=True)
 
         except Exception as e:
             error_dminfo_embed = discord.Embed(
@@ -1572,8 +1679,6 @@ async def admin_panel(interaction: discord.Interaction):
 
             await USER_DM.send(embed=error_dminfo_embed)
             await interaction.response.send_message(embed=error_embed, ephemeral=True)
-
-      
 
 
 @tree.command(name="explosion", description="Boum !")
