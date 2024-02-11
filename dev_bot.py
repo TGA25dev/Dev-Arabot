@@ -46,8 +46,7 @@ TGA25_ID = 845327664143532053
 
 class aclient(discord.Client):
     def __init__(self):
-        super().__init__(intents = discord.Intents.all())
-        discord.Intents.messages = True        
+        super().__init__(intents = discord.Intents.all()) 
         self.synced = False 
 
 client = aclient()
@@ -1391,6 +1390,36 @@ async def setup(interaction: discord.Interaction):
 
                                 if choosen_channel_global_info and isinstance(choosen_channel_global_info, discord.TextChannel):
                                     print(f"User provided a valid channel: {choosen_channel_global_info.mention}")
+                                    # Iterate over each entry in the setup data
+                                    for entry in bot_setup_data:
+                                     guild_id = entry["Guild Id"]
+                                     guild_name = entry["Guild Name"]
+                                     news_role_id = entry["Created Role Id"]
+                                     channel_id = entry["Choosen Channel Id"]
+                                     autorole_mesage_id = entry["Autorole Mesage Id"]
+
+                                     if autorole_mesage_id == "":
+                                      continue
+
+                                     # Find the guild object
+                                     guild = client.get_guild(guild_id) #Probleme , salon choisi est different , bot trouve pas message, mauvais salon , meme problleme on_startup
+                                     if guild is None:
+                                      print(f"Guild with ID {guild_id} not found.")
+                                      continue
+
+                                     # Find the channel object
+                                     channel = guild.get_channel(channel_id)
+                                     if channel is None:
+                                      print(f"Channel with ID {channel_id} not found in guild {guild.name}.")
+                                      continue
+      
+                                     # Find the mesage object
+                                     old_mesage = await channel.fetch_message(autorole_mesage_id)
+                                     if old_mesage is None:
+                                        print(f"Message with ID {autorole_mesage_id} not found in guild {guild.name}.")
+                                     else:    
+                                      await old_mesage.delete()
+
 
                                     for entry in bot_setup_data:
                                         if entry.get("Guild Name") == guild_name:
@@ -1548,7 +1577,7 @@ async def setup(interaction: discord.Interaction):
 
                         setup_modification_recap_message = await user_id.send(embed=setup_modification_recap)
 
-            
+                        
                         test_embed.title = ""
                         test_embed.description = f"**Configuration Terminée !**\n*Cliquez [ici]({setup_modification_recap_message.jump_url}) pour accéder au récapitulatif des modifications.*"
 
@@ -2745,5 +2774,4 @@ async def explosion_command_system(interaction: discord.Interaction):
         pass
 
 
-        
 client.run(token)
