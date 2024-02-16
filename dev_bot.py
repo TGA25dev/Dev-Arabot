@@ -702,7 +702,7 @@ class ButtonView_settings(discord.ui.View):
      await interaction.message.edit(content="☠️", view=self)
      await asyncio.sleep(2)
 
-     print(f"The bot has been stopped by {user.name} !")
+     print(f"{printer_timestamp()} The bot has been stopped by {user.name} !")
 
      await client.close()
      os._exit(0) 
@@ -1094,7 +1094,7 @@ async def share_couscous_command(interaction: discord.Interaction, utilisateur: 
                      if utilisateur.bot:
                        no_couscous_bot_embed = discord.Embed(
                        title="",
-                       description="**Pas sûr que les robots aiment le couscous...** 🤖🍲",
+                       description="**Pas sûr que les robots aiment le couscous...** 🤖",
                        color=discord.Color.orange()
                        )
                        await interaction.response.send_message(embed=no_couscous_bot_embed, ephemeral=True)
@@ -1778,13 +1778,6 @@ async def explosion_command(interaction: discord.Interaction):
                      with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
                         json.dump(explosion_command_cooldown, f)
 
-
-
-
-
-
-
-
 @tree.command(name="vol", description="Vole le nom d'un utilisateur")
 async def vol_command(interaction: discord.Interaction, user: discord.Member):
     if isinstance(interaction.channel, discord.DMChannel):
@@ -1964,9 +1957,6 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                     await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
 
-          
-
-        
 @tree.command(name="help", description="Affiche les commandes disponibles")
 async def embed_command(interaction: discord.Interaction):
     if isinstance(interaction.channel, discord.DMChannel):
@@ -1988,10 +1978,7 @@ async def embed_command(interaction: discord.Interaction):
 
          if not is_tos_accepted:
             await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
-         else:
-            # Rest of the code for when TOS is accepted
-            # ...
-
+         else:    
             user_id = interaction.user.id
             command_name = interaction.data['name']
             command_id = interaction.data['id']
@@ -2024,12 +2011,6 @@ async def embed_command(interaction: discord.Interaction):
                 await USER_DM.send(embed=error_dminfo_embed)
                 await interaction.response.send_message(
                     embed=error_embed, ephemeral=True)
-
-        
-
-    
-
-
 
 
 @tree.command(name="info", description="Affiche des informations à propos du bot")
@@ -2150,7 +2131,6 @@ async def dev_info_command(interaction: discord.Interaction):
                 await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
 
-
 #Twitch Live Alert Loop
 
 async def twitch_loop():
@@ -2228,7 +2208,7 @@ async def twitch_loop():
 
                  twitch_live_embed.set_footer(text=f"{version_note}")
 
-                 await twitch_message_channel.send(content="@everyon e",embed=twitch_live_embed)
+                 await twitch_message_channel.send(content="@everyone",embed=twitch_live_embed)
                  print(f"{printer_timestamp()} Twitch Live Alert has been sent ! (in channel : {twitch_message_channel})")
 
             previous_status = current_status
@@ -2255,28 +2235,9 @@ async def twitch_loop():
      await asyncio.sleep(15)
 
 
-@tree.command(name="test", description="test_command")
-async def test_command(interaction: discord.Interaction):
-    print("test")
-
-
-
-
-
-         
-
-
-
-
-
-
-
-
-
-
-
-    
-
+#@tree.command(name="test", description="test_command")
+#async def test_command(interaction: discord.Interaction):
+#    print("test")
 
 async def explosion_command_system(interaction: discord.Interaction):
 
@@ -2697,8 +2658,6 @@ async def explosion_command_system(interaction: discord.Interaction):
 
         print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Channel unhiding started...")
 
-
-
         # Unhide all channels for the 'Explosion' role
         for channel in guild.text_channels:
             if channel.id != refuge_channel_id:
@@ -2710,7 +2669,6 @@ async def explosion_command_system(interaction: discord.Interaction):
         print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} All channels have been successfully unhidden !")
 
         
-
         explosion_refuge_embed.title = "**🟢 Explosion Terminée 🟢**"
         explosion_refuge_embed.description = "Le serveur est de nouveau accessible !"
 
@@ -2769,3 +2727,4 @@ async def explosion_command_system(interaction: discord.Interaction):
 
 
 client.run(token)
+#2730 Lines !
