@@ -1660,7 +1660,7 @@ async def admin_panel(interaction: discord.Interaction):
             )
 
             error_dminfo_embed.add_field(name="Details :",
-                                         value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
+                                         value=f"Erreur survenue <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
                                          inline=True)
             error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
             error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
@@ -1764,7 +1764,7 @@ async def explosion_command(interaction: discord.Interaction):
                         )
 
                         error_dminfo_embed.add_field(name="Details :",
-                                                     value=f"Erreur survenue il y a <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
+                                                     value=f"Erreur survenue <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
                                                      inline=True)
                         error_dminfo_embed.add_field(name="**Commande :**", value=f"`{command_name}`", inline=True)
                         error_dminfo_embed.add_field(name="**ID de la commande :**", value=f"`{command_id}`", inline=True)
@@ -1943,7 +1943,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                     )
 
                     error_dminfo_embed.add_field(
-                        name="Details :", value=f"Erreur survenue il y à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
+                        name="Details :", value=f"Erreur survenue <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`",
                         inline=True)
                     error_dminfo_embed.add_field(
                         name="**Commande :**", value=f"`{command_name}`", inline=True)
@@ -1999,7 +1999,7 @@ async def embed_command(interaction: discord.Interaction):
                 )
 
                 error_dminfo_embed.add_field(
-                    name="Details :", value=f"Erreur survenue il y a <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
+                    name="Details :", value=f"Erreur survenue <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
                 error_dminfo_embed.add_field(
                     name="**Commande :**", value=f"`{command_name}`", inline=True)
                 error_dminfo_embed.add_field(
@@ -2118,7 +2118,7 @@ async def dev_info_command(interaction: discord.Interaction):
                 )
 
                 error_dminfo_embed.add_field(
-                    name="Details :", value=f"Erreur survenue il y a à <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
+                    name="Details :", value=f"Erreur survenue <t:{generate_current_time_timestamp()}:R> dans le serveur `{guild_name}`", inline=True)
                 error_dminfo_embed.add_field(
                     name="**Commande :**", value=f"`{command_name}`", inline=True)
                 error_dminfo_embed.add_field(
