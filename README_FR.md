@@ -23,7 +23,7 @@ ___Vous voulez pas m'aider à écrire une description ... ?___
 
 ## Ajout du bot <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Hammer%20and%20Wrench.png" alt="Hammer and Wrench" width="25" height="25" />
 
-*Le lien sera disponible quand tout sera fini !* <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Construction.png" alt="Construction" width="25" height="25" />  
+*Cliquez [ici](https://bit.ly/4bzzAyd) pour ajouter le bot sur votre serveur !*
     
 ## Screenshots <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Camera%20with%20Flash.png" alt="Camera with Flash" width="25" height="25" />
 

@@ -2339,7 +2339,7 @@ async def explosion_command_system(interaction: discord.Interaction):
             # Send a message to the default or fallback channel
             if default_channel:
                 print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Message sending to :{default_channel.name} ({default_channel.id})")
-                await default_channel.send(content=f"@hee ! Rejoignez le salon <#{refuge_channel_id}> !")
+                await default_channel.send(content=f"@here ! Rejoignez le salon <#{refuge_channel_id}> !")
             elif fallback_channel:
                 print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Message sending to fallback channel: {fallback_channel.name} ({fallback_channel.id})")
                 await fallback_channel.send(content=f"@here ! Rejoignez le salon <#{refuge_channel_id}> !")
