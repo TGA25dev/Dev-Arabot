@@ -15,7 +15,6 @@ from blagues_api import BlaguesAPI
 from blagues_api import BlagueType
 import traceback
 
-
 with open("JSON Files/bot_config_data.json", 'r', encoding='utf-8') as file:
     data = json.load(file)
 
@@ -1022,18 +1021,8 @@ async def test_command(interaction: discord.Interaction):
             else:
               if not is_tos_accepted:    
                await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
-              else:
-                # Open the JSON file and read its contents
-                with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
-                 data = json.load(file)
-                 # Iterate over each entry in the setup data
-                for entry in data:
-                 guild_id = entry["Guild Id"]
 
-                if interaction.guild.id != guild_id:
-                 await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
-
-                else:   
+              else:   
                  blagues = BlaguesAPI(blagues_token)
 
                  blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV])
@@ -1074,18 +1063,6 @@ async def share_couscous_command(interaction: discord.Interaction, utilisateur: 
               if not is_tos_accepted:    
                await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
               else:
-                  #
-                  # Open the JSON file and read its contents
-                  with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
-                   data = json.load(file)
-                   # Iterate over each entry in the setup data
-                  for entry in data:
-                   guild_id = entry["Guild Id"]
-
-                  if interaction.guild.id != guild_id:
-                   await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
-
-                  else:
                      #
                      couscous_gifs = [
                      "https://i.postimg.cc/0NzhwZ0T/couscous-gif-01.gif",
@@ -1147,18 +1124,6 @@ async def server_info(interaction: discord.Interaction):
          if not is_tos_accepted:
             await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
          else:
-            # Open the JSON file and read its contents
-            with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
-             data = json.load(file)
-
-            # Iterate over each entry in the setup data
-            for entry in data:
-             guild_id = entry["Guild Id"]
-
-            if interaction.guild.id != guild_id:
-             await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
-
-            else:
                #   
                if interaction.guild.premium_tier == 0:
                 guild_boost_level = f"Aucun boost"
@@ -1725,20 +1690,24 @@ async def explosion_command(interaction: discord.Interaction):
             if not is_tos_accepted:
                 await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
             else:
-                if explosion_command_avalaible == False:
+                if explosion_command_avalaible == "False":
                     await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
                 else:
                     #
+                    bot_configured = False
                     # Open the JSON file and read its contents
                     with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
                      data = json.load(file)
-
                     # Iterate over each entry in the setup data
                     for entry in data:
                      guild_id = entry["Guild Id"]
 
-                    if interaction.guild.id != guild_id:
-                     await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
+                     if interaction.guild.id == guild_id:
+                      bot_configured = True
+                      break
+             
+                    if not bot_configured: 
+                     await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/setup`.", ephemeral=True)
 
                     else:
                     
@@ -1836,6 +1805,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
          if not is_tos_accepted:
             await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
          else:
+            bot_configured = False
             # Open the JSON file and read its contents
             with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
              data = json.load(file)
@@ -1844,14 +1814,20 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
             for entry in data:
              guild_id = entry["Guild Id"]
 
-            if interaction.guild.id != guild_id:
-             await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
-
+             if interaction.guild.id == guild_id:
+              bot_configured = True
+              break
+             
+            if not bot_configured: 
+              await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/setup`.", ephemeral=True)
+            
             else:
+
                     
-             if vol_command_avalaible == False:
+             if vol_command_avalaible == "False":
                 await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
-             elif vol_command_avalaible == True:
+
+             else:
                 user_id = interaction.user.id
                 command_name = interaction.data['name']
                 command_id = interaction.data['id']
@@ -1896,7 +1872,7 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
                             profile_image = open(profile_image_path, 'rb')
                             pfp = profile_image.read()
 
-                            await interaction.response.send_message(f"J'ai temporairement 'volé' le profil de <@{user.id}> :tada: ! ", ephemeral=True)
+                            await interaction.response.send_message(f"J'ai temporairement volé le profil de <@{user.id}> :tada: ! ", ephemeral=True)
 
                             try:
                                 await client.user.edit(avatar=pfp)
