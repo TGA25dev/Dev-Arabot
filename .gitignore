@@ -1,7 +1,11 @@
 # .gitignore
 
 Token/*.env
+JSON Files/Explosion_Command_Data/*.json
+JSON Files/Vol_Command_Data/*.json
+JSON Files/Global Data/*.json
 JSON Files/*.json
+
 Images\*.png
 
 favorites.json

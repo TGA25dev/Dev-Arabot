@@ -13,6 +13,48 @@ import time
 import re
 from blagues_api import BlaguesAPI
 from blagues_api import BlagueType
+import traceback
+
+
+with open("JSON Files/bot_config_data.json", 'r', encoding='utf-8') as file:
+    data = json.load(file)
+
+for entry in data:    
+ bot_mode_lc = entry["bot_mode_lc"]
+ bot_mode_hc = entry["bot_mode_hc"]
+ bot_mode_def = entry["bot_mode_def"]
+ TGA25_ID = entry["TGA25 ID"]
+ timezone = entry["Timezone"]
+ version_note_text = entry["Version Note"]
+ default_bot_nick_text = entry["Default Bot Nick"]
+ version_number = entry["Version Number"]
+ streamer_name = entry["Streamer Name"]
+
+ lock_icon_url = entry["lock_icon_url"]
+ clock12_icon_url = entry["clock12_icon_url"]
+ clock3_icon_url = entry["clock3_icon_url"]
+ clock1230_icon_url = entry["clock1230_icon_url"]
+ clock9_icon_url = entry["clock9_icon_url"]
+ unlock_icon_url = entry["unlock_icon_url"]
+ trash_icon_url = entry["trash_icon_url"]
+ tada_icon_url = entry["tada_icon_url"]
+
+ explosion_command_avalaible = entry["explosion_command_avalaible"]
+ vol_command_avalaible = entry["vol_command_avalaible"]
+ goomink_news_channel_id = entry["goomink_news_channel_id"]
+ setup_command_id = entry["setup_command_id"]
+ help_command_id = entry["help_command_id"]
+ explosion_command_id = entry["explosion_command_id"]
+ vol_command_id = entry["vol_command_id"]
+ effacer_dm_command_id = entry["effacer_dm_command_id"]
+ info_command_id = entry["info_command_id"]
+ dev_info_command_id = entry["dev_info_command_id"]
+ admin_command_id = entry["admin_command_id"]
+ conditions_command_id = entry["conditions_command_id"]
+ joke_command_id = entry["joke_command_id"]
+ share_couscous_command_id = entry["share_couscous_command_id"]
+ server_info_command_id = entry["server_info_command_id"]
+ support_command_id = entry["support_command_id"]
 
 
 #PATH
@@ -22,13 +64,6 @@ DEFAULT_PATH = os.getcwd()
 IMAGES_PATH = f"Images"
 
 TEXT_PATH = f"Text_Files"
-
-bot_mode_lc ="dev"
-bot_mode_hc = "DEV"
-bot_mode_def = "Dev"
-
-
-
 
 def printer_timestamp():
    return datetime.now().strftime("\033[1;90m %Y-%m-%d %H:%M:%S \033[0m")
@@ -40,9 +75,6 @@ global start_time
 start_time = datetime.now()
 
 print(f"\033[1m{printer_timestamp()} Token has been loaded ! \033[0m")
-
-TGA25_ID = 845327664143532053
-
 
 class aclient(discord.Client):
     def __init__(self):
@@ -99,192 +131,196 @@ async def on_ready():
     print(f"{printer_timestamp()} Bot ready !")
 
     try:
-     bot_starting_embed = discord.Embed(
-        title="**Lancement en cours... ⏳**",
-        description="**Le bot est en train de démarrer. Veuillez patienter...**"
-
-     )
-
-     USER_DM = await client.fetch_user(TGA25_ID)
-     message = await USER_DM.send(embed=bot_starting_embed)
-
-     await tree.sync()
-     print(f"{printer_timestamp()} Commands Synced !")
-
-     print(f"{printer_timestamp()} Logged in as {client.user.name} !") 
-
-     profile_image_path = f"{IMAGES_PATH}/Bot Logo/default_image_{bot_mode_lc}_bot.png"
-
-     profile_image = open(profile_image_path, "rb")
-     pfp = profile_image.read()
-        
-     await client.user.edit(avatar=pfp)
-
-     print(f"{printer_timestamp()} Profile image sucessfully restablished to default !")
-
-     
-     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"/help | {version_number}"))
-     print(f"{printer_timestamp()} Bot Status has been corectly set up !")
-
-     asyncio.create_task(twitch_loop())
-     print(f"{printer_timestamp()} Twitch loop has been corectly created ! ")
-
-     # Open the JSON file and read its contents
-     with open("JSON Files/Global Data/setup_data.json", 'r') as file:
-      data = json.load(file)
-
-     # Iterate over each entry in the setup data
-     for entry in data:
-      guild_id = entry["Guild Id"]
-      guild_name = entry["Guild Name"]
-      news_role_id = entry["Created Role Id"]
-      channel_id = entry["Choosen Channel Id"]
-      autorole_mesage_id = entry["Autorole Mesage Id"]
-
-      if autorole_mesage_id == "":
-        continue
-
-      # Find the guild object
-      guild = client.get_guild(guild_id)
-      if guild is None:
-        print(f"Guild with ID {guild_id} not found.")
-        continue
-
-      # Find the channel object
-      channel = guild.get_channel(channel_id)
-      if channel is None:
-        print(f"Channel with ID {channel_id} not found in guild {guild.name}.")
-        continue
-      
-      # Find the role object
-      arabot_notif_role = guild.get_role(news_role_id)
-      if arabot_notif_role is None:
-
-        continue  
-
-      # Find the mesage object
-      old_mesage = await channel.fetch_message(autorole_mesage_id)
-      await old_mesage.delete()
-
-      # Give Role Embed
-      give_role_embed = discord.Embed(
-      title="**Auto Rôle**",
-      description=f"Cliquez sur le bouton ci-dessous pour obtenir le rôle <@&{arabot_notif_role.id}>",
-      color=discord.Color.from_rgb(3, 144, 252)
-      )
-      give_role_embed.add_field(name="A quoi ça sert ?", value=f"En obtenant le rôle <@&{arabot_notif_role.id}> vous êtes ainsi __abonnés__ aux *informations* concernant **l'Arabot**.")
-      give_role_embed.set_footer(text=version_note)
-
-      class ButtonView_give_roles(discord.ui.View):
-       def __init__(self):
-        super().__init__(timeout=None)
-
-       @discord.ui.button(style=discord.ButtonStyle.green, label="Obtenir", custom_id="button_obtain", emoji="➕")
-       async def button1_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        role = interaction.guild.get_role(arabot_notif_role.id)  # Get the role
-        await interaction.user.add_roles(role)  # Add the role to the user
-
-        given_autorole_embed = discord.Embed( 
-        title="",
-        description=f"{interaction.user.mention} tu as reçu le rôle <@&{arabot_notif_role.id}> !",
-        color=discord.Color.from_rgb(3, 144, 252)        
+        bot_start_infos_embed = discord.Embed(
+            title="**Lancement en cours... ⏳**",
+            description="**Le bot est en train de démarrer. Veuillez patienter...**"
         )
 
-        await interaction.response.send_message(embed=given_autorole_embed, ephemeral=True)
+        USER_DM = await client.fetch_user(TGA25_ID)
+        startup_message = await USER_DM.send(embed=bot_start_infos_embed)
 
-       @discord.ui.button(style=discord.ButtonStyle.danger, label="Retirer", custom_id="button_remove", emoji="➖")
-       async def button2_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-         role = interaction.guild.get_role(arabot_notif_role.id)  # Get the role
-         user = interaction.user  # Get the user who clicked the button
+        await tree.sync()
+        print(f"{printer_timestamp()} Commands Synced !")
 
-         await user.remove_roles(role)  # Remove the role from the user
+        print(f"{printer_timestamp()} Logged in as {client.user.name} !")
 
-         removed_autorole_embed = discord.Embed( 
-         title="",
-         description=f"{user.mention} le rôle <@&{arabot_notif_role.id}> t'as été retiré !",
-         color=discord.Color.from_rgb(3, 144, 252)        
-         )
-         await interaction.response.send_message(embed=removed_autorole_embed, ephemeral=True)
+        profile_image_path = f"{IMAGES_PATH}/Bot Logo/default_image_{bot_mode_lc}_bot.png"
 
-      # Find the channel object
-      channel = guild.get_channel(channel_id)
+        profile_image = open(profile_image_path, "rb")
+        pfp = profile_image.read()
 
-      new_mesage = await channel.send(embed=give_role_embed, view=ButtonView_give_roles())
+        #await client.user.edit(avatar=pfp) #NE PAS OUBLIER DE REACTIVER !!!
 
-      for entry in data:
-       if entry.get("Guild Name") == guild_name:
-        entry["Autorole Mesage Id"] = new_mesage.id
-        break
+        print(f"{printer_timestamp()} Profile image sucessfully restablished to default !")
 
-      # Write the updated bot_setup_data to the JSON file
-      with open("JSON Files/Global Data/setup_data.json", 'w') as file:
-       json.dump(data, file)
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"/help | {version_number}"))
+        print(f"{printer_timestamp()} Bot Status has been corectly set up !")
+
+        asyncio.create_task(twitch_loop())
+        print(f"{printer_timestamp()} Twitch loop has been corectly created ! ")
+
+        # Open the JSON file and read its contents
+        with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+        # Iterate over each entry in the setup data
+        for entry in data:
+            guild_id = entry["Guild Id"]
+            guild_name = entry["Guild Name"]
+            news_role_id = entry["Created Role Id"]
+            channel_id = entry["Choosen Channel Id"]
+            autorole_message_id = entry["Autorole Mesage Id"]
+
+            guild = client.get_guild(guild_id)
+
+            if guild:
+                channel = guild.get_channel(channel_id)
+                # Find the role object
+                arabot_notif_role = guild.get_role(news_role_id)
+
+                if arabot_notif_role is None:    
+                    print(f"{printer_timestamp()} The notification role does not exists in guild {guild_name}")
+                    role_not_found_embed = discord.Embed(
+                    title="",
+                    description="**Le rôle de notication semble avoir été supprimé par quelqu'un...**\n*Merci de refaire* `/setup` *!*"      
+                    )
+                    setup_user_data = entry["Setup User Info"]
+                    setup_user_id = setup_user_data.split()[1]
+
+                    await channel.send(content=f"<@{setup_user_id}>", embed=role_not_found_embed)
+                    continue
+                
+                else:
+                 if channel:
+                    if autorole_message_id:
+                        try:
+                         autorole_message = await channel.fetch_message(autorole_message_id)
+                         if autorole_message:
+                            await autorole_message.delete()
+                            print(f"{printer_timestamp()} Deleted message with ID {autorole_message_id} in channel {channel.name} in guild {guild.name}")
+                            # Give Role Embed
+
+                            give_role_embed = discord.Embed(
+                             title="**Auto Rôle**",
+                             description=f"Cliquez sur le bouton ci-dessous pour obtenir le rôle <@&{arabot_notif_role.id}>",
+                             color=discord.Color.from_rgb(3, 144, 252)
+                            )
+                            give_role_embed.add_field(name="A quoi ça sert ?", value=f"En obtenant le rôle <@&{arabot_notif_role.id}> vous êtes ainsi __abonnés__ aux *informations* concernant **l'Arabot**.")
+                            give_role_embed.set_footer(text=version_note)
+
+                            class ButtonView_give_roles(discord.ui.View):
+                             def __init__(self):
+                              super().__init__(timeout=None)
+
+                             @discord.ui.button(style=discord.ButtonStyle.green, label="Obtenir", custom_id="button_obtain", emoji="➕")
+                             async def button1_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+                              role = interaction.guild.get_role(arabot_notif_role.id)  # Get the role
+                              await interaction.user.add_roles(role)  # Add the role to the user
+
+                              given_autorole_embed = discord.Embed(
+                              title="",
+                              description=f"{interaction.user.mention} tu as reçu le rôle <@&{arabot_notif_role.id}> !",
+                              color=discord.Color.from_rgb(3, 144, 252)
+                              )
+
+                              await interaction.response.send_message(embed=given_autorole_embed, ephemeral=True)
+
+                             @discord.ui.button(style=discord.ButtonStyle.danger, label="Retirer", custom_id="button_remove", emoji="➖")
+                             async def button2_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+                              role = interaction.guild.get_role(arabot_notif_role.id)  # Get the role
+                              user = interaction.user  # Get the user who clicked the button
+
+                              removed_autorole_embed = discord.Embed(
+                              title="",
+                              description=f"{user.mention} le rôle {arabot_notif_role.mention} t'as été retiré ! !",
+                              color=discord.Color.from_rgb(3, 144, 252)
+                              )
+
+                              await user.remove_roles(role)  # Remove the role from the user
+                              
+                              await interaction.response.send_message(embed=removed_autorole_embed, ephemeral=True)
+
+                            # Find the channel object
+                            channel = guild.get_channel(channel_id)
+
+                            new_message = await channel.send(embed=give_role_embed, view=ButtonView_give_roles())
+
+                            entry["Autorole Mesage Id"] = new_message.id
+
+                        except:
+                           channel = guild.get_channel(channel_id)
+
+                           print(f"{printer_timestamp()} Message with ID {autorole_message_id} not found in channel {channel.name} in guild {guild_name}")
+                           setup_user_data = entry["Setup User Info"]
+                           setup_user_id = setup_user_data.split()[1]
+
+                           
+                           msg_not_found_embed = discord.Embed(
+                              title="",
+                              description="**Il semblerait que le message de l'autorole ai été supprimé...**\n*Merci de refaire* `/setup` *!*"      
+                           )
+                           await channel.send(content=f"<@{setup_user_id}>", embed=msg_not_found_embed)
+                           continue
+
+                 else:
+                  print(f"{printer_timestamp()} Channel with ID {channel_id} not found in guild {guild_id}")
+            else:
+                print(f"{printer_timestamp()} Guild with ID {guild_id} not found")
+
+        # Write the updated bot_setup_data to the JSON file
+        with open("JSON Files/Global Data/setup_data.json", 'w', encoding='utf-8') as file:
+            json.dump(data, file,  ensure_ascii=False)
 
 
-      
+        print(f"{printer_timestamp()} Twitch Loop starting in 30 seconds...")
 
+        bot_start_infos_embed.title = ":green_circle: Succès ! :green_circle:"
+        bot_start_infos_embed.description = "**Le bot a correctement démarré !**"
 
+        await asyncio.sleep(3)
 
-    
+        await startup_message.edit(embed=bot_start_infos_embed)
 
-     print(f"{printer_timestamp()} Twitch Loop starting in 30 seconds...")
+        with open("JSON Files/Global Data/starting_time_average.json", 'r') as file:
+            time_data = json.load(file)
 
-     bot_started_embed = discord.Embed(
-        title=":green_circle: Succès ! :green_circle:",
-        description="**Le bot a correctement démarré !**\n*__(N'oubliez pas de relancer les commandes nécessaires...)__* "
+        end_time = datetime.now()
+        time_taken = round((end_time - start_time).total_seconds(), 1)
 
-     )
+        time_data.append({
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "time_taken": time_taken
+        })
 
-     await asyncio.sleep(3)
+        # Save the updated data back to the file
+        with open("JSON Files/Global Data/starting_time_average.json", 'w') as file:
+            json.dump(time_data, file)
 
-     await message.edit(embed=bot_started_embed)
+        time_taken_values = [entry['time_taken'] for entry in time_data]
 
-     try:
-      with open("JSON Files/Global Data/starting_time_average.json", 'r') as file:
-        time_data = json.load(file)
-     except FileNotFoundError:
-      time_data = []
+        average_time_taken = round(sum(time_taken_values) / len(time_taken_values), 1)
 
-     end_time = datetime.now()
-     time_taken = round((end_time - start_time).total_seconds(), 1)
+        print(f"{printer_timestamp()}\033[1;92m All startup operations have been completed in {time_taken}s ! \033[0m\033[1;35m(average is {average_time_taken}s)\033[0m")
 
-
-     time_data.append({
-     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-     "time_taken": time_taken
-     })
-
-# Save the updated data back to the file
-     with open("JSON Files/Global Data/starting_time_average.json", 'w') as file:
-      json.dump(time_data, file)
-
-     time_taken_values = [entry['time_taken'] for entry in time_data]
-
-     average_time_taken = round(sum(time_taken_values) / len(time_taken_values), 1)
-
-     
-
-     print(f"{printer_timestamp()}\033[1;92m All startup operations have been completed in {time_taken}s ! \033[0m\033[1;35m(average is {average_time_taken}s)\033[0m")
-
-     global is_ready
-     is_ready = True
+        global is_ready
+        is_ready = True
 
     except Exception as e:
-       print(f"{printer_timestamp()} \033[1;91mAn error has occured during bot starting : \033[0m \033[91m{e} \033[0m")
-       bot_start_error = discord.Embed(
-          title="**:red_circle: Une erreur est survenue lors du démarage du bot :red_circle: **",
-          description=f"**Detail de l'erreur :** `{e}` "
-          
-       )
-       USER_DM = await client.fetch_user(TGA25_ID)
-       await USER_DM.send(embed=bot_start_error)
-       print(f"{printer_timestamp()} \033[1;34mWaiting....\033[0m")
+        print(f"{printer_timestamp()} \033[1;91mAn error has occured during bot starting : \033[0m \033[91m{e} \033[0m")
 
-       await asyncio.sleep(10)
-       print(f"{printer_timestamp()} \033[1;33mBot stoping....\033[0m")
+        bot_start_infos_embed.title="**:red_circle: Une erreur est survenue lors du démarage du bot :red_circle: **"
+        bot_start_infos_embed.description=f"**Detail de l'erreur :** `{e}`\n\n{traceback.print_exc()}"
+        
+        USER_DM = await client.fetch_user(TGA25_ID)
+        await startup_message.edit(embed=bot_start_infos_embed)
+        print(f"{printer_timestamp()} \033[1;34mWaiting....\033[0m")
 
-       await client.close()
-       os._exit(0)
+        await asyncio.sleep(10)
+        print(f"{printer_timestamp()} \033[1;33mBot stoping....\033[0m")
+
+        await client.close()
+        os._exit(0)
+
        
 
 #BOT DISCONECT EVENT HANDLING
@@ -303,84 +339,19 @@ async def on_disconnect():
             await asyncio.sleep(30)
 
 
-#VARIABLES   
-         
+#VARIABLES         
 restart_time = datetime.now()
 tree = app_commands.CommandTree(client)
-france_tz = pytz.timezone("Europe/Paris")
-version_note = f"{bot_mode_def} Arabot v2.0 | Ink Corp |✨TGA25✨"
 maintenance_mode = False
-default_bot_nick = f"{bot_mode_def} Arabot"
-version_number = "v2.0"
-
-streamer_name = ("Locklear")
-
-lock_icon_url = "https://i.postimg.cc/MTG44vm8/lock-icon.png"
-clock12_icon_url = "https://i.postimg.cc/nrCysCX1/clock12-icon.png"
-clock3_icon_url = "https://i.postimg.cc/SRFPKDpm/clock3-icon.png"
-clock1230_icon_url = "https://i.postimg.cc/2yQKLhzh/clock1230-icon.png"
-clock9_icon_url = "https://i.postimg.cc/7ZYWb5jJ/clock9-icon.png"
-unlock_icon_url = "https://i.postimg.cc/X7gPVf10/unlock-icon.png"
-trash_icon_url = "https://i.postimg.cc/1z6SZ7Fm/trash-icon.png"
-tada_icon_url = "https://i.postimg.cc/zvrbZPGK/tada-icon.png"
+france_tz = pytz.timezone(timezone)
+version_note = f"{bot_mode_def} {version_note_text}"
+default_bot_nick = f"{bot_mode_def} {default_bot_nick_text}"
 
 def generate_current_time_timestamp():
    discord_current_time = datetime.now(france_tz)
    current_time_timestamp = int(discord_current_time.timestamp())
    return current_time_timestamp
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-explosion_command_avalaible = True
-vol_command_avalaible = True
-
-#ID'S VARIABLES
-
-#TO MODIFY !!!!
-
-goomink_news_channel_id = 1193954102670020648
-
-            
-bot_channel = 1120723328307581003
-
-
-
-setup_command_id = 1184232293691293726
-
-help_command_id = 1098204837612617731
-
-explosion_command_id = 1119281805477036194
-
-vol_command_id = 1119281805477036195
-
-effacer_dm_command_id = 1184924715480006707
-
-info_command_id = 1119281805477036197
-
-dev_info_command_id = 1108432433830965340
-
-admin_command_id = 1098204837612617733
-
-conditions_command_id = 1190253770379120722
-
-joke_command_id = 1201271328745992252
-
-share_couscous_command_id = 1191482935258398774
-
-server_info_command_id = 1190775361009635428
-
-support_command_id = 1205262201229942795
 
 
 #EVENTS
@@ -757,7 +728,7 @@ class ButtonView_settings(discord.ui.View):
      maintenance_mode=False
 
      # Open the JSON file and read its contents
-     with open("JSON Files/Global Data/setup_data.json", 'r') as file:
+     with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
       data = json.load(file)
 
      # Iterate over each entry in the setup data
@@ -767,8 +738,9 @@ class ButtonView_settings(discord.ui.View):
       news_role_id = entry["Created Role Id"]
 
       # Find the guild object
-      guild = client.get_guild(guild_id)
-      if guild is None:
+      if guild_name == guild.name:
+       guild = client.get_guild(guild_id)
+       if guild is None:
         print(f"Guild with ID {guild_id} not found.")
         continue
 
@@ -1050,26 +1022,37 @@ async def test_command(interaction: discord.Interaction):
             else:
               if not is_tos_accepted:    
                await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
-              else:  
-                blagues = BlaguesAPI(blagues_token)
+              else:
+                # Open the JSON file and read its contents
+                with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
+                 data = json.load(file)
+                 # Iterate over each entry in the setup data
+                for entry in data:
+                 guild_id = entry["Guild Id"]
 
-                blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV])
+                if interaction.guild.id != guild_id:
+                 await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
 
-                joke = blague.joke
-                answer = blague.answer
-                type_blague = blague.type
+                else:   
+                 blagues = BlaguesAPI(blagues_token)
 
-                hc_type_blague = type_blague[0].upper() + type_blague[1:]
+                 blague = await blagues.random(disallow=[BlagueType.GLOBAL, BlagueType.DEV])
 
-                joke_embed = discord.Embed(
-                 title="",
-                 description="",
-                 color=discord.Color.from_rgb(60, 240, 132)
-                )
-                joke_embed.add_field(name=f"{joke}", value=f"||{answer}||")
-                joke_embed.set_footer(text=f"{hc_type_blague} • Demandé à {datetime.now(france_tz).strftime('%H:%M')} par {interaction.user.global_name} | BlaguesAPI")
+                 joke = blague.joke
+                 answer = blague.answer
+                 type_blague = blague.type
 
-                await interaction.response.send_message(embed=joke_embed)
+                 hc_type_blague = type_blague[0].upper() + type_blague[1:]
+
+                 joke_embed = discord.Embed(
+                  title="",
+                  description="",
+                  color=discord.Color.from_rgb(60, 240, 132)
+                 )
+                 joke_embed.add_field(name=f"{joke}", value=f"||{answer}||")
+                 joke_embed.set_footer(text=f"{hc_type_blague} • Demandé à {datetime.now(france_tz).strftime('%H:%M')} par {interaction.user.global_name} | BlaguesAPI")
+
+                 await interaction.response.send_message(embed=joke_embed)
 
 @tree.command(name="couscous", description="Partage un couscous avec quelqu'un")
 async def share_couscous_command(interaction: discord.Interaction, utilisateur: discord.User):
@@ -1091,44 +1074,56 @@ async def share_couscous_command(interaction: discord.Interaction, utilisateur: 
               if not is_tos_accepted:    
                await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
               else:
-                 #
-                 couscous_gifs = [
-                 "https://i.postimg.cc/0NzhwZ0T/couscous-gif-01.gif",
-                 "https://i.postimg.cc/wM4GMmsq/couscous-gif-02.gif",
-                 "https://i.postimg.cc/bv8cK1xW/couscous-gif-03.gif",
-                 "https://i.postimg.cc/rs9QRt00/couscous-gif-04.gif"
-                 ]
+                  #
+                  # Open the JSON file and read its contents
+                  with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
+                   data = json.load(file)
+                   # Iterate over each entry in the setup data
+                  for entry in data:
+                   guild_id = entry["Guild Id"]
 
-                 random_couscous_gif = random.choice(couscous_gifs)
-                 # Create random messages
-                 random_messages = [
-                 f"**{interaction.user.global_name}** partage un succulent couscous avec toi !\nBon appétit ! 🍲",
-                 f"**{interaction.user.global_name}** t'offre un délicieux couscous.\nProfitez-en ! 🌟",
-                 f"**{interaction.user.global_name}** a préparé un couscous spécial pour toi.\nC'est l'heure du festin ! 🎉",
-                 f"**{interaction.user.global_name}** et **{utilisateur.global_name}** savourent un couscous ensemble.\nQuelqu'un veut la recette ! 📖",
-                 ]
+                  if interaction.guild.id != guild_id:
+                   await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
 
-                 random_message = random.choice(random_messages)
+                  else:
+                     #
+                     couscous_gifs = [
+                     "https://i.postimg.cc/0NzhwZ0T/couscous-gif-01.gif",
+                     "https://i.postimg.cc/wM4GMmsq/couscous-gif-02.gif",
+                     "https://i.postimg.cc/bv8cK1xW/couscous-gif-03.gif",
+                     "https://i.postimg.cc/rs9QRt00/couscous-gif-04.gif"
+                     ]
 
-                 # Create an embed for the couscous
-                 couscous_embed = discord.Embed(
-                    title="",
-                    color=discord.Color.green()
-                 )
-                 couscous_embed.add_field(name="", value=random_message)
-                 couscous_embed.set_image(url=random_couscous_gif)
-                 couscous_embed.set_footer(text=version_note)
+                     random_couscous_gif = random.choice(couscous_gifs)
+                     # Create random messages
+                     random_messages = [
+                     f"**{interaction.user.global_name}** partage un succulent couscous avec toi !\nBon appétit ! 🍲",
+                     f"**{interaction.user.global_name}** t'offre un délicieux couscous.\nProfitez-en ! 🌟",
+                     f"**{interaction.user.global_name}** a préparé un couscous spécial pour toi.\nC'est l'heure du festin ! 🎉",
+                     f"**{interaction.user.global_name}** et **{utilisateur.global_name}** savourent un couscous ensemble.\nQuelqu'un veut la recette ! 📖",
+                     ]
 
-                 if utilisateur.bot:
-                    no_couscous_bot_embed = discord.Embed(
-                    title="",
-                    description="**Pas sûr que les robots aiment le couscous...** 🤖🍲",
-                    color=discord.Color.orange()
-                    )
-                    await interaction.response.send_message(embed=no_couscous_bot_embed, ephemeral=True)
-                 else:
-                    # Send the couscous embed with the random message
-                    await interaction.response.send_message(content=utilisateur.mention,embed=couscous_embed)
+                     random_message = random.choice(random_messages)
+
+                     # Create an embed for the couscous
+                     couscous_embed = discord.Embed(
+                       title="",
+                       color=discord.Color.green()
+                     )
+                     couscous_embed.add_field(name="", value=random_message)
+                     couscous_embed.set_image(url=random_couscous_gif)
+                     couscous_embed.set_footer(text=version_note)
+
+                     if utilisateur.bot:
+                       no_couscous_bot_embed = discord.Embed(
+                       title="",
+                       description="**Pas sûr que les robots aiment le couscous...** 🤖🍲",
+                       color=discord.Color.orange()
+                       )
+                       await interaction.response.send_message(embed=no_couscous_bot_embed, ephemeral=True)
+                     else:
+                       # Send the couscous embed with the random message
+                       await interaction.response.send_message(content=utilisateur.mention,embed=couscous_embed)
    
           
 
@@ -1152,55 +1147,68 @@ async def server_info(interaction: discord.Interaction):
          if not is_tos_accepted:
             await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
          else:
-             #
-            if interaction.guild.premium_tier == 0:
-             guild_boost_level = f"Aucun boost"
+            # Open the JSON file and read its contents
+            with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
+             data = json.load(file)
 
-            elif interaction.guild.premium_tier == 1:
-             guild_boost_level = f"Niveau 1 {interaction.guild.premium_subscription_count} boost(s)"
+            # Iterate over each entry in the setup data
+            for entry in data:
+             guild_id = entry["Guild Id"]
 
-            elif interaction.guild.premium_tier == 2:
-             guild_boost_level = f"Niveau 2 {interaction.guild.premium_subscription_count} boost(s)"
+            if interaction.guild.id != guild_id:
+             await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
 
-            elif interaction.guild.premium_tier == 3:
-             guild_boost_level = f"Niveau 3 {interaction.guild.premium_subscription_count} boost(s)"             
+            else:
+               #   
+               if interaction.guild.premium_tier == 0:
+                guild_boost_level = f"Aucun boost"
 
-            bot_members = [member for member in interaction.guild.members if member.bot]
-            server_stat_embed = discord.Embed(
-            title="Quelques infos sur ce serveur :information_source:",
+               elif interaction.guild.premium_tier == 1:
+                guild_boost_level = f"Niveau 1 {interaction.guild.premium_subscription_count} boost(s)"
+
+               elif interaction.guild.premium_tier == 2:
+                guild_boost_level = f"Niveau 2 {interaction.guild.premium_subscription_count} boost(s)"
+
+               elif interaction.guild.premium_tier == 3:
+                guild_boost_level = f"Niveau 3 {interaction.guild.premium_subscription_count} boost(s)"             
+
+               bot_members = [member for member in interaction.guild.members if member.bot]
+               text_channels = [channel for channel in interaction.guild.channels if isinstance(channel, discord.TextChannel) or isinstance(channel, discord.VoiceChannel)]
+
+               server_stat_embed = discord.Embed(
+               title="Quelques infos à propose de ce serveur :information_source:",
         
-            description=f"*__{interaction.guild.name} ({interaction.guild.id})__*\n**{len(interaction.guild.channels)} salons • {len(interaction.guild.threads)} fils • {len(interaction.guild.roles)} roles • {len(bot_members)} bots**",
-            color=discord.Color.from_rgb(3, 165, 252)
-            )
-            server_stat_embed.set_thumbnail(url=interaction.guild.icon)
+               description=f"*__{interaction.guild.name} ({interaction.guild.id})__*\n**{len(text_channels)} salons • {len(interaction.guild.threads)} fils • {len(interaction.guild.roles)} rôles • {len(bot_members)} bots**",
+               color=discord.Color.from_rgb(3, 165, 252)
+               )
+               server_stat_embed.set_thumbnail(url=interaction.guild.icon)
 
-            server_stat_embed.add_field(name="Membres :", value=interaction.guild.member_count, inline=True)
+               server_stat_embed.add_field(name="Membres :", value=interaction.guild.member_count, inline=True)
 
-            server_stat_embed.add_field(name="Propriétaire :", value=f"<@{interaction.guild.owner.id}>", inline=True)
+               server_stat_embed.add_field(name="Propriétaire :", value=f"<@{interaction.guild.owner.id}>", inline=True)
 
-            server_stat_embed.add_field(name="Boost :", value=guild_boost_level)
+               server_stat_embed.add_field(name="Boost :", value=guild_boost_level)
 
-            server_stat_embed.add_field(name="Création du serveur", value=f"<t:{int(interaction.guild.created_at.timestamp())}:F>")
+               server_stat_embed.add_field(name="Création du serveur", value=f"<t:{int(interaction.guild.created_at.timestamp())}:F>")
 
-            bot_member = interaction.guild.get_member(client.user.id)
+               bot_member = interaction.guild.get_member(client.user.id)
 
-            server_stat_embed.add_field(name="Date d'ajout de l'Arabot :", value=f"<t:{(int(bot_member.joined_at.timestamp()))}:F>")
+               server_stat_embed.add_field(name="Date d'ajout de l'Arabot :", value=f"<t:{(int(bot_member.joined_at.timestamp()))}:F>")
                       
-            server_stat_embed.set_footer(text=version_note)
+               server_stat_embed.set_footer(text=version_note)
 
-            await interaction.response.send_message(embed=server_stat_embed)
+               await interaction.response.send_message(embed=server_stat_embed)
 
 
 @tree.command(name="support", description="Besoin d'aide ? Rejoignez le serveur support !")
 async def support_command(interaction: discord.Interaction):
-
-    class ButtonView_support(discord.ui.View):                
-        def __init__(self):
+         class ButtonView_support(discord.ui.View):                
+          def __init__(self):
             super().__init__(timeout=None)
 
             super().add_item(discord.ui.Button(style=discord.ButtonStyle.link, label="Serveur Support", url="https://discord.com/invite/uGWkqYazzw"))
 
-    await interaction.response.send_message("Cliquez [ici](https://discord.com/invite/uGWkqYazzw) pour rejoindre le serveur support.", view=ButtonView_support(), ephemeral=True)
+         await interaction.response.send_message("Cliquez [ici](https://discord.com/invite/uGWkqYazzw) pour rejoindre le serveur support.", view=ButtonView_support(), ephemeral=True)
 
 
 
@@ -1225,7 +1233,7 @@ async def setup(interaction: discord.Interaction):
             else:
                 test_embed = discord.Embed(
                     title="Configuration du bot",
-                    description= f"**Seules les personnes avec la permission** `Administrateur` **sont autorisées à configurer le bot.**\n\n*Vérifiez que vous possédez cette permission et appuyez sur* **Commencer**",
+                    description= f"Les personnes disposant de la permission `Administrateur` sont les seules autorisées à configurer le bot.\n\nPour démarrer la configuration, assurez-vous que vous avez cette permission et appuyez sur **Commencer**.",
                     color=discord.Color.from_rgb(252, 165, 119)
                 )
 
@@ -1237,104 +1245,101 @@ async def setup(interaction: discord.Interaction):
                     @discord.ui.button(style=discord.ButtonStyle.blurple, label="Commencer", custom_id="start", disabled=False)
                     async def button_start_callback(self, interaction: discord.Interaction, button):
                         try:
-                            with open("JSON Files/Global Data/setup_data.json", 'r') as file:
+                            with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
                                 global bot_setup_data
                                 bot_setup_data = json.load(file)
                         except FileNotFoundError:
                             bot_setup_data = []  
 
-                        print("Start")
+                        print(f"{printer_timestamp()} Setup has been started in guild {interaction.guild.name}")
 
                         guild = interaction.guild
                         admin_role_ids = [role.id for role in guild.roles if role.permissions.administrator and not role.managed]
 
-                        if admin_role_ids:
+                        if not admin_role_ids:
+                            print(f"{printer_timestamp()}No non-bot roles found with 'Admin' permission in guild {interaction.guild.name}")
+                            test_embed.description = "Hum... :face_with_monocle:\nOn dirait bien qu'il n'y a aucun rôle avec la permission requise !"
+
+                        else:
                             role_mentions = [f"<@&{role_id}>" for role_id in admin_role_ids]
                             roles = ', '.join(role_mentions)
-                        else:
-                            print("No non-bot roles found with 'Admin' permission.")
+                            # Update embed title and description
+                            test_embed.title = "1/4 Configuration du bot"
 
-                        # Update embed title and description
-                        test_embed.title = "1/4 Configuration du bot"
+                            user = interaction.user
 
-                        user = interaction.user
+                            admin_role_ids = [role.id for role in guild.roles if role.permissions.administrator and not role.managed]
 
-                        admin_role_ids = [role.id for role in guild.roles if role.permissions.administrator and not role.managed]
+                            has_admin_role = any(role.id in admin_role_ids for role in user.roles)
 
-                        has_admin_role = any(role.id in admin_role_ids for role in user.roles)
+                            global guild_name
+                            global guild_id
+                            global setup_user_name
+                            global setup_user_id
 
-                        global guild_name
-                        global guild_id
-                        global setup_user_name
-                        global setup_user_id
+                            guild_name = interaction.guild.name
+                            guild_id = interaction.guild.id
+                            setup_user_name = interaction.user.global_name
+                            setup_user_id = interaction.user.id
 
-                        guild_name = interaction.guild.name
-                        guild_id = interaction.guild.id
-                        setup_user_name = interaction.user.global_name
-                        setup_user_id = interaction.user.id
-
-                        if guild_name not in [entry.get("Guild Name") for entry in bot_setup_data]:
-                            bot_setup_data.append({
+                            if guild_name not in [entry.get("Guild Name") for entry in bot_setup_data]:
+                             bot_setup_data.append({
                                 "Guild Name": guild_name,
                                 "Guild Id": guild_id,
-                                "Setup User Info": f"{setup_user_name} {setup_user_id}",
+                                "Setup User Info": "",
                                 "Timestamp": datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S"),
                                 "Status": "Started",
                                 "Choosen Channel Name": "",
                                 "Choosen Channel Id": "",
                                 "Created Role Id": "",
                                 "Autorole Mesage Id": "",
-                            })
+                             })
 
-                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
-                            json.dump(bot_setup_data, file)
+                            with open("JSON Files/Global Data/setup_data.json", 'w', encoding='utf-8') as file:
+                             json.dump(bot_setup_data, file, ensure_ascii=False)
 
-                        if not has_admin_role:
-                            test_embed.description  =f"**Vous n'avez pas les permissions nécessaires !**\n\n*Veuillez demander à un utilisateur avec le(s) role(s) :*\n{roles}"
-                            for entry in bot_setup_data:
+                            if not has_admin_role:
+                             test_embed.description  =f"**Vous n'avez pas les permissions nécessaires !**\n\n*Veuillez demander à un utilisateur avec le(s) role(s) :*\n{roles}"
+                             for entry in bot_setup_data:
                                 if entry.get("Guild Name") == guild_name:
                                     entry["Status"] = "Admin Error"
                                     entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
                                     break  # Exit loop once the entry is found and updated  
-                        else:
-                            print("roles ok")
-                            for entry in bot_setup_data:
+                            else:
+                             for entry in bot_setup_data:
                                 if entry.get("Guild Name") == guild_name:
                                     entry["Status"] = "Admin Role Finished"
                                     entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
+                                    entry["Setup User Info"] = f"{setup_user_name} {setup_user_id}"
                                     break  # Exit loop once the entry is found and updated
 
-                            # Hide the "Commencer" button
-                            start_button = self.children[0]
-                            start_button.disabled = True
-                            start_button.style = discord.ButtonStyle.green
+                             # Hide the "Commencer" button
+                             start_button = self.children[0]
+                             start_button.disabled = True
+                             start_button.style = discord.ButtonStyle.green
 
-                            # Show the "Etape 1" button
-                            step_1_button = self.children[1]
-                            step_1_button.disabled = False
-                            step_1_button.style = discord.ButtonStyle.blurple
+                             # Show the "Etape 1" button
+                             step_1_button = self.children[1]
+                             step_1_button.disabled = False
+                             step_1_button.style = discord.ButtonStyle.blurple
 
-                            test_embed.title = "1/4 Configuration du bot"
-                            test_embed.description = "Pour que le bot fonctionne correctement, il a besoin d'être en haut de la liste des rôles.\n\nPlacez-le en haut puis cliquez sur **Vérifier**"
+                             test_embed.title = "1/4 Configuration du bot"
+                             test_embed.description = "Pour que le bot fonctionne correctement, il doit être en haut de la liste des rôles.\n\nPlacez-le en haut puis cliquez sur **Vérifier**."
 
                         # Write the updated bot_setup_data to the JSON file
-                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
-                            json.dump(bot_setup_data, file)
+                        with open("JSON Files/Global Data/setup_data.json", 'w', encoding='utf-8') as file:
+                            json.dump(bot_setup_data, file, ensure_ascii=False)
 
                         await interaction.response.edit_message(view=self, embed=test_embed)
 
                     @discord.ui.button(style=discord.ButtonStyle.grey, label="Vérifier", custom_id="step_1", disabled=True)
                     async def button_step_1_callback(self, interaction: discord.Interaction, button):
-
                         bot_member = client.user.name
 
                         highest_role = interaction.guild.roles[-1].name
 
                         if highest_role != bot_member:
-                            print(highest_role)
-                            print(bot_member)
-                            print("Bot's role is not on top of the role list.")
-                            test_embed.description = f"Le bot n'est pas en haut de la liste !\n\nVeuillez réessayer..."
+                            test_embed.description = f"Le bot n'est pas en haut de la liste des rôles !\n\nVeuillez réessayer..."
 
                             for entry in bot_setup_data:
                                 if entry.get("Guild Name") == guild_name:
@@ -1343,7 +1348,7 @@ async def setup(interaction: discord.Interaction):
                                     break  # Exit loop once the entry is found and updated
                         elif highest_role == bot_member:
                             test_embed.title = "2/4 Configuration du bot"
-                            test_embed.description = "Veuillez cliquer sur le bouton ci-dessous puis envoyer un salon."
+                            test_embed.description = "Cliquez sur le bouton ci-dessous pour sélectionner le salon par défaut du bot.\n\nEnsuite, suivez les instructions pour terminer la configuration."
 
                             step_1_button = self.children[1]
                             step_1_button.disabled = True
@@ -1360,13 +1365,12 @@ async def setup(interaction: discord.Interaction):
                                     break  # Exit loop once the entry is found and updated  
 
                         # Write the updated bot_setup_data to the JSON file
-                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
-                            json.dump(bot_setup_data, file)
+                        with open("JSON Files/Global Data/setup_data.json", 'w', encoding='utf-8') as file:
+                            json.dump(bot_setup_data, file, ensure_ascii=False)
                         await interaction.response.edit_message(view=self, embed=test_embed)
 
                     @discord.ui.button(style=discord.ButtonStyle.grey, label="Choisir un salon", custom_id="step_2", disabled=True)
                     async def button_step_2_callback(self, interaction: discord.Interaction, button):
-                        print("Step 2")
                         class Feedback(discord.ui.Modal, title="Choix du salon"):
                             channel_get_name = discord.ui.TextInput(
                                 label="Salon",
@@ -1382,43 +1386,50 @@ async def setup(interaction: discord.Interaction):
                                 choosen_channel_global_info = discord.utils.get(guild.channels, name=choosen_channel)
 
                                 if choosen_channel_global_info is None or not isinstance(choosen_channel_global_info, discord.TextChannel):
-                                    print(f"**Opération annulée. Le salon spécifié est invalide.** :x:")
-                                    test_embed.description = f"**Veuillez réessayer.\nLe salon spécifié est invalide.** :x:"
+                                    print(f"{printer_timestamp()} {interaction.guild.name} Le salon spécifié est invalide.")
+                                    test_embed.description = f"**Veuillez réessayer...**\n*Le salon spécifié est invalide !* :x:"
+
+                                    for entry in bot_setup_data:
+                                     if entry.get("Guild Name") == guild.name:
+                                        entry["Status"] = f"Choosen channel Error"
+                                        entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
+                                        break  # Exit loop once the entry is found and updated
+
+
                                 else:
                                     choosen_channel_id = int(choosen_channel_global_info.id)
-                                    print(choosen_channel_id)
-
-                                if choosen_channel_global_info and isinstance(choosen_channel_global_info, discord.TextChannel):
-                                    print(f"User provided a valid channel: {choosen_channel_global_info.mention}")
+                                    print(f"{printer_timestamp()} User provided a valid channel: {choosen_channel_global_info.name}")
                                     # Iterate over each entry in the setup data
+
                                     for entry in bot_setup_data:
-                                     guild_id = entry["Guild Id"]
-                                     guild_name = entry["Guild Name"]
-                                     news_role_id = entry["Created Role Id"]
-                                     channel_id = entry["Choosen Channel Id"]
-                                     autorole_mesage_id = entry["Autorole Mesage Id"]
+                                     if entry["Guild Id"] == interaction.guild.id:
+                                      guild_id = entry["Guild Id"]
+                                      guild_name = entry["Guild Name"]
+                                      news_role_id = entry["Created Role Id"]
+                                      channel_id = entry["Choosen Channel Id"]
+                                      autorole_mesage_id = entry["Autorole Mesage Id"]
+                                      if autorole_mesage_id == "":
+                                       print("no data for message")
 
-                                     if autorole_mesage_id == "":
-                                      continue
+                                      else:
+                                        # Find the guild object
+                                        if guild_name == guild.name:
+                                         guild = client.get_guild(guild_id)
+                                        if guild is None:
+                                         print(f"{printer_timestamp()} Guild with ID {guild_id} not found.")
+                                         continue
 
-                                     # Find the guild object
-                                     guild = client.get_guild(guild_id) #Probleme , salon choisi est different , bot trouve pas message, mauvais salon , meme problleme on_startup
-                                     if guild is None:
-                                      print(f"Guild with ID {guild_id} not found.")
-                                      continue
-
-                                     # Find the channel object
-                                     channel = guild.get_channel(channel_id)
-                                     if channel is None:
-                                      print(f"Channel with ID {channel_id} not found in guild {guild.name}.")
-                                      continue
+                                        # Find the channel object
+                                        channel = guild.get_channel(channel_id)
+                                        if channel is None:
+                                         print(f"{printer_timestamp()} Channel with ID {channel_id} not found in guild {guild.name}.")
+                                         continue
       
-                                     # Find the mesage object
-                                     old_mesage = await channel.fetch_message(autorole_mesage_id)
-                                     if old_mesage is None:
-                                        print(f"Message with ID {autorole_mesage_id} not found in guild {guild.name}.")
-                                     else:    
-                                      await old_mesage.delete()
+                                        try:
+                                          old_mesage = await channel.fetch_message(autorole_mesage_id)
+                                          await old_mesage.delete()
+                                        except:
+                                           print(f"{printer_timestamp()} The old autorole message was not found in channel {channel_id} in guild {guild_id}")  
 
 
                                     for entry in bot_setup_data:
@@ -1440,30 +1451,17 @@ async def setup(interaction: discord.Interaction):
                                     step_3_button.style = discord.ButtonStyle.blurple
 
                                     test_embed.title = f"3/4 Configuration du bot"
-                                    test_embed.description = f"Cliquez sur le bouton ci-dessous pour créer un rôle pour être informé des modifications du bot."
-
-                                else:
-                                    print(f"**Veuillez réessayer. Le canal spécifié est invalide.** :x:")
-
-                                    test_embed.description = f"**Veuillez réessayer\nLe salon spécifié est invalide.** :x:"
-
-                                    for entry in bot_setup_data:
-                                        if entry.get("Guild Name") == guild_name:
-                                            entry["Status"] = f"Choosen channel Error"
-                                            entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
-                                            break  # Exit loop once the entry is found and updated
+                                    test_embed.description = f"Cliquez sur le bouton ci-dessous pour créer un rôle.\n\nCe rôle vous permettra de recevoir des notifications concernant les modifications apportées au bot."
 
                                 await interaction.response.edit_message(view=self, embed=test_embed)
                                 # Write the updated bot_setup_data to the JSON file
-                                with open("JSON Files/Global Data/setup_data.json", 'w') as file:
-                                    json.dump(bot_setup_data, file)
+                                with open("JSON Files/Global Data/setup_data.json", 'w', encoding='utf-8') as file:
+                                    json.dump(bot_setup_data, file, ensure_ascii=False)
 
                         await interaction.response.send_modal(Feedback())
 
                     @discord.ui.button(style=discord.ButtonStyle.grey, label="Créer", custom_id="step_3", disabled=True)
-                    async def button_step_3_callback(self, interaction: discord.Interaction, button):
-                        print("Step 3")
-                        
+                    async def button_step_3_callback(self, interaction: discord.Interaction, button):        
                         role_name = "Arabot News"
 
                         global existing_role
@@ -1474,7 +1472,7 @@ async def setup(interaction: discord.Interaction):
                             global arabot_notif_role
 
                             arabot_notif_role = await interaction.guild.create_role(name="Arabot News", hoist=False, mentionable=True, color=discord.Color.from_rgb(245, 138, 66))
-                            print("arabot notif role has been created!")
+                            print(f"{printer_timestamp()} Arabot notif role has been created in guild {interaction.guild.name}!")
 
                             global arabot_notif_role_id
                             arabot_notif_role_id = arabot_notif_role.id
@@ -1486,11 +1484,11 @@ async def setup(interaction: discord.Interaction):
                                     entry["Created Role Id"] = arabot_notif_role.id
                                     break  # Exit loop once the entry is found and updated
                         else:
-                            print(f"Role '{role_name}' already exists!")
+                            print(f"{printer_timestamp()} Arabot notif role already exists in guild {interaction.guild.name}!")
 
                             for entry in bot_setup_data:
                                 if entry.get("Guild Name") == guild_name:
-                                    entry["Status"] = "Existing News Role Finished"
+                                    entry["Status"] = "News Role Finished"
                                     entry["Timestamp"] = datetime.now(france_tz).strftime("%Y-%m-%d %H:%M:%S")
                                     break  # Exit loop once the entry is found and updated
 
@@ -1505,18 +1503,16 @@ async def setup(interaction: discord.Interaction):
                         step_4_button.style = discord.ButtonStyle.blurple
 
                         test_embed.title = f"4/4 Configuration du bot"
-                        test_embed.description = f"Vous y êtes presque !\n\nSi vous avez des questions ou simplement besoin d'aide, n'hésitez pas à rejoindre le [serveur support](https://discord.com/invite/uGWkqYazzw)."
+                        test_embed.description = f"Vous y êtes presque !\n\nSi vous avez des questions ou simplement besoin d'aide, n'hésitez pas à rejoindre le [serveur support](https://discord.com/invite/uGWkqYazzw). 🛠️🤝"
 
                         await interaction.response.edit_message(view=self, embed=test_embed)
 
                         # Write the updated bot_setup_data to the JSON file
-                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
-                            json.dump(bot_setup_data, file)
+                        with open("JSON Files/Global Data/setup_data.json", 'w', encoding='utf-8') as file:
+                            json.dump(bot_setup_data, file, ensure_ascii=False)
 
                     @discord.ui.button(style=discord.ButtonStyle.grey, label="Ok", custom_id="step_4", disabled=True)
                     async def button_step_4_callback(self, interaction: discord.Interaction, button):
-                        print("Step 4")
-
                         # Give Role Embed
                         give_role_embed = discord.Embed(
                             title="**Auto Rôle**",
@@ -1562,12 +1558,14 @@ async def setup(interaction: discord.Interaction):
                             description= "",
                             color=discord.Color.from_rgb(252, 165, 119),
                         )
-                        setup_modification_recap.add_field(name="", value=f"Le salon par défaut du bot est désormais le salon {choosen_channel_global_info.mention}.", inline=True)
+                        setup_modification_recap.add_field(name="", value=f"-Le salon par défaut du bot est désormais le salon {choosen_channel_global_info.mention}.", inline=True)
 
                         if not existing_role:
-                            setup_modification_recap.add_field(name="", value=f"Le rôle ***{arabot_notif_role.name}*** a été créé.", inline=False)
+                            setup_modification_recap.add_field(name="", value=f"-Le rôle ***{arabot_notif_role.name}*** a été créé.", inline=False)
                         else:
-                            setup_modification_recap.add_field(name="", value=f"Le rôle ***{arabot_notif_role.name}*** existait déjà sur le serveur, il n'a donc pas été créé à nouveau.", inline=False)
+                            setup_modification_recap.add_field(name="", value=f"-Le rôle ***{arabot_notif_role.name}*** existait déjà sur le serveur, il n'a donc pas été créé à nouveau.", inline=False)
+
+                        setup_modification_recap.add_field(name="", value=f"-Un systeme d'autorôle a été envoyé dans le salon configuré. *({choosen_channel_global_info.name})*", inline=True) 
 
                         setup_modification_recap.set_author(name= interaction.user.global_name, icon_url= interaction.user.avatar.url)
 
@@ -1596,13 +1594,11 @@ async def setup(interaction: discord.Interaction):
 
                         await interaction.response.edit_message(view=None, embed=test_embed)
                         # Write the updated bot_setup_data to the JSON file
-                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
-                            json.dump(bot_setup_data, file)
+                        with open("JSON Files/Global Data/setup_data.json", 'w', encoding='utf-8') as file:
+                            json.dump(bot_setup_data, file, ensure_ascii=False)
 
                     @discord.ui.button(style=discord.ButtonStyle.red, label="Annuler", custom_id="cancel", disabled=False)
                     async def button_right_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-                        print("cancel")
-
                         test_embed.title = ""
                         test_embed.description = "**Configuration Annulée !**"
 
@@ -1613,8 +1609,8 @@ async def setup(interaction: discord.Interaction):
                           break  # Exit loop once the entry is found and updated
 
                                                 # Write the updated bot_setup_data to the JSON file
-                        with open("JSON Files/Global Data/setup_data.json", 'w') as file:
-                            json.dump(bot_setup_data, file)
+                        with open("JSON Files/Global Data/setup_data.json", 'w', encoding='utf-8') as file:
+                            json.dump(bot_setup_data, file, ensure_ascii=False)
 
                         await interaction.response.edit_message(view=None, embed=test_embed)
 
@@ -1732,22 +1728,36 @@ async def explosion_command(interaction: discord.Interaction):
                 if explosion_command_avalaible == False:
                     await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
                 else:
-                    try:
+                    #
+                    # Open the JSON file and read its contents
+                    with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
+                     data = json.load(file)
+
+                    # Iterate over each entry in the setup data
+                    for entry in data:
+                     guild_id = entry["Guild Id"]
+
+                    if interaction.guild.id != guild_id:
+                     await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
+
+                    else:
+                    
+                     try:
                         with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'r') as f:
                             explosion_command_cooldown = json.load(f)
-                    except FileNotFoundError:
+                     except FileNotFoundError:
                         explosion_command_cooldown = {}
 
-                    # Check for cooldown
-                    guild_id = str(interaction.guild_id)
+                     # Check for cooldown
+                     guild_id = str(interaction.guild_id)
 
-                    if guild_id not in explosion_command_cooldown:
+                     if guild_id not in explosion_command_cooldown:
                         explosion_command_cooldown[guild_id] = 0
 
-                    current_time = time.time()
-                    cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
+                     current_time = time.time()
+                     cooldown_time = 5 * 24 * 60 * 60  # Cooldown time set to 5 days in seconds
 
-                    if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
+                     if current_time - explosion_command_cooldown[guild_id] <= cooldown_time:
                         # Server is on cooldown, inform users
                         remaining_time_seconds = int(cooldown_time - (current_time - explosion_command_cooldown[guild_id]))
 
@@ -1762,23 +1772,22 @@ async def explosion_command(interaction: discord.Interaction):
                         await interaction.response.send_message(f"Veuillez attendre {remaining_time_formatted} avant de refaire exploser ce serveur... :hourglass_flowing_sand:", ephemeral=True)
                         return
 
-                    explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
+                     explosion_command_cooldown[guild_id] = current_time  # Update the cooldown time for the server
 
-                    user_id = interaction.user.id
-                    command_name = interaction.data['name']
-                    command_id = interaction.data['id']
-                    guild_name = interaction.guild.name
-                    TGA25_ID = "845327664143532053"
-                    USER_DM = await client.fetch_user(TGA25_ID)
+                     user_id = interaction.user.id
+                     command_name = interaction.data['name']
+                     command_id = interaction.data['id']
+                     guild_name = interaction.guild.name
+                     USER_DM = await client.fetch_user(TGA25_ID)
 
-                    try:
+                     try:
                         if maintenance_mode:
                             await interaction.response.send_message(embed=maintenance_embed, ephemeral=True)
                             return
                         await interaction.response.send_message(content="Sélectionnez une force d'explosion :",
                                                                  view=ButtonView_explosion_command(), embed=explosion_force_embed)
 
-                    except Exception as e:
+                     except Exception as e:
                         error_dminfo_embed = discord.Embed(
                             title="**:red_circle: Une erreur est survenue sur l'un des serveurs :red_circle: **",
                             description=f"**Erreur causée par** <@{user_id}>",
@@ -1796,8 +1805,8 @@ async def explosion_command(interaction: discord.Interaction):
                         await USER_DM.send(embed=error_dminfo_embed)
                         await interaction.response.send_message(embed=error_embed, ephemeral=True)
 
-                    # Save the updated server cooldown data to the JSON file
-                    with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
+                     # Save the updated server cooldown data to the JSON file
+                     with open("JSON Files/Explosion_Command_Data/explosion_command_cooldown.json", 'w') as f:
                         json.dump(explosion_command_cooldown, f)
 
 
@@ -1827,14 +1836,26 @@ async def vol_command(interaction: discord.Interaction, user: discord.Member):
          if not is_tos_accepted:
             await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
          else:
-            if vol_command_avalaible == False:
+            # Open the JSON file and read its contents
+            with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
+             data = json.load(file)
+
+            # Iterate over each entry in the setup data
+            for entry in data:
+             guild_id = entry["Guild Id"]
+
+            if interaction.guild.id != guild_id:
+             await interaction.response.send_message("Le bot n'a pas été configuré ! Faites `/support`.", ephemeral=True)
+
+            else:
+                    
+             if vol_command_avalaible == False:
                 await interaction.response.send_message(embed=unavaileble_command_embed, ephemeral=True)
-            elif vol_command_avalaible == True:
+             elif vol_command_avalaible == True:
                 user_id = interaction.user.id
                 command_name = interaction.data['name']
                 command_id = interaction.data['id']
                 guild_name = interaction.guild.name
-                TGA25_ID = "845327664143532053"
                 USER_DM = await client.fetch_user(TGA25_ID)
 
                 try:
@@ -1999,7 +2020,6 @@ async def embed_command(interaction: discord.Interaction):
             command_name = interaction.data['name']
             command_id = interaction.data['id']
             guild_name = interaction.guild.name
-            TGA25_ID = "845327664143532053"
             USER_DM = await client.fetch_user(TGA25_ID)
 
             if maintenance_mode:
@@ -2061,7 +2081,6 @@ async def embed_command(interaction: discord.Interaction):
             command_name = interaction.data['name']
             command_id = interaction.data['id']
             guild_name = interaction.guild.name
-            TGA25_ID = "845327664143532053"
             USER_DM = await client.fetch_user(TGA25_ID)
 
             if maintenance_mode:
@@ -2127,7 +2146,6 @@ async def dev_info_command(interaction: discord.Interaction):
             user_id = interaction.user.id
             command_id = interaction.data['id']
             guild_name = interaction.guild.name
-            TGA25_ID = "845327664143532053"
             USER_DM = await client.fetch_user(TGA25_ID)
 
             try:
@@ -2387,7 +2405,7 @@ async def explosion_command_system(interaction: discord.Interaction):
                 await default_channel.send(content=f"@hee ! Rejoignez le salon <#{refuge_channel_id}> !")
             elif fallback_channel:
                 print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Message sending to fallback channel: {fallback_channel.name} ({fallback_channel.id})")
-                await fallback_channel.send(content=f"@her ! Rejoignez le salon <#{refuge_channel_id}> !")
+                await fallback_channel.send(content=f"@here ! Rejoignez le salon <#{refuge_channel_id}> !")
 
             # Create an Embed for the 'Refuge' channel
             explosion_refuge_embed = discord.Embed(
@@ -2417,7 +2435,7 @@ async def explosion_command_system(interaction: discord.Interaction):
             refuge_embed_message = await refuge_channel.send(embed=explosion_refuge_embed)
 
             # Pause for a moment
-            await asyncio.sleep(5)
+            await asyncio.sleep(10)
 
             print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion Started !")
 
@@ -2435,7 +2453,7 @@ async def explosion_command_system(interaction: discord.Interaction):
                 continue
              try:
                 # Send "aaa" in separate messages to the text channel
-                delay = random.uniform(0.3, 1.3)
+                delay = random.uniform(0.3, 1.5)
                 await channel.send(explosion_message_content)
                 await asyncio.sleep(delay)
 
@@ -2766,11 +2784,11 @@ async def explosion_command_system(interaction: discord.Interaction):
         # Delete the 'Explosion' role
         await explosion_role.delete()
         print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} Explosion role deleted !")
-        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} \033[92mThe explosion command system has been succesfully finished !\033[92m")
+        print(f"{printer_timestamp()} {interaction.guild.name} {interaction.guild.id} \033[92mThe explosion command system has been succesfully finished ![92m\033")
 
 
     except Exception as global_explosion_system_error:
-        print(global_explosion_system_error)
+        print(f"{printer_timestamp()} An error has occured during the explosion system : {global_explosion_system_error}")
         pass
 
 
