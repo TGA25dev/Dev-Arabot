@@ -357,7 +357,7 @@ def generate_current_time_timestamp():
 
 @client.event
 async def on_message(message):
-    couscous_trigger_pattern = re.compile(r"\b(?:tajine|couscous)\b", re.IGNORECASE)
+    couscous_trigger_pattern = re.compile(r"\b(?:tajine|couscous|tajin)\b", re.IGNORECASE)
     greeting_trigger_pattern = re.compile(r"\b(?:hi|hello|salut|bonjour|hey|helo|salu|salutation|salutations|coucous|coucou)\b", re.IGNORECASE)
 
     # Make sure the bot doesn't respond to its own messages
