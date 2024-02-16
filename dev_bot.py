@@ -396,11 +396,11 @@ async def on_guild_join(guild):
 
     welcome_embed.add_field(name="", value="", inline=False)
 
-    welcome_embed.add_field(name="", value=f"Je suis un bot français mais avec quelques origines...\nJe possède plusieurs commandes, toutes visibles avec la commande </help:{help_command_id}>.", inline=False)
+    welcome_embed.add_field(name="", value=f"Je possède plusieurs commandes, toutes visibles avec la commande </help:{help_command_id}>.", inline=False)
 
     welcome_embed.add_field(name="", value="", inline=False)
 
-    welcome_embed.add_field(name="", value=f"**Avant de pouvoir m'utiliser merci de faire </setup:{setup_command_id}> pour lire les conditions d'utilisations et me configurer :smile:**", inline=False)
+    welcome_embed.add_field(name="", value=f"**Avant de pouvoir m'utiliser merci de faire </setup:{setup_command_id}> ainsi que </conditions:{conditions_command_id}>**", inline=False)
     welcome_embed.set_footer(text=version_note)
 
     # Check if the guild has already received the welcome message
