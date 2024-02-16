@@ -358,7 +358,7 @@ def generate_current_time_timestamp():
 @client.event
 async def on_message(message):
     couscous_trigger_pattern = re.compile(r"\b(?:tajine|couscous)\b", re.IGNORECASE)
-    greeting_trigger_pattern = re.compile(r"\b(?:hi|hello|salut|bonjour|hey|helo|salu|salutation|salutations)\b", re.IGNORECASE)
+    greeting_trigger_pattern = re.compile(r"\b(?:hi|hello|salut|bonjour|hey|helo|salu|salutation|salutations|coucous|coucou)\b", re.IGNORECASE)
 
     # Make sure the bot doesn't respond to its own messages
     if message.author == client.user:
@@ -367,7 +367,7 @@ async def on_message(message):
     # Check if any trigger word is present in the message content
     if couscous_trigger_pattern.search(message.content):
         # Add a reaction for couscous trigger
-        await message.add_reaction("<:logo_python_arabot:1108367929457791116>")
+        await message.add_reaction("<:couscous:1208069557860962384>")
 
     elif greeting_trigger_pattern.search(message.content):
         # Add a reaction for greeting trigger
