@@ -1,5 +1,6 @@
 import discord
 from discord import app_commands
+from discord.ext import tasks
 from datetime import datetime
 from datetime import timedelta
 import pytz
@@ -54,7 +55,7 @@ for entry in data:
  share_couscous_command_id = entry["share_couscous_command_id"]
  server_info_command_id = entry["server_info_command_id"]
  support_command_id = entry["support_command_id"]
-
+ invite_command_id = entry["invite_command_id"]
 
 #PATH
 
@@ -124,8 +125,25 @@ asyncio.run(check_shutdown_file())
 
 is_ready = False
 
+# Function to read the value of first_use_msg from a file
+def read_first_use_msg():
+    if os.path.exists("first_use_msg.txt"):
+        with open("first_use_msg.txt", "r") as file:
+            return file.read().strip() == "True"
+    else:
+        return False
+
+# Function to write the value of first_use_msg to a file
+def write_first_use_msg(value):
+    with open("first_use_msg.txt", "w") as file:
+        file.write(str(value))
+
+# Initialize first_use_msg by reading its value from the file
+first_use_msg = read_first_use_msg()
+
 @client.event
 async def on_ready():
+    global first_use_msg  # Declare first_use_msg as global within the function
     await client.wait_until_ready()
     print(f"{printer_timestamp()} Bot ready !")
 
@@ -157,6 +175,11 @@ async def on_ready():
 
         asyncio.create_task(twitch_loop())
         print(f"{printer_timestamp()} Twitch loop has been corectly created ! ")
+
+        async def start_update_timestamp():
+         await update_timestamp_message.start()
+
+        asyncio.create_task(start_update_timestamp())
 
         # Open the JSON file and read its contents
         with open("JSON Files/Global Data/setup_data.json", 'r', encoding='utf-8') as file:
@@ -322,6 +345,8 @@ async def on_ready():
 
        
 
+
+
 #BOT DISCONECT EVENT HANDLING
 
 @client.event
@@ -341,7 +366,10 @@ async def on_disconnect():
 #VARIABLES         
 restart_time = datetime.now()
 tree = app_commands.CommandTree(client)
+
+
 maintenance_mode = False
+
 france_tz = pytz.timezone(timezone)
 version_note = f"{bot_mode_def} {version_note_text}"
 default_bot_nick = f"{bot_mode_def} {default_bot_nick_text}"
@@ -350,6 +378,26 @@ def generate_current_time_timestamp():
    discord_current_time = datetime.now(france_tz)
    current_time_timestamp = int(discord_current_time.timestamp())
    return current_time_timestamp
+
+
+@tasks.loop(seconds=30)
+async def update_timestamp_message():
+    # Get the channel and message ID where you want to edit the timestamp
+    channel_id = 1209817387021373482  # Replace YOUR_CHANNEL_ID with the actual channel ID
+    message_id = 1209820609865977876  # Replace YOUR_MESSAGE_ID with the actual message ID
+
+    # Fetch the channel and message objects
+    channel = client.get_channel(channel_id)
+    if channel:
+        message = await channel.fetch_message(message_id)
+        if message:
+            # Edit the message content with the current timestamp
+            await message.edit(content=f"Current timestamp: <t:{generate_current_time_timestamp()}:F>")
+
+# Error handling
+@update_timestamp_message.error
+async def update_timestamp_message_error(error):
+    print(f"An error occurred in the update_timestamp_message task: {error}")
 
 
 
@@ -454,6 +502,8 @@ help_embed.add_field(name=f"</devinfo:{dev_info_command_id}>", value="Affiche de
 help_embed.add_field(name=f"</info-serveur:{server_info_command_id}>", value="Affiche des informations sur ce serveur", inline=False)
 
 help_embed.add_field(name=f"</support:{support_command_id}>", value="Besoin d'aide ? Rejoignez le serveur support !", inline=False)
+
+help_embed.add_field(name=f"</inviter:{invite_command_id}>", value="Invitez le bot sur votre serveur !", inline=False)
 
 help_embed.add_field(name=f"</help:{help_command_id}>", value="Affiche ceci", inline=False)
 
@@ -663,7 +713,13 @@ class ButtonView_settings(discord.ui.View):
                 await confirm_response.delete()
         
         except asyncio.TimeoutError:
-            await interaction.edit_original_response(content="***Temps écoulé.*** Veuillez réessayer. :alarm_clock:")    
+            await interaction.edit_original_response(content="***Temps écoulé.*** Veuillez réessayer. :alarm_clock:")
+
+    @discord.ui.button(style=discord.ButtonStyle.primary, label="Activer Message de Timestamp", custom_id="button_enable_timestamp", emoji="⏰")
+    async def button_timestamp_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+                  #
+                  channel = client.get_channel(1209817387021373482)
+                  await channel.send(content="Message")
         
 
     @discord.ui.button(style=discord.ButtonStyle.primary, label="Réinitialiser le profil", custom_id="button_reset", emoji="🔄")
@@ -915,40 +971,7 @@ class ButtonView_setup_tos(discord.ui.View):
 
 #SELECT VIEWS  
 
-class TESTSelectMenu(discord.ui.View):
-    def __init__(self, roles):
-        super().__init__(timeout=None)
-
-        
-       
-        self.roles = roles
-
-        # Create a select dropdown with role options
-        self.select = discord.ui.Select(placeholder="Select a role", options=[
-                discord.SelectOption(label=role.name, value=str(role.id)) for role in roles
-        ])
-            
-        # Add the select dropdown to the view
-        self.add_item(self.select)
-
-       
-
-    async def select_callback(self, component: discord.ui.Select):
-        selected_role_id = int(component.values[0])
-        selected_role = discord.utils.get(self.roles, id=selected_role_id)
-
-        if selected_role:
-            # Perform actions with the selected role
-            print(f"You have selected role {selected_role}.")
-        else:
-            print("Error")
-
-
-
  #Select Admin Menu
-
-# Create the embed
-
 
 class AdminSelectMenu(discord.ui.View):
     def __init__(self):
@@ -1005,9 +1028,34 @@ class AdminSelectMenu(discord.ui.View):
 
 
 #COMMANDS
+         
+class ButtonView_invite(discord.ui.View):                
+          def __init__(self):
+            super().__init__(timeout=None)
+
+            super().add_item(discord.ui.Button(style=discord.ButtonStyle.link, label="Ajouter le bot", url="https://discord.com/oauth2/authorize?client_id=1067456101039214672&permissions=8&scope=bot"))
+
+@tree.command(name="inviter", description="Invitez le bot sur votre serveur")
+async def invite_command(interaction: discord.Interaction):
+            with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
+              loaded_data = json.load(json_file)
+
+            # Extract relevant data from loaded JSON using the specific guild ID
+            user_id = str(interaction.user.id)
+            user_data = loaded_data.get(user_id, {})
+            is_tos_accepted = loaded_data.get(user_id, {}).get("accepted_tos", False)
+
+            if not user_data:
+              await interaction.response.send_message(content="Faites `/conditions` et réessayez !",ephemeral=True)
+            else:
+              if not is_tos_accepted:    
+               await interaction.response.send_message(embed=tos_not_accepted_embed, ephemeral=True)
+
+              else:
+                 await interaction.response.send_message(content="Ajoutez le bot avec le bouton ci-dessous ou cliquez simplement [ici](https://discord.com/oauth2/authorize?client_id=1067456101039214672&permissions=8&scope=bot).", view=ButtonView_invite(), ephemeral=True)
 
 @tree.command(name="blague", description="Raconte une blague")
-async def test_command(interaction: discord.Interaction):
+async def joke_command(interaction: discord.Interaction):
             with open("JSON Files/Global Data/TOS_info_data.json", 'r') as json_file:
               loaded_data = json.load(json_file)
 
@@ -2235,9 +2283,10 @@ async def twitch_loop():
      await asyncio.sleep(15)
 
 
-#@tree.command(name="test", description="test_command")
-#async def test_command(interaction: discord.Interaction):
-#    print("test")
+@tree.command(name="test", description="test_command")
+async def test_command(interaction: discord.Interaction):
+    channel = client.get_channel(1209817387021373482)
+    channel.send(content="Message")
 
 async def explosion_command_system(interaction: discord.Interaction):
 

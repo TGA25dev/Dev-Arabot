@@ -3,7 +3,9 @@
 
 # Dev Arabot <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Sparkles.png" alt="Sparkles" width="25" height="25" />
 
-___Vous voulez pas m'aider à écrire une description ... ?___
+#### Le projet à été archivé le 25 Mars 2023 et est maintenant en lecture seule.
+
+___Un bot Discord qui n'aurait pas dû voir le jour...___
 
 ![Version](https://img.shields.io/badge/version-2.0-blue.svg?style=for-the-badge)
 [![Licence](https://img.shields.io/badge/License-CC_BY--NC--ND_4.0-green?style=for-the-badge)](./LICENSE)
