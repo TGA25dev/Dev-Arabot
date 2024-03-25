@@ -3,7 +3,7 @@
 
 # Dev Arabot <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Sparkles.png" alt="Sparkles" width="25" height="25" />
 
-#### The project was archived on March 25, 2023, and is now in read-only mode.
+#### The project was archived on March 25, 2024, and is now in read-only mode.
 
 ___A Discord Bot that should never had existed...___
 
